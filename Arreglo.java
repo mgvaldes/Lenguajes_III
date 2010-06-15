@@ -113,10 +113,9 @@ public class Arreglo extends Tipo {
     }
     
     public String toString() {
-	return "Arreglo";
-	//String m = new String(sub.toString());
-	//m = m.concat("[]");	
-	//return m;
+	String m = new String(sub.toString());
+	m = m.concat("[]");	
+	return m;
     }
 
     public void generateCode(Writer fd, int nextReg, String region, int offset, int ani) {};

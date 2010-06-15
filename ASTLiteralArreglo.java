@@ -92,7 +92,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	AssemblerInfo.saveReg(fd, nextReg + 1);
 	while (it.hasNext()) {
 	    ((ASTConst)it.next()).generateCode(fd, nextReg + 1, "", "");
-	    fd.write("mov [" + reg + " + " + offset + "], " + reg1 + "\n");
+	    fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");
 	    offset += tamBase;
 	}
 	AssemblerInfo.restoreReg(fd, nextReg + 1);

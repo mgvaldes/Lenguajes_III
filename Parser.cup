@@ -705,9 +705,7 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		     parser.declaration_error(i);
 		 
 		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);		 
-		 System.out.println(id.getState());
 		 id.update();
-		 System.out.println(id.getState());
 
 		 if (!id.check())
 		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());

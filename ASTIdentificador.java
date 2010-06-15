@@ -43,8 +43,9 @@ public class ASTIdentificador extends ASTExpresion {
     public void generateCode(Writer fd, int nextReg, String si, String no)  throws IOException {
 	try {	    
 	    String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
+	    Tipo aux_state = ((SymVar)getTable().getSym(getValue())).getState();
 
-	    if (state instanceof Basico) {
+	    if (aux_state instanceof Basico) {
                 if(getTable().getParent() == null)
                     fd.write("mov " + reg + ", [static + " + ((SymVar)getTable().getSym(getValue())).getOffset() + "]\n");
                 else
@@ -56,14 +57,18 @@ public class ASTIdentificador extends ASTExpresion {
 		    fd.write("jmp " + no + "\n");
 		}
 	    }
-	    else if (state instanceof Arreglo) {
-		if(getTable().getParent() == null)
-                    fd.write("mov " + reg + ", static + " + ((SymVar)getTable().getSym(getValue())).getOffset() + "\n");
-                else
-                    fd.write("mov " + reg + ", " + AssemblerInfo.getFp() + " - " + ((SymVar)getTable().getSym(getValue())).getOffset() + "\n");
+	    else if (aux_state instanceof Arreglo) {
+		if(getTable().getParent() == null) {
+                    fd.write("mov " + reg + ", static \n");
+		    fd.write("add " + reg + ((SymVar)getTable().getSym(getValue())).getOffset() + "\n");
+		}
+                else {
+		    fd.write("mov " + reg + ", " + AssemblerInfo.getFp() + "\n");	
+                    fd.write("sub " + reg + ", " + ((SymVar)getTable().getSym(getValue())).getOffset() + "\n");
+		}
 
 		if (acceso != null)
-		    acceso.generateCode(fd, nextReg, state);
+		    acceso.generateCode(fd, nextReg, aux_state);
 	    }
 	}
 	catch (IOException e) {

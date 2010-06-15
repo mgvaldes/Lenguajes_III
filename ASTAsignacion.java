@@ -74,10 +74,18 @@ public class ASTAsignacion extends ASTInstruccion {
 	    //En este registro esta calculada la expresion que se va a asignarx
             String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	    String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1);
+	    Tipo expr_state = new Basico(0); // Solo para inicializarlo
 
             if (expr != null) {		
 		if (!(expr instanceof ASTLiteralArreglo)) {
-		    if (expr.getState() instanceof Basico && ((Basico)expr.getState()).getNBasico() == 3) {
+		    if (expr instanceof ASTIdentificador) {
+			expr_state = ((SymVar)((ASTIdentificador)expr).getTable().getSym(expr.getValue())).getState();
+		    }
+		    else {
+			expr_state = expr.getState();
+		    }
+		    
+		    if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
 			expr.generateCode(fd, nextReg, si, no);
 			fd.write(si + ":\n");
 			fd.write("mov " + reg + ", 1\n");    
@@ -86,7 +94,7 @@ public class ASTAsignacion extends ASTInstruccion {
 			fd.write("mov " + reg + ", 0\n");    
 			fd.write(end + ":\n");
 		    }
-		    else if (expr.getState() instanceof Arreglo) {
+		    else if (expr_state instanceof Arreglo) {
 			expr.generateCode(fd, nextReg, si, no);		
 			fd.write("mov " + reg + ", [" + reg + "]\n");
 		    }
@@ -100,6 +108,8 @@ public class ASTAsignacion extends ASTInstruccion {
 
             ASTIdentificador id;
             ASTCast ct;
+	    int offset;
+	    Tipo aux_state;
 
             while(it.hasNext()) {
 
@@ -111,15 +121,16 @@ public class ASTAsignacion extends ASTInstruccion {
                     ct.generateCode(fd, nextReg, si, no);
                 }
 
-                int offset = ((SymVar)id.getTable().getSym(id.getValue())).getOffset();
+                offset = ((SymVar)id.getTable().getSym(id.getValue())).getOffset();
+		aux_state = ((SymVar)id.getTable().getSym(id.getValue())).getState();
 
-	        if (id.getState() instanceof Basico && expr != null) {
+	        if (aux_state instanceof Basico && expr != null) {
 		    if(id.getTable().getParent() == null)
 		        fd.write("mov [static + " + offset + "], " + reg + "\n");
 		    else
 		        fd.write("mov [" + AssemblerInfo.getFp() + " - " + offset + "], " + reg + "\n");
 	        }
-	        else if (id.getState() instanceof Arreglo) {	
+	        else if (aux_state instanceof Arreglo) {		    
 		    AssemblerInfo.saveReg(fd, nextReg + 1);
 
                     if (expr != null) { // Esto se verifica arriba.
@@ -146,8 +157,8 @@ public class ASTAsignacion extends ASTInstruccion {
                     //         fd.write("xor  rax, rax\n");
                     //         fd.write("call malloc\n");
                     //         fd.write("mov [static + " + offset + "], rax\n");
-                    //         fd.write("pop rdi\n");
-                    //         fd.write("pop rax\n");
+                    //         fd.write("pop rdi\n"); 
+                   //         fd.write("pop rax\n");
                     //     }
 
                     //     if (expr != null)

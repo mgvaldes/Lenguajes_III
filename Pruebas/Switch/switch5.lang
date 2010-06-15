@@ -1,0 +1,41 @@
+//Switch anidados
+//Salida: 23.
+
+int main{
+
+	int a = 3;
+	int b,d,e;
+
+        b = 1;
+
+	d = a*4 + 8;
+	e = 90;
+ 
+	switch (d) {
+		case 4:
+			for (int i = 0; i < 8; i++) {
+				a--;
+			}
+		case 20: 
+			bool x = false;
+			bool y;
+			switch (x) {
+				case true:
+					y = !x;
+					print 4;
+				case false:
+					print 23;
+					print '\n';
+				default:
+					y = x;
+					print 8;
+			}			
+		default:
+			if (true) {
+				b--;
+			}
+			else {
+				b++;
+			}
+	}
+}

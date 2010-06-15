@@ -1,0 +1,19 @@
+// Division y modulo
+// SALIDA: 2,1
+
+int main{
+
+  int a = 3;
+  int b = 7;
+
+  a = b/3;
+
+  print a;
+  print '\n';
+
+  a = b%3;
+
+  print a;
+  print '\n';
+
+}

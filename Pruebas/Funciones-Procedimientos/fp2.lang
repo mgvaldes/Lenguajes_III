@@ -1,0 +1,17 @@
+//Procedimiento ya declarado
+//Salida: Error
+
+void proc1(int a, int b)
+{
+  a = 2;
+}
+
+void proc1()
+{
+}
+
+
+
+int main
+{
+}

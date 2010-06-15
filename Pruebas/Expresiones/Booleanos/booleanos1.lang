@@ -1,0 +1,14 @@
+//Expresion simple
+//Salida: true
+
+int main{
+
+  bool a = true;
+  bool b = false;
+
+  a = a || b;
+
+  print a;
+  print '\n';
+
+}

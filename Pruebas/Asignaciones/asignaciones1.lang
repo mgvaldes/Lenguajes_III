@@ -1,0 +1,14 @@
+//Asignaciones a variables globales
+//Salida: 3,6.
+
+int a = 3;
+int b = a +3;
+
+int main
+{
+
+  print a;
+  print '\n';
+  print b;
+  print '\n';
+}

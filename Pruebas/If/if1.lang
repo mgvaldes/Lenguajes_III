@@ -1,0 +1,13 @@
+//Comprobar comparancion entre flotantes
+//Salida: Si se intrega 3.2 se imprime 3.2, sino nada.
+
+int main{
+
+  float a = 3.2;
+  float b = read float;
+
+  if( a == b){
+    print 'a';
+    print '\n';
+  }
+}

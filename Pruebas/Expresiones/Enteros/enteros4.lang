@@ -1,0 +1,17 @@
+// Expresion compleja
+// SALIDA: -22
+
+int main{
+
+  int a = 1;
+  int b = 2;
+  int c = 3;
+  int d = 4;
+
+  a = ((a+b)*c)/d + 4*((c%b)-d)*((a+b+c+d)/4);
+
+
+  print a;
+  print '\n';
+
+}

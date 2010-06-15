@@ -1,0 +1,22 @@
+//For anidados
+//Salida: Se imprime del 3 al 49 6 veces.
+
+int main{
+
+  int a, l, k, t;
+  int d;
+  int c;
+  bool b;
+  int m;
+
+
+  for(int i = 3; i<10; i++)
+  {
+    c = i;
+    for(c = 3; c<50; c++)
+    {
+      print c;
+      print '\n';
+    }
+  }
+}

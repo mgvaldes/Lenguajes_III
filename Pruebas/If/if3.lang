@@ -1,0 +1,21 @@
+//if con else
+//Salida: 2.
+
+int main{
+
+  int a = 3;
+  int d = 2;
+
+  if ((a == d) || false)
+  {
+   a++;
+  }
+  else
+  {
+    a--;
+  }
+
+  print a;
+  print '\n';
+
+}

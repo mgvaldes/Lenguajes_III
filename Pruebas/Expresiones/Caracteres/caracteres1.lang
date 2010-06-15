@@ -1,0 +1,11 @@
+//Expresion simple
+//Salida: a
+
+int main{
+
+  char a = 'a';
+
+  print a;
+  print '\n';
+
+}

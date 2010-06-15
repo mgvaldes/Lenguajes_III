@@ -1,0 +1,27 @@
+//While con if
+//Salida: 29 50s, 1 100, 29 80 y 19 1000.
+
+int main {
+	int a = 20;
+	
+	while ( a != 100 ) {
+               if(a<50){
+                   print 50;
+                   print '\n';
+               }
+               elif(a==50){
+                   print 100;
+                   print '\n';
+               }
+                elif(a<80){
+                    print 80;
+                    print '\n';
+               }
+               else{
+                    print 1000;
+                    print '\n';
+               }
+               a++;
+
+	}
+}

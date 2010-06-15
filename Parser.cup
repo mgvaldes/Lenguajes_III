@@ -1,0 +1,1769 @@
+import java_cup.runtime.*;
+import java.util.LinkedList;
+import java.util.Hashtable;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Stack;
+
+/* Preliminaries to use the scanner.  */
+scan with {: return lexer.next_token(); :};
+
+parser code {: 
+    
+    public SymTable anterior = null;
+    public SymTable actual = new SymTable(anterior);
+    public SymTable alias_anterior = null;
+    public SymTable alias_actual = new SymTable(alias_anterior);
+    public Stack piladesplazamiento = new Stack();
+    public Hashtable promesas = new Hashtable();
+    public Tipo tipoactual;
+    public Tipo tipoactualfun;
+    public int canBreak = 0;
+    public int anidamiento = -1;
+    public int desplazamiento = 0;
+    public int desplazamientoglobal = 0;
+    public int maxdesplazamiento = 0;
+    public boolean error = false;
+    public boolean literal = false;
+    public boolean syntaxErrors = false;
+    public boolean returning;
+    public boolean breaking;
+    public boolean inSwitch = false;
+    public boolean inFun = false;
+    public boolean inProc = false;
+    public boolean cambiada = false;
+    public boolean procDeclared = false;
+    public boolean promiseDeclared = false;
+    public ASTAcceso last;
+    public LinkedList in;
+    public LinkedList referencias  = new LinkedList();
+    public LinkedList procedimientos  = new LinkedList();
+    public LinkedList globales = new LinkedList();
+    public Lexer lexer;
+    public boolean printConst = false;
+
+    public Parser(Lexer lex) {
+	super(lex);
+	lexer = lex;
+    }
+
+    public void report_error(String message, Object info) {
+	syntaxErrors = true;
+	
+	System.out.print(message);
+	
+	if (!(info instanceof Symbol)) return;
+	Symbol symbol = (Symbol) info;
+	
+	if ((symbol.left < 0) || (symbol.right < 0)) return;
+	
+	System.out.println(" en la linea "+symbol.left+", columna "+symbol.right);
+    }
+
+    public ASTCast checkCast(Tipo t, ASTExpresion e) {
+        if (t == null) return null;
+
+        Tipo estate = e.getState();
+
+        if (estate == null) return null;
+
+        if (t.equals(new Basico(1)) && estate.equals(new Basico(2)))
+            return new ASTCast(null, new Basico(1));
+
+        if (t.equals(new Basico(2)) && estate.equals(new Basico(1)))
+            return new ASTCast(null, new Basico(2));
+
+        if (t.equals(new Basico(4)) && estate.equals(new Basico(1)))
+            return new ASTCast(null, new Basico(4));
+
+	return null;
+    }
+
+    public void warning(String msg) {
+	error = true;
+	System.out.println("Precaucion: "+msg+" en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".");
+    }
+    
+    public void custom_error(String msg) {
+	error = true;
+	System.out.println(msg+" en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".");
+    }
+    
+    public void crash_error(String msg) throws Exception {
+	report_fatal_error(msg+" en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".\n",null);
+    }
+    
+    public void type_declaration(String var) {
+	error = true;
+	System.out.println("Tipo "+var+" no declarado en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".");
+    }
+    
+    public void used_error(String var) throws Exception {
+	report_fatal_error("Variable "+var+" anteriormente declarada en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".\n",null);
+    }
+
+    public void declaration_error(String var) {
+	error = true;
+	System.out.println("Variable "+var+" no declarada en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".");
+    }
+    
+    public void type_error(Tipo t1, Tipo t2, String operacion) {
+	if(t1!=null) {
+	    error = true;
+	    if(t2 != null)
+		System.out.println("No puede "+operacion+" "+t1+" con "+t2+" en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".");
+	    else
+		System.out.println("No puede "+operacion+" con "+t1+" en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".");
+	}
+    }
+    
+    :}; 
+
+terminal INT, FLOAT, BOOL, BREAK, IF, ELIF, ELSE, SWITCH, CASE, DEFAULT, FOR;
+terminal WHILE, CONST, ASIG, EQ, PLUS, MINUS, PLUSPLUS, MINUSMINUS, MULT, DIV, MOD;
+terminal NOTEQ, LESS, MORE, MOREEQ, LESSEQ, OR, AND, NOT, DOSPUNTOS, SEQ, COMA, PARLEFT;
+terminal PARRIGHT, BRACKETLEFT, BRACKETRIGHT, CORLEFT, CORRIGHT, DOT, COMILLAS;
+terminal UMINUS, UNOT, VOID, REF, RETURN, MAIN, UNION, STRUCT, TYPEDEF, PRINT, READ;
+
+terminal Long NUM;
+terminal String  IDENTIFIER;
+terminal Boolean TRUE, FALSE;
+terminal String CHAR;
+non terminal ASTIf conif, listaelif;
+non terminal ASTSwitch listacase, conswitch;
+non terminal ASTWhile loopwhile;
+non terminal Tipo tipos,complejos, basicos, arreglos, struct, union, listadimension, voidfun;
+non terminal ASTBloque bloque, main;
+non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaconstantes, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor;
+non terminal ASTAsignacion declaracion, declaracionsimple, declaracionsimple1, declaracionsimple2, listaident, asignacion,asignacion2, declaasig;
+non terminal ASTAsignacionExpr asignacion1;
+non terminal ASTExpresion expresionarit, expresion, expresionliteral, literales;
+non terminal ASTAcceso acceso;
+non terminal ASTInstruccion instruccion, condicional;
+non terminal ASTInvocar llamadafuncion;
+non terminal String declaracionfuncion, declaracionprocedimiento;
+non terminal ASTConst constantes;
+non terminal Boolean referencia;
+non terminal SymTable programa;
+
+non terminal declaraciontypedef;
+non terminal listadeclaraciones, promesafuncion, promesaprocedimiento;
+
+/* Duda con respecto a si <,>,>=,<=,==,!= a su asociatividad */
+
+precedence right ASIG;
+precedence left AND, OR;
+precedence nonassoc EQ, NOTEQ;
+precedence nonassoc LESS, LESSEQ, MORE, MOREEQ;
+precedence left PLUS, MINUS;
+precedence left MULT, DIV, MOD;
+precedence nonassoc UMINUS, UNOT, MINUSMINUS, PLUSPLUS;
+
+programa ::= listadeclaraciones voidfun:t 
+             {: 
+               parser.procDeclared = true;
+	       parser.tipoactualfun = t; 
+	     :} 
+             main:m
+	     {:
+               Promesa p;
+               String iden;
+               for (Enumeration e = parser.promesas.keys() ; e.hasMoreElements() ;) {
+                 iden = (String)e.nextElement();
+                 p = (Promesa) parser.promesas.get(iden);
+                 if( !p.getHecha() )
+                   parser.custom_error("La promesa de "+iden+" no fue cumplida");
+               }
+
+               SymProc pro =new SymProc("main", t, null, null, m);
+               pro.setTamlocal(parser.maxdesplazamiento);
+               parser.actual.insert(pro, parser.anidamiento);
+
+               parser.procedimientos.add("main");
+
+	       RESULT = parser.actual;
+	     :}
+          ;
+
+voidfun ::= tipos:t {: RESULT = t; :}
+         |  VOID {: RESULT = new Basico(0); :}
+         ;
+
+listadeclaraciones ::= listadeclaraciones declaracion:d
+                       {:
+			if(parser.procDeclared || parser.promiseDeclared)
+			    parser.crash_error("Se tienen que declarar las variables globales y typedef antes de los procedimientos y funciones y sus promesas");
+			
+			parser.globales.add(d);
+                       :} SEQ
+		    |  listadeclaraciones declaraciontypedef
+                       {:
+			if(parser.procDeclared || parser.promiseDeclared)
+			    parser.crash_error("Se tienen que declarar las variables globales y typedef antes de los procedimientos y funciones y sus promesas");
+			:} SEQ
+                    |  listadeclaraciones promesafuncion SEQ
+                       {:
+                        if(parser.procDeclared)
+			  parser.crash_error("Se tienen que declarar las promesas antes de los procedimientos y funciones");
+                       :}
+                    |  listadeclaraciones declaracionfuncion:f
+                       {:
+			parser.procedimientos.add(f);
+			parser.procDeclared = true;
+                       :}
+                    |  listadeclaraciones promesaprocedimiento SEQ
+                       {:
+                        if(parser.procDeclared)
+			  parser.crash_error("Se tienen que declarar las promesas antes de los procedimientos y funciones");
+                       :}
+                    |  listadeclaraciones declaracionprocedimiento:p
+                       {:
+			parser.procedimientos.add(p);
+			parser.procDeclared = true;
+                       :}
+                    | /* lamda */
+                    ;
+
+main ::= MAIN bloque:b
+         {:
+	  RESULT = b;
+	 :}
+      ;
+
+listainstrucciones ::= listainstrucciones:l instruccion:i
+                       {: 
+                        if(!parser.returning && !parser.breaking) {
+			    if(i!=null) {
+				l.add(i); 				
+				i.update();
+				
+				if(i.getIreturn())
+				    parser.returning = true;
+				
+				if(i.getIbreak())
+				    parser.breaking = true;				
+			    }
+			}
+			else
+			    parser.warning("Código inalcanzable");
+			
+			RESULT =l;
+                       :}
+                    | listainstrucciones:l loopfor:f
+                       {: 
+
+                        if(!parser.returning && !parser.breaking) {
+                            l.add(f.getFirst());
+                            ASTInstruccion i = (ASTInstruccion) f.getLast();
+                            l.add(i);
+                            i.update();
+				
+                            if(i.getIreturn())
+                                parser.returning = true;
+				
+                            if(i.getIbreak())
+                                parser.breaking = true;				
+			}
+			else
+			    parser.warning("Código inalcanzable");
+			
+			RESULT =l;
+                       :}
+                    |  /* lamda */ {: RESULT = new LinkedList(); :}
+                    ;
+
+instruccion ::= declaracion:d SEQ {: RESULT = d; :}
+             |  declaraciontypedef SEQ
+             |  asignacion:a SEQ {: RESULT = a; :}
+             |  condicional:c {: RESULT = c; :}
+             |  loopwhile:l {: RESULT = l; :}      
+             |  PRINT {: parser.printConst = true; :} constantes:c SEQ
+                {:
+		 parser.printConst = false;
+		 RESULT = new ASTPrintConstante(c);
+                :}
+             |  PRINT IDENTIFIER:i acceso:a SEQ
+                {:
+		 Resultado r = parser.actual.exist(i);
+		 Tipo state = r.getTipo();
+		 ASTIdentificador iden = new ASTIdentificador(i, r.getTable(), a, state);
+
+		 if (state != null) {
+		     iden.update();
+		     
+		     if (!iden.check())
+			 parser.custom_error("Mal acceso al idenficicador "+i);
+		     
+		     if (!(state instanceof Basico))
+			 parser.custom_error("Solo se puede imprimir tipos basico");
+		 } 
+		 else 
+		     parser.declaration_error(i);
+		 
+		 RESULT = new ASTPrintIdentificador(iden);
+                :}
+             |  BREAK SEQ
+                {:
+		 if (parser.canBreak == 0)
+		     parser.custom_error("Sólo los puede usar \"break\" en los ciclos");
+		 
+		 ASTInstruccion i = new ASTInstruccion("break");
+		 i.setIbreak(true);
+		 RESULT = i;
+                :}
+             |  llamadafuncion:i SEQ {: RESULT = i; :}
+             |  RETURN SEQ
+                {:
+		 ASTInstruccion i = new ASTInstruccion("return");
+		 i.setIreturn(true);
+		 
+		 Tipo t = parser.tipoactualfun;
+		 
+		 if(!(t instanceof Basico) && ((Basico) t).getNBasico() != 0)
+		     parser.custom_error("Tiene que retornar un "+t);
+                   
+		 RESULT = i;
+                :}
+             |  RETURN expresion:e SEQ 
+                {:
+		 ASTInstruccion i = new ASTInstruccion("return");
+		 i.setIreturn(true);
+		 
+		 Tipo t = parser.tipoactualfun;
+		 
+		 if (!t.equals(e.getState()))
+		     parser.custom_error("Tiene que retornar un "+t);
+
+		 RESULT = i;
+                :}
+             ;
+
+declaracion ::= CONST tipos:t declaracionsimple:l 
+                {:
+                 ASTIdentificador i;
+		 SymVar s;
+		 Iterator it = l.getIds().iterator();		 
+		 ASTExpresion e = l.getExpr();
+		 Tipo res = null;
+		 
+		 if(e == null)
+		     parser.custom_error("Tiene que asignarle un valor a la variable(s) que son constantes");
+		 else {		     
+		     if(parser.literal) {
+			 e.setState(t);
+			 e.update();
+			 if(!e.check())
+			     parser.custom_error("Error inicializando el literal");
+			 
+			 parser.literal = false;
+                     }
+
+		     res = t.asign(e.getState());
+
+		     if (res == null)
+			 parser.type_error(t,e.getState(),"asignar");
+	             else
+			 l.getCasts().add(parser.checkCast(t, e));
+		 }
+                   
+		 while(it.hasNext()) {
+		     i = (ASTIdentificador) it.next();
+		     i.setState(t);
+		     
+                     if(!parser.procDeclared && !parser.promiseDeclared) {
+			 s = new SymVar(i.getValue(), t, true, parser.desplazamientoglobal);
+			 parser.desplazamientoglobal += t.getTam();
+                     }
+                     else {
+			 s = new SymVar(i.getValue(), t, true, parser.desplazamiento);
+			 parser.desplazamiento += t.getTam();
+                     }
+		     
+		     if (!parser.actual.insert(s, parser.anidamiento))
+			 parser.used_error(i.getValue());                     
+		 }
+
+                 l.setIsDeclaration(true);		 
+		 RESULT = l;
+                :}
+             |  tipos:t declaracionsimple:l 
+                {: 
+                 ASTIdentificador i;
+		 SymVar s;		
+		 Iterator it = l.getIds().iterator();		 
+		 ASTExpresion e = l.getExpr();
+		 Tipo res = null;
+		 
+		 if (e != null) {
+                    if(parser.literal) {
+			e.setState(t);
+			e.update();
+			if(!e.check())
+			    parser.custom_error("Error inicializando el literal");
+			
+			parser.literal = false;
+		    }
+		    
+		    res = t.asign(e.getState());
+		    
+		    if(res == null)
+			parser.type_error(t,e.getState(),"asignar");
+		    else
+			l.getCasts().add(parser.checkCast(t, e));
+		 }                   
+		 
+		 while(it.hasNext()) {
+		     i = (ASTIdentificador) it.next();
+		     i.setState(t);
+		     
+                     if(!parser.procDeclared && !parser.promiseDeclared) {
+			 s = new SymVar(i.getValue(), t, false, parser.desplazamientoglobal);
+			 parser.desplazamientoglobal += t.getTam();
+                     }
+                     else {
+			 s = new SymVar(i.getValue(), t, false, parser.desplazamiento);
+			 parser.desplazamiento += t.getTam();
+                     }
+
+		     if (!parser.actual.insert(s, parser.anidamiento))
+			 parser.used_error(i.getValue());                     
+		 }
+
+                 l.setIsDeclaration(true);
+		 RESULT = l;
+                :}
+             ;
+
+complejos ::= struct:s {: RESULT = s; :}
+           |  union:u {: RESULT = u; :}
+           ;
+
+struct ::= STRUCT BRACKETLEFT listaatributos:l BRACKETRIGHT 
+	   {:
+	    Registro r = new Registro((LinkedList)l.getFirst(), (LinkedList)l.getLast()); 
+	    RESULT = r;                      
+           :}                   
+        ;
+
+union ::= UNION BRACKETLEFT listaatributos:l BRACKETRIGHT 
+          {:
+	   Union u = new Union((LinkedList)l.getFirst(), (LinkedList)l.getLast());
+	   RESULT = u;
+          :}                   
+       ;
+
+listaatributos ::= listaatributos:l tipos:t IDENTIFIER:i SEQ
+                   {:
+		    LinkedList ids = (LinkedList)l.getLast();
+
+                    if(ids.contains(i))
+			parser.custom_error("Identificador "+i+" repetido");		   
+		    
+		    ((LinkedList)l.getFirst()).add(t);
+		    ((LinkedList)l.getLast()).add(i);
+		    RESULT = l;
+		   :}
+                |  tipos:t IDENTIFIER:i SEQ
+                   {:
+		    LinkedList l = new LinkedList();
+		    LinkedList campos = new LinkedList();
+		    campos.add(i);
+		    LinkedList tipos = new LinkedList();
+		    tipos.add(t);
+		    l.add(tipos);
+		    l.add(campos);
+		    RESULT = l;
+		   :}
+                ;
+
+expresionliteral ::= expresion:e {: RESULT = e; :}
+                  |  literales:l {: parser.literal = true; RESULT = l; :}
+                  ;
+
+literales ::= literalarreglo:la {: RESULT = new ASTLiteralArreglo(la); :}
+           |  literalstructunion:lur {: RESULT = new ASTLiteralUR(lur); :}
+           ;
+
+
+listaliteralarreglo ::= listaliteralarreglo:l SEQ literalarreglo:la
+                        {:
+                          l.add(la);
+                          RESULT = l;
+                        :}
+                     |  literalarreglo:la
+                        {:
+                          LinkedList l = new LinkedList();
+                          l.add(la);
+                          RESULT = l;
+                        :}
+                     ;
+
+listaconstantes ::= listaconstantes:l COMA constantes:c
+                    {:
+                      l.add(c);
+                      RESULT = l;
+                    :}
+                 |  constantes:c 
+                    {: 
+		     if (parser.tipoactual == null)
+			 parser.tipoactual = c.getState();
+
+		     LinkedList l = new LinkedList();
+		     l.add(c);
+		     RESULT = l;
+                    :}
+                 ;
+
+literalarreglo ::= BRACKETLEFT listaliteralarreglo:l BRACKETRIGHT
+                   {:
+                     RESULT = l;
+                   :}
+                |  BRACKETLEFT listaconstantes:l BRACKETRIGHT
+                   {:
+                     RESULT = l;
+                   :}
+                ;
+
+literalstructunion ::= BRACKETLEFT listaasignaciones:l BRACKETRIGHT
+                       {:
+                         RESULT = l;
+                       :}
+                    ;
+
+listaasignaciones ::= listaasignaciones:l SEQ IDENTIFIER:i ASIG expresionliteral:el
+                      {:
+                        LinkedList ids = new LinkedList();
+                        ids.add(new ASTIdentificador(i,null, null, null));
+                        l.add(new ASTAsignacion(ids, el, new LinkedList()));
+                        RESULT = l;
+                      :}
+                   |  IDENTIFIER:i ASIG expresionliteral:el
+                      {:
+                        LinkedList l = new LinkedList();
+                        LinkedList ids = new LinkedList();
+                        ids.add(new ASTIdentificador(i,null, null, null));
+                        l.add(new ASTAsignacion(ids, el, new LinkedList()));
+                        RESULT = l;
+                      :}
+                   ;
+
+
+declaraciontypedef ::= TYPEDEF tipos:ti IDENTIFIER:i
+                       {:
+			if (!parser.alias_actual.insert(new Sym(i, ti), parser.anidamiento))
+			    parser.used_error(i);
+		       :}
+;
+
+tipos ::= basicos:b {: RESULT = b; :}
+       |  complejos:c {: RESULT = c; :}
+       |  arreglos:a {: RESULT = a; :}
+       |  IDENTIFIER:i 
+          {:
+           Resultado r = parser.alias_actual.exist(i);
+	   Tipo t = r.getTipo();
+
+	   if(t == null)
+	       parser.type_declaration(i);
+
+	   RESULT = t;
+          :}
+       ;
+
+listadimension ::= listadimension:l CORLEFT NUM:n CORRIGHT
+                   {:
+		    Arreglo a = (Arreglo)l;
+
+		    while(a.getSub() != null)
+			a = (Arreglo)a.getSub();
+		    
+		    a.setSub(new Arreglo(n.intValue(), null));
+		    RESULT = l;		    
+		   :}
+                |  CORLEFT NUM:n CORRIGHT
+                   {:
+		    RESULT = new Arreglo(n.intValue(), null); 
+		   :}
+                ;
+
+arreglos ::= basicos:t listadimension:l
+             {:
+              Arreglo a = (Arreglo)l;
+
+	      while(a.getSub() != null)
+		  a = (Arreglo)a.getSub();
+
+	      a.setSub(t);
+	      RESULT = l;
+             :}
+          |  complejos:t listadimension:l
+             {:
+              Arreglo a = (Arreglo)l;
+
+	      while(a.getSub() != null)
+		  a = (Arreglo)a.getSub();
+
+	      a.setSub(t);
+	      RESULT = l;
+            :}
+          ;
+
+basicos ::= INT {: RESULT = new Basico(1); :}
+         |  FLOAT {: RESULT = new Basico(2); :}
+         |  BOOL {: RESULT = new Basico(3); :}
+         |  CHAR {: RESULT = new Basico(4); :}
+         ;
+
+listaident ::= listaident:l COMA IDENTIFIER:i 
+               {: 
+                l.getIds().add(new ASTIdentificador(i, parser.actual, null, null));
+                l.getCasts().add(null);
+                RESULT = l; 
+	       :}
+            |  IDENTIFIER:i
+               {:
+		ASTAsignacion a = new ASTAsignacion(new LinkedList(), null, new LinkedList()); 
+		a.getIds().add(new ASTIdentificador(i, parser.actual, null, null));
+                a.getCasts().add(null);
+		RESULT = a;
+	       :}
+            ;
+
+declaracionsimple ::= declaracionsimple1:l {: RESULT = l; :}
+                   |  declaracionsimple2:l {: RESULT = l; :}
+                   ;
+
+declaracionsimple1 ::= listaident:l {: RESULT = l; :} /* Declaracion sin asignacion */ 
+                    ;
+
+declaracionsimple2 ::= listaident:l ASIG expresionliteral:e  /* Declaracion con asignacion de dos o mas identificadores */
+                       {: 
+			l.setExpr(e);
+			RESULT = l;
+                       :}
+                    |  listaident:l ASIG READ tipos:t  /* Declaracion con asignacion de dos o mas identificadores */
+                       {: 
+			if (!(t instanceof Basico))
+			    parser.custom_error("Solo puede hacer read de tipos basicos");
+			
+			ASTRead re = new ASTRead(t);
+			l.setExpr(re);
+			RESULT = l;
+                       :}
+                    ;
+
+asignacion ::= asignacion1:a {: RESULT = a.getASTAsignacion(); :} 
+            |  asignacion2:a {: RESULT = a; :}
+            ;
+
+acceso ::= acceso:a DOT IDENTIFIER:c
+           {:
+            ASTAcceso res;
+
+            if(a.isNull()) {
+		res = new ASTAccesoUR(a,c);
+		parser.last = res;
+            }
+            else {
+		parser.last.setHijo(new ASTAccesoUR(parser.last.getHijo(),c));
+		parser.last = parser.last.getHijo();
+		res = a;
+            }
+	    
+            RESULT = res;              
+	   :}
+        |  acceso:a CORLEFT expresion:e CORRIGHT
+           {:
+	    Tipo t = e.getState();
+		
+	    if (!(t instanceof Basico) && ((Basico) t).getNBasico() != 1)
+		parser.custom_error("Tiene que usar int para acceder a un arreglo");
+	    
+            ASTAcceso res;
+	    
+            if (a.isNull()) {
+		res = new ASTAccesoArreglo(a,e);
+		parser.last = res;
+            }
+            else {
+		parser.last.setHijo(new ASTAccesoArreglo(parser.last.getHijo(),e));
+		parser.last = parser.last.getHijo();
+		res = a;
+            }
+	    
+            RESULT = res;
+           :}
+        |  /* lamda */ {: RESULT = new ASTAcceso(); :}
+        ;
+
+asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo identificador */
+                {:
+                 Resultado r = parser.actual.exist(i); 
+                 Tipo state = r.getTipo();
+		 
+		 if (state == null) 
+		     parser.declaration_error(i);
+		 
+		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);		 
+		 System.out.println(id.getState());
+		 id.update();
+		 System.out.println(id.getState());
+
+		 if (!id.check())
+		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
+
+		     Tipo res = id.getState().asign(e.getState());
+		     
+		     if (res != null)
+			 state = res;
+		     else
+			 parser.type_error(id.getState(),e.getState() ,"asignar");
+		 		 
+	     	 RESULT = new ASTAsignacionExpr(id, e, state, parser.checkCast(id.getState(), e));
+	     	:}
+             |  IDENTIFIER:i acceso:ac PLUSPLUS
+                {:
+                 Resultado r = parser.actual.exist(i); 
+                 Tipo state = r.getTipo();
+		 
+		 if (state == null) 
+		     parser.declaration_error(i);
+		 
+		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);		 
+		 id.update();
+		 
+		 if (!id.check())
+		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
+		 
+		 ASTAritmetica exp = new ASTAritmetica("+",id, new ASTConst(1));		 
+		 exp.update();
+		 
+		 if (!exp.check())
+		     parser.type_error(state, null, "hacer suma posterior");
+		 
+		 Tipo res = id.getState().asign(exp.getState());
+
+		 if(res != null)
+		     state = res;
+		 else
+		     parser.type_error(id.getState(),exp.getState() ,"asignar");
+		 
+		 RESULT = new ASTAsignacionExpr(id, exp, res, parser.checkCast(id.getState(), exp));
+		:}
+             |  IDENTIFIER:i acceso:ac MINUSMINUS
+                {:
+                 Resultado r = parser.actual.exist(i); 
+                 Tipo state = r.getTipo();
+		 
+		 if (state == null) 
+		     parser.declaration_error(i);
+		 
+		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);
+
+		 if(!id.check())
+		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
+		 
+		 ASTAritmetica exp = new ASTAritmetica("-",id, new ASTConst(1));		 
+		 exp.update();
+		 
+		 if(!exp.check())
+		     parser.type_error(state, null, "hacer resta posterior");
+
+		 Tipo res = id.getState().asign(exp.getState());
+		 
+		 if(res != null)
+		     state = res;
+		 else
+		     parser.type_error(id.getState(),exp.getState() ,"asignar");
+		 
+		 RESULT = new ASTAsignacionExpr(id, exp, res, parser.checkCast(id.getState(), exp));
+		:}
+             ;  
+
+asignacion2 ::= IDENTIFIER:i acceso:ac ASIG literales:e
+                {:
+		 Resultado r = parser.actual.exist(i); 
+		 Tipo state = r.getTipo();
+		 
+		 if (state == null) 
+		     parser.declaration_error(i);
+		 
+		 e.setState(state);
+		 e.update();
+		 
+		 if(!e.check())
+		     parser.custom_error("Error inicializando el literal");
+		 
+		 parser.literal = false;
+		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);
+		 id.update();
+		 
+		 if(!id.check())
+		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
+		 
+		 Tipo res = id.getState().asign(e.getState());
+		 
+		 if (res != null)
+		     state = res;
+		 else
+		     parser.type_error(id.getState(),e.getState() ,"asignar");
+		 
+		 ASTAsignacionExpr re = new ASTAsignacionExpr(id, e, state, parser.checkCast(id.getState(), e));
+		 RESULT = re.getASTAsignacion();
+                :}
+
+             |  IDENTIFIER:i acceso:ac ASIG READ tipos:t
+                {:
+		 Resultado r = parser.actual.exist(i); 
+		 Tipo state = r.getTipo();
+		 boolean flag = false;
+		 
+		 if (state == null) 
+		     parser.declaration_error(i);
+		 
+		 if (!(t instanceof Basico)){
+		     parser.custom_error("Solo puede hacer read de tipos basicos");
+		     flag = true;
+		 }
+		 
+		 ASTRead re = new ASTRead(t);		 
+		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);
+		 id.update();
+		 
+		 if(!id.check())
+		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
+
+		 if (!flag) {
+		     Tipo res = id.getState().asign(re.getState());
+		     
+		     if(res != null)
+			 state = res;
+		     else
+			 parser.type_error(id.getState(),re.getState() ,"asignar");
+		 }
+		 
+		 ASTAsignacionExpr ae = new ASTAsignacionExpr(id, re, state, parser.checkCast(id.getState(), re));
+		 RESULT = ae.getASTAsignacion();
+                :}
+
+             |  IDENTIFIER:i acceso:ac ASIG listaasig:l READ tipos:t
+                {:
+                 ASTIdentificador a;
+		 String id;
+		 Tipo res = null;
+                 Resultado r = parser.actual.exist(i); 
+                 Tipo state = r.getTipo();
+                 boolean flag = false;
+
+                 if (!(t instanceof Basico)) {
+		     parser.custom_error("Solo puede hacer read de tipos basicos");
+		     flag = true;
+                 }
+
+                 ASTRead re = new ASTRead(t);
+		 
+		 if (state == null) 
+		     parser.declaration_error(i);
+		 
+		 l.add(new ASTIdentificador(i, r.getTable(), ac, state));
+		 
+		 Iterator it = l.iterator();
+
+                 LinkedList c = new LinkedList();
+		 
+		 while(it.hasNext()) {		     
+		     a = (ASTIdentificador) it.next();
+		     id = a.getValue();		     
+		     a.update();
+		     
+		     if(!a.check())
+			 parser.custom_error("Mal acceso al idenficicador "+id);
+		     
+                     if(!flag)
+			 res = a.getState().asign(re.getState());
+		     
+                     c.add(parser.checkCast(res, re));
+		     
+		     if(res == null)
+			 parser.type_error(a.getState(),state ,"asignar");
+		 }
+
+		 RESULT = new ASTAsignacion(l, re, c );
+	        :}
+
+             |  IDENTIFIER:i acceso:ac ASIG listaasig:l expresionliteral:e
+                {:
+                 ASTIdentificador a;
+		 String id;
+		 Tipo res = null;
+                 Resultado r = parser.actual.exist(i); 
+                 Tipo state = r.getTipo();
+		 
+		 if (state == null) 
+		     parser.declaration_error(i);
+
+                 if(parser.literal) {
+		     e.setState(state);
+		     e.update();
+
+		     if(!e.check())
+			 parser.custom_error("Error inicializando el literal");
+		     
+		     parser.literal = false;
+                 }
+		 
+		 l.add(new ASTIdentificador(i, r.getTable(), ac, state));
+		 
+		 Iterator it = l.iterator();
+
+                 LinkedList c = new LinkedList();
+		 
+		 while(it.hasNext()) {		     
+		     a = (ASTIdentificador) it.next();
+		     id = a.getValue();		     
+		     a.update();
+		     
+		     if (!a.check())
+			 parser.custom_error("Mal acceso al idenficicador "+id);
+		     
+		     res = a.getState().asign(e.getState());		     
+                     c.add(parser.checkCast(res, e));
+			 
+		     if (res == null)
+			 parser.type_error(a.getState(),state ,"asignar");
+		 }
+
+		 RESULT = new ASTAsignacion(l, e, c );
+	        :}
+             ;   
+
+
+listaasig ::= listaasig:l IDENTIFIER:i acceso:a ASIG
+              {:
+               Resultado r = parser.actual.exist(i); 
+               Tipo state = r.getTipo();
+
+	       if (state != null) {
+		   l.addFirst(new ASTIdentificador(i, r.getTable(),a, state));
+		   RESULT = l;
+	       }
+	       else 
+		   parser.declaration_error(i);
+	      :}
+           |  IDENTIFIER:i acceso:a ASIG 
+              {:
+               Resultado r = parser.actual.exist(i); 
+               Tipo state = r.getTipo();
+
+	       if (state != null) {
+		   LinkedList l = new LinkedList();
+		   l.addFirst(new ASTIdentificador(i, r.getTable(),a, state));
+		   RESULT = l;
+	       }
+	       else 
+		   parser.declaration_error(i);
+	      :}
+           ;
+
+condicional ::= conif:i {: RESULT = i; :}
+             |  conswitch:s {: RESULT = s; :}
+             ;
+
+bloque ::= BRACKETLEFT  
+           {: 
+            parser.returning = false;
+	    parser.breaking = false;
+
+	    if(!parser.cambiada) {
+                parser.piladesplazamiento.push(new Integer(parser.desplazamiento));
+		parser.anidamiento++;
+		parser.anterior = parser.actual;
+		parser.actual = new SymTable(parser.anterior);
+	    } 
+
+	    parser.cambiada = false;
+	    parser.alias_anterior = parser.alias_actual;
+	    parser.alias_actual = new SymTable(parser.alias_anterior);
+	   :} 
+           listainstrucciones:l BRACKETRIGHT 
+           {:	       
+	    if(parser.maxdesplazamiento < parser.desplazamiento)
+		parser.maxdesplazamiento = parser.desplazamiento;
+	    
+            parser.desplazamiento = ((Integer) parser.piladesplazamiento.pop()).intValue();	    
+	    ASTBloque b = new ASTBloque(l,parser.actual);
+	    
+	    b.setIreturn(parser.returning);
+	    b.setIbreak(parser.breaking);
+	    
+	    parser.actual = parser.anterior; 
+	    parser.anterior = parser.anterior.getParent();
+	    parser.alias_actual = parser.alias_anterior; 
+	    parser.alias_anterior = parser.alias_anterior.getParent();
+	    
+	    parser.anidamiento--;
+	    parser.returning = false;
+	    parser.breaking = false;
+	    
+	    RESULT = b;
+           :} 
+        ;
+
+conif ::= IF PARLEFT expresion:e PARRIGHT bloque:b
+          {:
+           LinkedList blq = new LinkedList();
+	   blq.add(b);
+	   LinkedList cif = new LinkedList();	   
+	   Tipo t = e.getState();
+
+	   if(!(t instanceof Basico) && ((Basico) t).getNBasico() != 3)
+	       parser.custom_error("Tiene que usar expresiones booleanas en los condicionales del if");
+
+	   cif.add(e);
+	   ASTIf instif = new ASTIf(cif, blq, null);
+	   RESULT = instif;	   
+          :}
+       |  IF PARLEFT expresion:e PARRIGHT bloque:b1 listaelif:l ELSE bloque:b2
+          {:
+           Tipo t = e.getState();
+	   
+	   if(!(t instanceof Basico) && ((Basico) t).getNBasico() != 3)
+	       parser.custom_error("Tiene que usar expresiones booleanas en los condicionales del if");
+
+	   l.getCond().addFirst(e);
+	   l.getBloques().addFirst(b1);
+	   l.setEls(b2);
+	   
+	   RESULT = l;
+          :}
+       ;
+
+listaelif ::= listaelif:l ELIF PARLEFT expresion:e PARRIGHT bloque:b
+              {:
+               Tipo t = e.getState();
+	       
+	       if(!(t instanceof Basico)&& ((Basico) t).getNBasico() != 3)
+		   parser.custom_error("Tiene que usar expresiones booleanas en los condicionales del elif");
+	       
+	       l.getCond().add(e);
+	       l.getBloques().add(b);
+	       RESULT = l;
+              :}
+           |  /* lamda */ {: RESULT = new ASTIf(new LinkedList(), new LinkedList(), null); :}                             
+           ;
+
+conswitch ::= SWITCH {: parser.inSwitch = true; :} PARLEFT expresion:e PARRIGHT BRACKETLEFT
+              {:
+	       parser.tipoactual = e.getState();
+              :}
+              listacase:l DEFAULT DOSPUNTOS
+              {:
+               parser.anterior = parser.actual;
+	       parser.actual = new SymTable(parser.anterior);
+              :}
+              listainstrucciones:b  BRACKETRIGHT
+              {:
+               l.setDef(new ASTBloque(b, parser.actual));
+	       l.setExp(e);
+	       parser.inSwitch = false; 
+	       parser.actual = parser.anterior; 
+	       parser.anterior = parser.anterior.getParent();
+	       RESULT = l;
+              :}
+           ;
+
+listacase ::= listacase:l CASE constantes:c DOSPUNTOS
+              {:
+	       parser.anterior = parser.actual;
+	       parser.actual = new SymTable(parser.anterior);
+	       parser.alias_anterior = parser.alias_actual;
+	       parser.alias_actual = new SymTable(parser.alias_anterior);
+	       parser.anidamiento++;
+              :} 
+              listainstrucciones:b
+              {:
+               l.getCases().add(c);
+	       l.getBloques().add(new ASTBloque(b, parser.actual));
+	       parser.anidamiento--;
+	       parser.actual = parser.anterior; 
+	       parser.anterior = parser.anterior.getParent();
+	       parser.alias_actual = parser.alias_anterior; 
+	       parser.alias_anterior = parser.alias_anterior.getParent();
+	       RESULT = l;
+	      :}
+           |  /* lamda */ {: RESULT = new ASTSwitch(null,new LinkedList(), new LinkedList(), null); :}              
+           ;
+
+constantes ::= NUM:n 
+               {: 
+                Basico en = new Basico(1);
+		
+		if (!parser.printConst) {
+		    if(parser.tipoactual == null) {
+			if(parser.inSwitch)
+			    parser.custom_error("Error en el switch");
+		    }
+		    else {
+			if(parser.tipoactual.equals(en) == false)
+			    parser.type_error(parser.tipoactual, en, "no pueden ser tipos compatibles");
+		    }
+		}              
+
+		RESULT = new ASTConst(n.longValue());
+               :}
+             | NUM:n1 DOT NUM:n2 
+               {:
+                Basico flo = new Basico(2);
+		
+		if (!parser.printConst) {
+		    if(parser.tipoactual == null) {
+			if(parser.inSwitch)
+			    parser.custom_error("Error en el switch");
+		    }
+		    else {
+			if(parser.tipoactual.equals(flo) == false)
+			    parser.type_error(parser.tipoactual, flo, "no pueden ser tipos compatibles");
+		    }
+		}
+				
+		Double f = new Double(n1+"."+n2);
+		RESULT = new ASTConst(f.doubleValue());
+               :}
+             | TRUE
+               {:
+		Basico bo = new Basico(3);
+
+		if (!parser.printConst) {		
+		    if(parser.tipoactual == null) {
+			if(parser.inSwitch)
+			    parser.custom_error("Error en el switch");
+		    }
+		    else {
+			if(parser.tipoactual.equals(bo) == false)
+			    parser.type_error(parser.tipoactual, bo, "no pueden ser tipos compatibles");
+		    }
+		}
+				
+		RESULT = new ASTConst(true);
+               :}
+             | FALSE
+               {:
+                Basico bo = new Basico(3);
+
+		if (!parser.printConst) {
+		    if(parser.tipoactual == null) {
+			if(parser.inSwitch)
+			    parser.custom_error("Error en el switch");
+
+		    }
+		    else {
+			if(parser.tipoactual.equals(bo) == false)
+			    parser.type_error(parser.tipoactual, bo, "no pueden ser tipos compatibles");
+		    }
+		}
+		
+		RESULT = new ASTConst(false);
+               :}
+             | COMILLAS CHAR:c COMILLAS
+               {:
+		Basico ch = new Basico(4);
+		
+		if (!parser.printConst) {
+		    if(parser.tipoactual == null) {
+			if(parser.inSwitch)
+			    parser.custom_error("Error en el switch");
+		    }
+		    else {
+			if(parser.tipoactual.equals(ch) == false)
+			    parser.type_error(parser.tipoactual, ch, "no pueden ser tipos compatibles");
+		    }
+		}
+		
+		RESULT = new ASTConst(c);
+               :}
+             ;
+
+loopfor ::= FOR
+            {:
+	     parser.anterior = parser.actual;
+	     parser.actual = new SymTable(parser.anterior);
+	     parser.cambiada = true;
+	     parser.canBreak++;
+	     parser.anidamiento++;
+             parser.piladesplazamiento.push(new Integer(parser.desplazamiento));
+	    :}
+            PARLEFT declaasig:d SEQ expresion:e SEQ asignacion:a PARRIGHT bloque:b
+            {:
+	     Tipo t = e.getState();
+	     
+	     if(!(t instanceof Basico) && ((Basico) t).getNBasico() != 1)
+		 parser.custom_error("Tiene que usar expresiones booleanas en los condicionales del for");
+	
+             LinkedList r = new LinkedList();
+     
+	     r.add(d);
+	     b.getInsts().add(a);
+
+             r.add(new ASTWhile(e, b));
+	     
+	     parser.cambiada = false;
+	     parser.canBreak--;
+	     
+	     RESULT = r;
+            :}
+         ;
+
+declaasig ::= tipos:t declaracionsimple2:l
+              {:
+               ASTIdentificador i;
+	       SymVar s;	       
+	       Iterator it = l.getIds().iterator();	       
+	       ASTExpresion e = l.getExpr();
+	       Tipo res = t.asign(e.getState());
+	       
+	       if(res == null)
+		   parser.type_error(t,e.getState(),"asignar");
+	       	       
+	       while(it.hasNext()) {
+		   i = (ASTIdentificador) it.next();
+		   i.setState(t);
+		   s = new SymVar(i.getValue(), t, false, parser.desplazamiento);
+                   parser.desplazamiento += t.getTam();
+		   if(!parser.actual.insert(s, parser.anidamiento))
+		       parser.used_error(i.getValue());                   
+	       }
+
+	       RESULT = l;
+              :}
+           |  asignacion:a {: RESULT = a; :}                              
+           ;
+
+loopwhile ::= WHILE {: parser.canBreak++; :}
+              PARLEFT expresion:e PARRIGHT bloque:b
+              {:
+               Tipo t = e.getState();
+	       
+	       if(!(t instanceof Basico) && ((Basico) t).getNBasico() != 3)
+		   parser.custom_error("Tiene que usar expresiones booleanas en los condicionales del while");
+	       
+	       parser.canBreak--;
+	       RESULT = new ASTWhile(e, b);
+              :}  
+           ;
+
+expresion ::= expresion:e1 EQ expresion:e2
+              {: 
+	       ASTExpresion exp = new ASTBool("==", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"equivaler");
+
+	       RESULT = exp;
+	      :}
+           |  expresion:e1 NOTEQ expresion:e2
+              {: 
+	       ASTExpresion exp = new ASTBool("!=", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"desigualar");
+
+	       RESULT = exp;
+              :}
+           |  NOT expresion:e1
+              {: 
+               ASTExpresion exp = new ASTBool("!", e1, null);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), null,"negar");
+
+	       RESULT = exp;
+              :} %prec UNOT
+           |  expresion:e1 OR expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool("||", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"hacer un OR con");
+
+	       RESULT = exp;
+              :}
+           |  expresion:e1 AND expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool("&&", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"hacer un AND con");
+
+	       RESULT = exp;
+	      :}
+           |  expresion:e1 LESS expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool("<", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"comparar");
+
+	       RESULT = exp;
+	      :}
+           |  expresion:e1 LESSEQ expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool("<=", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"comparar");
+
+	       RESULT = exp;
+              :}
+           |  expresion:e1 MORE expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool(">", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"comparar");
+
+	       RESULT = exp;
+              :}
+           |  expresion:e1 MOREEQ expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool(">=", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"comparar");
+
+	       RESULT = exp;
+              :}
+           |  FALSE {: RESULT = new ASTConst(false); :}              
+           |  TRUE {: RESULT = new ASTConst(true); :}              
+           |  COMILLAS CHAR:c COMILLAS {: RESULT = new ASTConst(c); :}
+           |  expresionarit:e1 {: RESULT = e1; :}
+           ;
+
+expresionarit ::= MINUS expresionarit:e1
+                  {: 
+                   ASTExpresion exp = new ASTAritmetica("-", e1, null);
+		   exp.update();
+
+		   if(!exp.check())
+		       parser.type_error(e1.getState(), null,"hacer resta unaria");
+		   
+		   RESULT = exp;
+                  :} %prec UMINUS
+               |  expresionarit:e1 MULT expresionarit:e2
+                  {: 
+		   ASTExpresion exp = new ASTAritmetica("*", e1, e2);
+                   exp.update();
+
+                   if(!exp.check())
+		       parser.type_error(e1.getState(), e2.getState(),"multiplicar");	  
+
+                   RESULT = exp;
+                  :}
+               |  expresionarit:e1 DIV expresionarit:e2
+                  {: 
+                   ASTExpresion exp = new ASTAritmetica("/", e1, e2);
+                   exp.update();
+
+                   if(!exp.check())
+		       parser.type_error(e1.getState(), e2.getState(),"dividir");
+
+                   RESULT = exp;
+		  :}
+               |  expresionarit:e1 PLUS expresionarit:e2
+                  {: 
+                   ASTExpresion exp = new ASTAritmetica("+", e1, e2);
+                   exp.update();
+
+                   if(!exp.check())
+		       parser.type_error(e1.getState(), e2.getState(),"sumar");
+
+                   RESULT = exp;
+                  :}
+               |  expresionarit:e1 MINUS expresionarit:e2
+                  {: 
+                   ASTExpresion exp = new ASTAritmetica("-", e1, e2);
+                   exp.update();
+
+                   if(!exp.check())
+		       parser.type_error(e1.getState(), e2.getState(),"restar");
+
+                   RESULT = exp;
+		  :}
+               |  expresionarit:e1 MOD expresionarit:e2
+                  {: 
+		   ASTExpresion exp = new ASTAritmetica("%", e1, e2);
+                   exp.update();
+
+                   if(!exp.check())
+		       parser.type_error(e1.getState(), e2.getState(),"sacar módulo a");
+
+                   RESULT = exp;
+                  :}
+               |  NUM:n 
+	          {:		   
+		   ASTConst aux = new ASTConst(n.longValue());
+		   RESULT = aux;
+		  :}
+               |  NUM:n1 DOT NUM:n2 
+		  {:
+		   Double f = new Double(n1+"."+n2);
+                   RESULT = new ASTConst(f.doubleValue()); 
+                  :}
+               |  IDENTIFIER:i acceso:a
+		  {:
+                   Resultado r = parser.actual.exist(i); 
+                   Tipo state = r.getTipo();
+                   ASTIdentificador iden = new ASTIdentificador(i, r.getTable(), a, state);
+
+                   if (state != null) {
+		       iden.update();
+		       
+		       if(!iden.check())
+			   parser.custom_error("Mal acceso al idenficicador "+i);
+		   } 
+                   else 
+		       parser.declaration_error(i);
+		   
+                   RESULT = iden;
+                  :}
+               |  asignacion1:a {: RESULT = a; :}
+               |  llamadafuncion:in
+                  {: 
+                   ASTInvocarExpresion ie = in.toExpresion();
+                   RESULT = ie;
+                  :}
+               |  PARLEFT expresion:e1 PARRIGHT {: RESULT = e1; :}
+               ;
+
+listaparametrosllamada ::= listaparametrosllamada:l COMA expresion:e
+                           {:
+                             l.add(e);
+  			     RESULT = l;
+                           :}
+                        |  expresion:e
+                           {:
+			     LinkedList l = new LinkedList();
+                             l.add(e);
+			     RESULT = l;
+			   :}
+                        ;
+
+llamadafuncion ::= IDENTIFIER:i PARLEFT PARRIGHT
+                   {:
+                    Sym s = parser.actual.getSym(i);
+		    Tipo state = null;
+                    boolean flag = false;
+		    
+		    if(s != null)
+			state = s.getState();
+		    else {
+	              if(parser.promesas.containsKey(i)) {
+			  state = ((Promesa) parser.promesas.get(i) ).getState(); 
+			  flag = true;
+                      }
+		      else
+			  parser.custom_error("El procedimiento/funcion "+i+" no ha sido declarado");
+                    }
+		    		    
+		    ASTInvocar re  = new ASTInvocar(i, new LinkedList(), state);		    
+
+		    if(s != null) {
+			if(!(s instanceof SymProc)) {
+			    parser.custom_error(i+" no es un procedimiento/funcion");
+			}
+			else {
+			    if(!re.check((SymProc)s))
+				parser.custom_error("Mala llamada al procedimiento/funcion "+i);
+			}
+		    }
+                    else {
+			if(flag && !re.check((LinkedList) ((Promesa) parser.promesas.get(i) ).getArgumentos()))
+			    parser.custom_error("Mala llamada al procedimiento/funcion "+i); 
+                    }
+                   
+		    RESULT = re;
+                   :}
+                |  IDENTIFIER:i PARLEFT listaparametrosllamada:l PARRIGHT
+                   {:
+                    Sym s = parser.actual.getSym(i);
+		    Tipo state = null;
+                    boolean flag = false;
+		    
+		    if(s != null)
+			state = s.getState();
+		    else {
+			if(parser.promesas.containsKey(i)) {
+			    state = ((Promesa) parser.promesas.get(i) ).getState(); 
+			    flag = true;
+			}
+			else
+			    parser.custom_error("El procedimiento/funcion "+i+" no ha sido declarado");
+                    }
+		    		    
+		    ASTInvocar re  = new ASTInvocar(i, l, state);		    
+
+		    if(s != null) {
+			if(!(s instanceof SymProc)) {
+			    parser.custom_error(i+" no es un procedimiento/funcion");
+			}
+			else {
+			    if(!re.check((SymProc)s))
+				parser.custom_error("Mala llamada al procedimiento/funcion "+i);
+			}
+		    }
+                    else {
+			if(flag && !re.check((LinkedList) ((Promesa) parser.promesas.get(i) ).getArgumentos()))
+			    parser.custom_error("Mala llamada al procedimiento/funcion "+i); 
+                    }
+		    
+		    RESULT = re;
+                   :}
+                ;
+
+referencia ::= REF {: RESULT = new Boolean(true); :}
+            |  {: RESULT = new Boolean(false); :}
+            ;
+
+listaparametros ::= listaparametros:l COMA tipos:t referencia:r IDENTIFIER:i
+                    {:  
+                     ASTIdentificador id = new ASTIdentificador(i, null,null, t);
+
+                     if(r.booleanValue())
+			 parser.referencias.add(i);
+		     
+		     parser.in.add(i);
+		     l.add(id);
+		     RESULT = l;
+                    :}
+                 |  tipos:t referencia:r IDENTIFIER:i
+                    {:
+                     parser.in = new LinkedList();
+		     parser.in.add(i);
+
+                     parser.referencias = new LinkedList();
+		     
+                     if(r.booleanValue())
+			 parser.referencias.add(i);
+
+		     LinkedList l = new LinkedList();
+		     ASTIdentificador id = new ASTIdentificador(i, null,null, t);
+		     l.add(id);
+		     RESULT = l;
+                    :}
+                 ;
+
+parametros ::= listaparametros:l {: RESULT = l; :}
+            |  /* lamda */
+               {:
+                parser.in = new LinkedList();
+		RESULT = new LinkedList();
+               :}
+            ; 
+
+promesafuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
+                   {:
+                    if(!parser.promesas.containsKey(i))
+			parser.promesas.put(i,new Promesa(t, l, parser.referencias, false));
+		    else
+			parser.custom_error("Promesa "+i+" ya declarada");
+                   :}
+                ;
+
+declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT 
+                       {: 
+                        parser.inFun = true; 
+			parser.cambiada = true;
+			parser.anterior = parser.actual;
+			parser.actual = new SymTable(parser.anterior);
+                        parser.piladesplazamiento.push(new Integer(parser.desplazamiento));
+			parser.anidamiento++;
+			
+			parser.tipoactualfun = t;
+ 			
+			ASTIdentificador id;
+			SymVar s;		 	
+			Iterator it = l.iterator();
+			boolean error = false;
+			
+			if(parser.promesas.containsKey(i)) {
+			    Promesa p = (Promesa) parser.promesas.get(i);
+			    LinkedList listap = (LinkedList) p.getArgumentos();
+			    
+			    if(l.size()!=listap.size()) {
+				parser.custom_error("No se cumple la promesa del procedimiento "+i);
+				error = true;
+			    }
+			    else {
+				Iterator argumentos = listap.iterator();
+				ASTIdentificador id2;
+				
+				while(it.hasNext()) {
+				    id = (ASTIdentificador) it.next();
+				    id2 = (ASTIdentificador) argumentos.next();
+				    s = new SymVar(id.getValue(), id.getState(), false, parser.desplazamiento);
+				    parser.desplazamiento += id.getState().getTam();
+				    
+				    if(!id2.getState().equals(id.getState())) {
+					parser.custom_error("El tipo de la variable "+id.getValue()+" no concuerda con la promesa de "+i);
+					error = true;
+				    }
+				    
+				    if(!parser.actual.insert(s, parser.anidamiento))
+					parser.used_error(id.getValue());
+				}
+
+				if(!p.getReferencias().equals(parser.referencias)) {
+				    parser.custom_error("El tipo de parametros (valor o valor/resultado) no concuerdan con la promesa de "+i);
+				    error = true;
+				}
+			    }
+			}
+			else {
+			    while(it.hasNext()) {
+				id = (ASTIdentificador) it.next();
+				s = new SymVar(id.getValue(), id.getState(), false, parser.desplazamiento);
+				parser.desplazamiento += id.getState().getTam();
+				
+				if(!parser.actual.insert(s, parser.anidamiento))
+				    parser.used_error(id.getValue());
+			    }		    
+                         }
+			
+			SymProc p = new SymProc(i,t, parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
+		        
+			if(!error) {
+			    if(!parser.anterior.insert(p, parser.anidamiento))
+				parser.used_error(i);
+			    else {
+				if(parser.promesas.containsKey(i))
+				    ((Promesa) parser.promesas.get(i)).setHecha(true);
+			    }
+			} 			
+                       :} 
+                       bloque:b
+                       {:
+                        parser.inFun = false; 
+			parser.cambiada = false;
+			
+			Sym s = parser.actual.getSym(i);
+			
+			if( s != null && (s instanceof SymProc)) {
+			    SymProc p = (SymProc) s;
+			    p.setTamlocal(parser.maxdesplazamiento);
+			    p.getBloque().setInsts(b.getInsts());
+			}
+			
+			parser.maxdesplazamiento = 0;	
+			
+			if(!b.getIreturn())
+			    parser.custom_error("Tiene que retornar "+t+" en la funcion "+i);
+						
+			RESULT = i;                              
+                       :}
+                    ;
+
+promesaprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
+                         {:
+			  if(!parser.promesas.containsKey(i))
+			      parser.promesas.put(i,new Promesa(new Basico(0), l, parser.referencias, false));
+			  else
+			      parser.custom_error("Promesa "+i+" ya declarada");
+                        :}
+                      ;
+
+declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT 
+                             {: 
+			      parser.inProc = true; 
+			      parser.cambiada = true;
+			      parser.anterior = parser.actual;
+			      parser.actual = new SymTable(parser.anterior);
+                              parser.piladesplazamiento.push(new Integer(parser.desplazamiento));
+			      parser.anidamiento++;
+		              
+			      parser.tipoactualfun = new Basico(0);
+		              
+			      ASTIdentificador id;
+			      SymVar s;		                          
+			      Iterator it = l.iterator();		              
+			      boolean error = false;
+			      
+			      if(parser.promesas.containsKey(i)) {
+				  Promesa p = (Promesa) parser.promesas.get(i);
+				  LinkedList listap = (LinkedList) p.getArgumentos();
+				  
+				  if(l.size()!=listap.size()) {
+				      parser.custom_error("No se cumple la promesa del procedimiento "+i);
+				      error = true;
+				  }
+				  else {
+				      Iterator argumentos = listap.iterator();
+				      ASTIdentificador id2;
+				      
+				      while(it.hasNext()) {
+					  id = (ASTIdentificador) it.next();
+					  id2 = (ASTIdentificador) argumentos.next();
+					  s = new SymVar(id.getValue(), id.getState(), false, parser.desplazamiento);
+					  parser.desplazamiento += id.getState().getTam();
+					  
+					  if(!id2.getState().equals(id.getState())) {
+					      parser.custom_error("El tipo de la variable "+id.getValue()+" no concuerda con la promesa de "+i);
+					      error = true;
+					  }
+					  
+					  if(!parser.actual.insert(s, parser.anidamiento))
+					      parser.used_error(id.getValue());
+				      }
+
+				      if(!p.getReferencias().equals(parser.referencias)) {
+					  parser.custom_error("El tipo de parametros (valor o valor/resultado) no concuerdan con la promesa de "+i);
+					  error = true;
+				      }
+				  }
+			      }
+			      else {     
+				  while(it.hasNext()) {
+				      id = (ASTIdentificador) it.next();
+				      s = new SymVar(id.getValue(), id.getState(), false, parser.desplazamiento);
+				      parser.desplazamiento += id.getState().getTam();
+
+				      if(!parser.actual.insert(s, parser.anidamiento))
+					  parser.used_error(id.getValue());
+				  }
+			      }
+			      
+			      SymProc p = new SymProc(i,new Basico(0), parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
+			      
+			      if(!error) {
+				  if(!parser.anterior.insert(p, parser.anidamiento))
+				      parser.used_error(i);
+				  else {
+				      if(parser.promesas.containsKey(i))
+					  ((Promesa) parser.promesas.get(i)).setHecha(true);
+				  }
+			      } 
+                             :} 
+                             bloque:b
+                             {:
+                              parser.inProc = false; 
+			      parser.cambiada = false;
+			      
+			      Sym s = parser.actual.getSym(i);
+			      
+			      if( s != null && (s instanceof SymProc)) {
+				  SymProc p = (SymProc) s;
+				  p.setTamlocal(parser.maxdesplazamiento);
+				  p.getBloque().setInsts(b.getInsts());
+			      }
+			      
+			      parser.maxdesplazamiento = 0;		                          
+			      RESULT = i;                              
+                             :}
+                          ;

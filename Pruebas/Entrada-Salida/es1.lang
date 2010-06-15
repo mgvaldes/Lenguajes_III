@@ -1,0 +1,75 @@
+//Entrada de cada uno de los tipos y se imprimen sus valores.
+//Salida: Los valores ingresados.
+
+int main
+{
+
+  print 'i';
+  print 'n';
+  print 't';
+  print ':';
+  print '\n';
+
+  int a = read int;
+
+  print 'E';
+  print 's';
+  print ':';
+  print '\n';
+
+  print a;
+  print '\n';
+
+  print 'f';
+  print 'l';
+  print 'o';
+  print 'a';
+  print 't';
+  print ':';
+  print '\n';
+
+  float b;
+  b = read float;
+
+  print 'E';
+  print 's';
+  print ':';
+  print '\n';
+
+  print b;
+  print '\n';
+
+  print 'b';
+  print 'o';
+  print 'o';
+  print 'l';
+  print ':';
+  print '\n';
+
+  bool c = read bool;
+
+  print 'E';
+  print 's';
+  print ':';
+  print '\n';
+
+  print c;
+  print '\n';
+
+  print 'c';
+  print 'h';
+  print 'a';
+  print 'r';
+  print ':';
+  print '\n';
+
+  char d = read char;
+
+  print 'E';
+  print 's';
+  print ':';
+  print '\n';
+
+  print d;
+  print '\n';
+}

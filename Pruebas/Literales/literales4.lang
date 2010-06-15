@@ -1,0 +1,9 @@
+//Literal de una estructura con errores, los campos que se quieren asignar
+//no son los mismo de la declaración de tipo.
+//Salida: Errores.
+
+int main{
+
+  struct{ int a; int b; } estructuta = { c = 3; d = 2 };
+
+}

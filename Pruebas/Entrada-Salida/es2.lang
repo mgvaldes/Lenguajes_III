@@ -1,0 +1,22 @@
+//Se imprimen los diferentes tipos básicos.
+//Salida: 1, 2.3, true, false, z.
+
+int main
+{
+
+  print 1;
+  print '\n';
+
+  print 2.3;
+  print '\n';
+
+  print true;
+  print '\n';
+
+  print false;
+  print '\n';
+
+  print 'z';
+  print '\n';
+
+}

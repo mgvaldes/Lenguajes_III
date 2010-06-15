@@ -1,0 +1,20 @@
+//Asignacion como expresion
+//Salida: 45.
+
+int c = 45;
+
+int main
+{
+
+  int b;
+
+  if( (b=c) == 45){
+    print b;
+    print '\n';
+  }
+  else{
+    print b;
+    print '\n';
+  }
+
+}

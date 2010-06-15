@@ -1,0 +1,32 @@
+//For con in switch
+//Salida: 2,5,7,9
+
+int main{
+
+  int a = 2;
+
+  for(int i = 0; i<10; i++)
+  {
+
+    switch(a+i)
+    {
+       case 1:
+          print 1;
+          print '\n';
+       case 2:
+          print 2;
+          print '\n';
+       case 5:
+          print 5;
+          print '\n';
+       case 7:
+          print 7;
+          print '\n';
+       case 9:
+          print 9;
+          print '\n';
+       default:
+    }
+
+  }
+}

@@ -1,0 +1,14 @@
+// Expresion que requiere salvar los registros
+// SALIDA: 20.8
+
+int main{
+
+  float a = 1.4;
+  float b = 2.0;
+
+  a = (a + b)*b + b + b + b + b + b + b + b;
+
+  print a;
+  print '\n';
+
+}

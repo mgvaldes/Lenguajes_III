@@ -1,0 +1,8 @@
+//Error ya que el tamaño de uno de los arreglos difiere con el resto.
+//Salida: Error.
+
+int main{
+
+  int [5][2] a = {{1};{1,2};{1,2};{1,2}};
+
+}

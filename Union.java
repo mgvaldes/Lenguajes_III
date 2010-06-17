@@ -18,8 +18,25 @@ public class Union extends Tipo {
         Iterator it = tipos.iterator();
         tam = 0;
 
-        while(it.hasNext())
-	    tam += ((Tipo)it.next()).getTam();
+        boolean first = true;
+        int max = 0;
+        int tamElem = 0;
+
+        while(it.hasNext()){
+
+            tamElem = ((Tipo)it.next()).getTam();
+            if(first){
+ 	        max = tamElem;
+                first = false;
+            }
+            else{
+                if(tamElem > max){
+                    max = tamElem;
+                }
+           }
+
+       }
+       tam = max +8;
     }
 
     //@ requires c != null;

@@ -90,7 +90,7 @@ public class ASTInvocar extends ASTInstruccion {
 	return nombre;
     }
 
-    public void generateCode(Writer fd, int nextReg) throws IOException {
+    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
 
     }
 

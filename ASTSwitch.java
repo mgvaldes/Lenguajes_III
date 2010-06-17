@@ -105,7 +105,7 @@ public class ASTSwitch extends ASTInstruccion {
 
     }
 
-    public void generateCode(Writer fd, int nextReg) throws IOException {
+    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
 	try {
 	    String si = AssemblerInfo.newLabel();
 	    String no = AssemblerInfo.newLabel();	    

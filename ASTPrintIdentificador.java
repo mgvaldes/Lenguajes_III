@@ -23,7 +23,7 @@ public class ASTPrintIdentificador extends ASTInstruccion {
 
     public void update() {}
 
-    public void generateCode(Writer fd, int nextReg) {
+    public void generateCode(Writer fd, int nextReg, String breakLabel) {
 	try {
 	    AssemblerInfo.saveSpecificReg(fd, "rdi");
 	    Basico t = new Basico(0);

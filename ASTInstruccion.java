@@ -37,6 +37,10 @@ public class ASTInstruccion {
 
     public void update() {}
 
-    public void generateCode(Writer fd, int nextReg) throws IOException {}
+    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
+        if(name.compareTo("break")){
+            fd.write("jmp "+breakLabel+"\n");
+        }
+    }
 
 }

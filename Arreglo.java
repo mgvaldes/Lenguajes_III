@@ -53,8 +53,12 @@ public class Arreglo extends Tipo {
 	return sub;
     }
 
-    public int getTam() {
+    public int calcTam() {
         tam = size*sub.getTam();
+        return tam;
+    }
+
+    public int getTam() {
         return tam;
     }
 

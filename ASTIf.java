@@ -112,7 +112,7 @@ public class ASTIf extends ASTInstruccion {
 
 	    ((ASTExpresion) itc.next()).generateCode(fd,nextReg, si, no);
 	    fd.write(si + ":\n");
-	    ((ASTBloque) itb.next()).generateCode(fd, nextReg);
+	    ((ASTBloque) itb.next()).generateCode(fd, nextReg, breakLabel);
 	    fd.write("jmp " + end + "\n");
 
 	    while(itc.hasNext()) {
@@ -121,13 +121,13 @@ public class ASTIf extends ASTInstruccion {
 		no = AssemblerInfo.newLabel();
 		((ASTExpresion) itc.next()).generateCode(fd, nextReg, si, no);
 		fd.write(si + ":\n");
-		((ASTBloque) itb.next()).generateCode(fd, nextReg);
+		((ASTBloque) itb.next()).generateCode(fd, nextReg, breakLabel);
 		fd.write("jmp " + end + "\n");
 	    }
 
 	    fd.write(no + ":\n");
 	    if(els != null)
-		els.generateCode(fd, nextReg);
+		els.generateCode(fd, nextReg, breakLabel);
 
 	    fd.write(end + ":\n");
 

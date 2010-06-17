@@ -52,7 +52,7 @@ public class ASTWhile extends ASTInstruccion {
 
           fd.write(si+":\n");
 
-          bloque.generateCode(fd,nextReg);
+          bloque.generateCode(fd,nextReg, no);
 
           fd.write(exp+":\n");
 

@@ -132,7 +132,10 @@ terminal String CHAR;
 non terminal ASTIf conif, listaelif;
 non terminal ASTSwitch listacase, conswitch;
 non terminal ASTWhile loopwhile;
-non terminal Tipo tipos,complejos, basicos, arreglos, struct, union, listadimension, voidfun;
+non terminal Arreglo arreglos, listadimension;
+non terminal Registro struct;
+non terminal Union union;
+non terminal Tipo tipos,complejos, basicos,voidfun;
 non terminal ASTBloque bloque, main;
 non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaconstantes, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor;
 non terminal ASTAsignacion declaracion, declaracionsimple, declaracionsimple1, declaracionsimple2, listaident, asignacion,asignacion2, declaasig;
@@ -572,7 +575,7 @@ tipos ::= basicos:b {: RESULT = b; :}
 
 listadimension ::= listadimension:l CORLEFT NUM:n CORRIGHT
                    {:
-		    Arreglo a = (Arreglo)l;
+		    Arreglo a = l;
 
 		    while(a.getSub() != null)
 			a = (Arreglo)a.getSub();
@@ -588,7 +591,7 @@ listadimension ::= listadimension:l CORLEFT NUM:n CORRIGHT
 
 arreglos ::= basicos:t listadimension:l
              {:
-              Arreglo a = (Arreglo)l;
+              Arreglo a = l;
 
 	      while(a.getSub() != null)
 		  a = (Arreglo)a.getSub();
@@ -598,7 +601,7 @@ arreglos ::= basicos:t listadimension:l
              :}
           |  complejos:t listadimension:l
              {:
-              Arreglo a = (Arreglo)l;
+              Arreglo a = l;
 
 	      while(a.getSub() != null)
 		  a = (Arreglo)a.getSub();

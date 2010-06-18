@@ -38,7 +38,7 @@ public class ASTInstruccion {
     public void update() {}
 
     public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
-        if(name.compareTo("break")){
+        if(name.compareTo("break")==0){
             fd.write("jmp "+breakLabel+"\n");
         }
     }

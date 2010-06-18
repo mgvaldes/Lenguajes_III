@@ -41,13 +41,12 @@ public class AssemblerInfo {
 		     "   static resb " + size + "\n\n" +
 		     "section .text\n" +
 		     "   global main\n" +
-		     "   extern malloc\n" +
 		     "main:\n");
 
             Iterator it = globales.iterator();
 
             while(it.hasNext())
-                ((ASTAsignacion)it.next()).generateCode(fd,0);
+                ((ASTAsignacion)it.next()).generateCode(fd,0,"");
 
 	}
 	catch (Exception e) {
@@ -60,7 +59,7 @@ public class AssemblerInfo {
 	
 	try {
 	    fd.write("enter " + Integer.toString(size) + ", 0\n");
-	    pro.getBloque().generateCode(fd, 0);
+	    pro.getBloque().generateCode(fd, 0,"");
 	    fd.write("leave\nret\n");
 	}
 	catch (Exception e) {

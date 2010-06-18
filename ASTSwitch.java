@@ -118,7 +118,7 @@ public class ASTSwitch extends ASTInstruccion {
 	    ASTConst aux;
 	    
 	    if (cases.size() == 0) {
-		def.generateCode(fd, nextReg);
+		def.generateCode(fd, nextReg,breakLabel);
 		fd.write("jmp " + end + "\n");
 	    }
 	    else {				
@@ -137,7 +137,7 @@ public class ASTSwitch extends ASTInstruccion {
 			aux.generateCode(fd, nextReg, new_si, next);			
 
 			fd.write(new_si + ": \n");
-			((ASTBloque)bloquesIt.next()).generateCode(fd, nextReg);	
+			((ASTBloque)bloquesIt.next()).generateCode(fd, nextReg,breakLabel);
 			fd.write("jmp " + end + "\n");
 
 			new_si = AssemblerInfo.newLabel();
@@ -155,14 +155,14 @@ public class ASTSwitch extends ASTInstruccion {
 			aux.generateCode(fd, nextReg, next, new_no);
 
 			fd.write(new_no + ": \n");
-			((ASTBloque)bloquesIt.next()).generateCode(fd, nextReg);	
+			((ASTBloque)bloquesIt.next()).generateCode(fd, nextReg, breakLabel);
 			fd.write("jmp " + end + "\n");
 
 			new_no = AssemblerInfo.newLabel();
 		    }		    
 
 		    fd.write(next + ": \n");
-		    def.generateCode(fd, nextReg);
+		    def.generateCode(fd, nextReg,breakLabel);
 		    fd.write("jmp " + end + "\n");
 		}
 		else {
@@ -179,12 +179,12 @@ public class ASTSwitch extends ASTInstruccion {
 			fd.write("cmp " + reg + ", " + nreg + "\n");
 			AssemblerInfo.restoreReg(fd, nextReg + 1);
 			fd.write("jne " + next + "\n");	      		    		    
-			((ASTBloque)bloquesIt.next()).generateCode(fd, nextReg + 1);    
+			((ASTBloque)bloquesIt.next()).generateCode(fd, nextReg + 1, breakLabel);
 			fd.write("jmp " + end + "\n");
 		    }
 		    
 		    fd.write(next + ": \n");
-		    def.generateCode(fd, nextReg);
+		    def.generateCode(fd, nextReg, breakLabel);
 		}
 	    }
 	    

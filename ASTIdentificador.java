@@ -67,8 +67,11 @@ public class ASTIdentificador extends ASTExpresion {
                     fd.write("sub " + reg + ", " + ((SymVar)getTable().getSym(getValue())).getOffset() + "\n");
 		}
 
-		if (acceso != null)
-		    acceso.generateCode(fd, nextReg, aux_state);
+		if (acceso != null) {
+		    if (acceso.getHijo() != null) {
+			acceso.generateCode(fd, nextReg, aux_state);			
+		    }
+		}
 	    }
 	}
 	catch (IOException e) {

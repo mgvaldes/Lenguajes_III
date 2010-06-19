@@ -95,8 +95,10 @@ public class ASTAsignacion extends ASTInstruccion {
 			fd.write(end + ":\n");
 		    }
 		    else if (expr_state instanceof Arreglo) {
-			expr.generateCode(fd, nextReg, si, no);		
-			fd.write("mov " + reg + ", [" + reg + "]\n");
+			expr.generateCode(fd, nextReg, si, no);	
+			if (((ASTIdentificador)expr).getAcceso().getHijo() != null) {
+			    fd.write("mov " + reg + ", [" + reg + "]\n");
+			}
 		    }
 		    else
 			expr.generateCode(fd, nextReg, si, no);
@@ -138,49 +140,26 @@ public class ASTAsignacion extends ASTInstruccion {
 			if (expr instanceof ASTLiteralArreglo) {
 			    ((ASTLiteralArreglo)expr).generateCode(fd, nextReg + 1, (Arreglo)id.getState());
 			}
-			else
+			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			    int tamBase = ((Arreglo)aux_state).getTipoBase().getTam();
+			    int offs = 0;
+			    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
+
+			    AssemblerInfo.saveReg(fd, nextReg + 2);
+			    for (int i = 0; i < ((Arreglo)aux_state).getTam(); i++) {
+				fd.write("mov " + reg2 + ", [" + reg + " - " + offs + "]\n");
+				fd.write("mov [" + reg1 + " - " + offs + "], " + reg2 + "\n");
+				offs += tamBase;
+			    }
+			    AssemblerInfo.restoreReg(fd, nextReg + 2);
+			}
+			else {
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
+			}
 
 			AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    }
-		
-		    /* Creo que al generateCode de Arreglo hay que pasarle 
-                       nextReg + 2, poeque netReg lo usa la exaluacion de la
-                       expresion arriba. Esto pasa en los 2 casos del if.
-                     */
-		    // if(id.getTable().getParent() == null) {
-                    //     if(isDeclaration) {
-                    //         ((Arreglo)id.getState()).generateCode(fd, nextReg, "static", offset, 8);
-                    //         fd.write("push rax\n");
-                    //         fd.write("push rdi\n");
-                    //         fd.write("mov  rdi, " + reg + "\n");
-                    //         fd.write("xor  rax, rax\n");
-                    //         fd.write("call malloc\n");
-                    //         fd.write("mov [static + " + offset + "], rax\n");
-                    //         fd.write("pop rdi\n"); 
-                   //         fd.write("pop rax\n");
-                    //     }
-
-                    //     if (expr != null)
-                    //         fd.write("mov [static + " + offset + " + " + reg1 + "], " + reg + "\n");			
-                    // }
-		    // else {
-                    //     if(isDeclaration) {
-                    //         ((Arreglo)id.getState()).generateCode(fd, nextReg, AssemblerInfo.getFp(), offset, 8);
-                    //         fd.write("push rax\n");
-                    //         fd.write("push rdi\n");
-                    //         fd.write("mov  rdi, " + reg + "\n");
-                    //         fd.write("xor  rax, rax\n");
-                    //         fd.write("call malloc\n");
-                    //         fd.write("mov [" + AssemblerInfo.getFp() + " - " + offset + "], rax\n");
-                    //         fd.write("pop rdi\n");
-                    //         fd.write("pop rax\n");
-                    //      }
-
-                    //      if (expr != null)
-                    //         fd.write("mov [" + AssemblerInfo.getFp() + " - " + offset + " " + reg1 + "], " + reg + "\n");
-                    // }
-	        }
+		}
 
                 if(ct != null)
                     AssemblerInfo.restoreSpecificReg(fd, reg);

@@ -56,7 +56,6 @@ public class Arreglo extends Tipo {
     }
 
     public int getTam() {
-
         if(!done){
             tam = size*sub.getTam();
             done = true;
@@ -64,7 +63,6 @@ public class Arreglo extends Tipo {
         }
         else
             return tam;
-
     }
 
     public Tipo aritmetica() {

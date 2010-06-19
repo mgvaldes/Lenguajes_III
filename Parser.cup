@@ -23,6 +23,7 @@ parser code {:
     public int desplazamiento = 0;
     public int desplazamientoglobal = 0;
     public int maxdesplazamiento = 0;
+    public int intam = 0;
     public boolean error = false;
     public boolean literal = false;
     public boolean syntaxErrors = false;
@@ -1513,6 +1514,7 @@ listaparametros ::= listaparametros:l COMA tipos:t referencia:r IDENTIFIER:i
                      ASTIdentificador id = new ASTIdentificador(i, null,null, t);
 
                      parser.referencias.add(r);
+                     parser.intam += t.getTam();
 		     
 		     parser.in.add(i);
 		     l.add(id);
@@ -1522,6 +1524,7 @@ listaparametros ::= listaparametros:l COMA tipos:t referencia:r IDENTIFIER:i
                     {:
                      parser.in = new LinkedList();
 		     parser.in.add(i);
+                     parser.intam += t.getTam();
 
                      parser.referencias = new LinkedList();
 		     
@@ -1561,7 +1564,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			parser.anidamiento++;
 			
 			parser.tipoactualfun = t;
- 			
+
 			ASTIdentificador id;
 			SymVar s;		 	
 			Iterator it = l.iterator();
@@ -1633,6 +1636,8 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			    SymProc p = (SymProc) s;
 			    p.setTamlocal(parser.maxdesplazamiento);
 			    p.getBloque().setInsts(b.getInsts());
+                            p.calcOffsets(parser.intam+8);
+                            parser.intam=0;
 			}
 			
 			parser.maxdesplazamiento = 0;	
@@ -1735,6 +1740,8 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 				  SymProc p = (SymProc) s;
 				  p.setTamlocal(parser.maxdesplazamiento);
 				  p.getBloque().setInsts(b.getInsts());
+                                  p.calcOffsets(parser.intam+8);
+                                  parser.intam=0;
 			      }
 			      
 			      parser.maxdesplazamiento = 0;		                          

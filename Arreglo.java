@@ -6,12 +6,14 @@ public class Arreglo extends Tipo {
     //@ invariant sub != null;
     private int size;
     private Tipo sub;
+    private boolean done;
 
     //@ requires s != null;
     public Arreglo(int si, Tipo s) {
 	super();
 	size = si;
 	sub = s;
+        done = false;
     }
 
     public int calcSubTam() {
@@ -53,13 +55,16 @@ public class Arreglo extends Tipo {
 	return sub;
     }
 
-    public int calcTam() {
-        tam = size*sub.getTam();
-        return tam;
-    }
-
     public int getTam() {
-        return tam;
+
+        if(!done){
+            tam = size*getTam();
+            done = true;
+            return tam;
+        }
+        else
+            return tam;
+
     }
 
     public Tipo aritmetica() {

@@ -1573,6 +1573,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 				    id = (ASTIdentificador) it.next();
 				    id2 = (ASTIdentificador) argumentos.next();
 				    s = new SymVar(id.getValue(), id.getState(), false, 0);
+                                    s.setIsIn(true);
 				    
 				    if(!id2.getState().equals(id.getState())) {
 					parser.custom_error("El tipo de la variable "+id.getValue()+" no concuerda con la promesa de "+i);
@@ -1592,8 +1593,8 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			else {
 			    while(it.hasNext()) {
 				id = (ASTIdentificador) it.next();
-				s = new SymVar(id.getValue(), id.getState(), false, parser.desplazamiento);
-				parser.desplazamiento += id.getState().getTam();
+				s = new SymVar(id.getValue(), id.getState(), false, 0);
+                                s.setIsIn(true);
 				
 				if(!parser.actual.insert(s, parser.anidamiento))
 				    parser.used_error(id.getValue());
@@ -1674,6 +1675,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 					  id = (ASTIdentificador) it.next();
 					  id2 = (ASTIdentificador) argumentos.next();
 					  s = new SymVar(id.getValue(), id.getState(), false, 0);
+                                          s.setIsIn(true);
 					  
 					  if(!id2.getState().equals(id.getState())) {
 					      parser.custom_error("El tipo de la variable "+id.getValue()+" no concuerda con la promesa de "+i);
@@ -1693,8 +1695,8 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			      else {     
 				  while(it.hasNext()) {
 				      id = (ASTIdentificador) it.next();
-				      s = new SymVar(id.getValue(), id.getState(), false, parser.desplazamiento);
-				      parser.desplazamiento += id.getState().getTam();
+				      s = new SymVar(id.getValue(), id.getState(), false, 0);
+                                      s.setIsIn(true);
 
 				      if(!parser.actual.insert(s, parser.anidamiento))
 					  parser.used_error(id.getValue());

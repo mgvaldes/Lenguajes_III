@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Iterator;
 
 public class SymProc extends Sym {
 
@@ -13,7 +14,7 @@ public class SymProc extends Sym {
     //@ requires i != null;
     //@ requires r != null;
     //@ requires b != null;    
-    public SymProc(String n, Tipo s, LinkedList i, LinkedList r, ASTBloque b) {
+    public SymProc(String n, Tipo s, LinkedList i, LinkedList r, ASTBloque b)     {
 	super(n,s);
 	in = i;
 	ref = r;
@@ -60,4 +61,23 @@ public class SymProc extends Sym {
 	else
 	    return false;
     }  
+
+   public void calcOffsets(int tam){
+
+       Iterator iti = in.iterator();
+       Iterator itr = ref.iterator();
+
+       ASTIdentificador argumento;
+
+       while(iti.hasNext()){
+           argumento = (ASTIdentificador) iti.next();
+           ((SymVar) bloque.getTable().getSym(argumento.getValue())).setOffset(tam);
+           tam += -argumento.getTable().exist(argumento.getValue()).getTipo().getTam();
+
+          if(((Boolean) itr.next()).booleanValue())
+             tam += -8;
+
+        }
+
+    }
 }

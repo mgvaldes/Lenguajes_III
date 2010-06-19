@@ -1502,8 +1502,7 @@ listaparametros ::= listaparametros:l COMA tipos:t referencia:r IDENTIFIER:i
                     {:  
                      ASTIdentificador id = new ASTIdentificador(i, null,null, t);
 
-                     if(r.booleanValue())
-			 parser.referencias.add(i);
+                     parser.referencias.add(r);
 		     
 		     parser.in.add(i);
 		     l.add(id);
@@ -1516,8 +1515,7 @@ listaparametros ::= listaparametros:l COMA tipos:t referencia:r IDENTIFIER:i
 
                      parser.referencias = new LinkedList();
 		     
-                     if(r.booleanValue())
-			 parser.referencias.add(i);
+                     parser.referencias.add(r);
 
 		     LinkedList l = new LinkedList();
 		     ASTIdentificador id = new ASTIdentificador(i, null,null, t);
@@ -1574,8 +1572,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 				while(it.hasNext()) {
 				    id = (ASTIdentificador) it.next();
 				    id2 = (ASTIdentificador) argumentos.next();
-				    s = new SymVar(id.getValue(), id.getState(), false, parser.desplazamiento);
-				    parser.desplazamiento += id.getState().getTam();
+				    s = new SymVar(id.getValue(), id.getState(), false, 0);
 				    
 				    if(!id2.getState().equals(id.getState())) {
 					parser.custom_error("El tipo de la variable "+id.getValue()+" no concuerda con la promesa de "+i);
@@ -1676,8 +1673,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 				      while(it.hasNext()) {
 					  id = (ASTIdentificador) it.next();
 					  id2 = (ASTIdentificador) argumentos.next();
-					  s = new SymVar(id.getValue(), id.getState(), false, parser.desplazamiento);
-					  parser.desplazamiento += id.getState().getTam();
+					  s = new SymVar(id.getValue(), id.getState(), false, 0);
 					  
 					  if(!id2.getState().equals(id.getState())) {
 					      parser.custom_error("El tipo de la variable "+id.getValue()+" no concuerda con la promesa de "+i);

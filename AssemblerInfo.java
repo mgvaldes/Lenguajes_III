@@ -34,19 +34,31 @@ public class AssemblerInfo {
 	return label;
     }
 
-    public static void writeStart(Writer fd, int size, LinkedList globales) {
+    public static void writeProgram(Writer fd, int size, SymTable table, LinkedList globales, LinkedList procedimientos) {
 	try {
 	    fd.write("%include \"asm_io.inc\"\n\n" +
 		     "section .bss\n" +
 		     "   static resb " + size + "\n\n" +
-		     "section .text\n" +
-		     "   global main\n" +
-		     "main:\n");
+		     "section .text\n\n");
 
-            Iterator it = globales.iterator();
+            Iterator it = procedimientos.iterator();
+            String proc = "";
+            SymProc procedimiento;
+
+            while(it.hasNext()){
+                proc = (String) it.next();
+                procedimiento = (SymProc)table.getSym(proc);
+                fd.write("proc"+proc+":\n");
+                writeProc(fd, procedimiento); 
+            }
+	
+            fd.write("   global main\n" +
+		     "main:\n");
 
             while(it.hasNext())
                 ((ASTAsignacion)it.next()).generateCode(fd,0,"");
+
+             writeProc(fd, (SymProc) table.getSym("main"));
 
 	}
 	catch (Exception e) {
@@ -54,7 +66,7 @@ public class AssemblerInfo {
 	}	
     }
 
-    public static void writeMain(Writer fd, SymProc pro) {
+    public static void writeProc(Writer fd, SymProc pro) {
 	int size = pro.getTamlocal();
 	
 	try {

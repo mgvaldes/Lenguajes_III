@@ -14,6 +14,7 @@ public class ASTAsignacion extends ASTInstruccion {
 	ids = l;
 	expr = e;
         casts = c;
+        isDeclaration = false;
     }
 
     public void setIds(LinkedList l) {
@@ -125,10 +126,16 @@ public class ASTAsignacion extends ASTInstruccion {
 		aux_state = ((SymVar)id.getTable().getSym(id.getValue())).getState();
 
 	        if (aux_state instanceof Basico && expr != null) {
-		    if(id.getTable().getParent() == null)
+		    String signo = "-";
+
+                    if( ((SymVar)id.getTable().getSym(id.getValue())).getIsIn() )
+                        signo = "-";
+
+                    if(id.getTable().getParent() == null)
 		        fd.write("mov [static + " + offset + "], " + reg + "\n");
+                      
 		    else
-		        fd.write("mov [" + AssemblerInfo.getFp() + " - " + offset + "], " + reg + "\n");
+		        fd.write("mov [" + AssemblerInfo.getFp() + " "+ signo + " " + offset + "], " + reg + "\n");
 	        }
 	        else if (aux_state instanceof Arreglo) {		    
 		    AssemblerInfo.saveReg(fd, nextReg + 1);

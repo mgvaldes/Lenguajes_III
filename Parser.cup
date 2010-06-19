@@ -140,7 +140,7 @@ non terminal ASTBloque bloque, main;
 non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaconstantes, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor;
 non terminal ASTAsignacion declaracion, declaracionsimple, declaracionsimple1, declaracionsimple2, listaident, asignacion,asignacion2, declaasig;
 non terminal ASTAsignacionExpr asignacion1;
-non terminal ASTExpresion expresionarit, expresion, expresionliteral, literales;
+non terminal ASTExpresion expresionarit, expresion, literales;
 non terminal ASTAcceso acceso;
 non terminal ASTInstruccion instruccion, condicional;
 non terminal ASTInvocar llamadafuncion;
@@ -479,10 +479,6 @@ listaatributos ::= listaatributos:l tipos:t IDENTIFIER:i SEQ
 		   :}
                 ;
 
-expresionliteral ::= expresion:e {: RESULT = e; :}
-                  |  literales:l {: parser.literal = true; RESULT = l; :}
-                  ;
-
 literales ::= literalarreglo:la {: RESULT = new ASTLiteralArreglo(la); :}
            |  literalstructunion:lur {: RESULT = new ASTLiteralUR(lur); :}
            ;
@@ -533,14 +529,14 @@ literalstructunion ::= BRACKETLEFT listaasignaciones:l BRACKETRIGHT
                        :}
                     ;
 
-listaasignaciones ::= listaasignaciones:l SEQ IDENTIFIER:i ASIG expresionliteral:el
+listaasignaciones ::= listaasignaciones:l SEQ IDENTIFIER:i ASIG expresion:el 
                       {:
                         LinkedList ids = new LinkedList();
                         ids.add(new ASTIdentificador(i,null, null, null));
                         l.add(new ASTAsignacion(ids, el, new LinkedList()));
                         RESULT = l;
                       :}
-                   |  IDENTIFIER:i ASIG expresionliteral:el
+                   |  IDENTIFIER:i ASIG expresion:el
                       {:
                         LinkedList l = new LinkedList();
                         LinkedList ids = new LinkedList();
@@ -639,7 +635,7 @@ declaracionsimple ::= declaracionsimple1:l {: RESULT = l; :}
 declaracionsimple1 ::= listaident:l {: RESULT = l; :} /* Declaracion sin asignacion */ 
                     ;
 
-declaracionsimple2 ::= listaident:l ASIG expresionliteral:e  /* Declaracion con asignacion de dos o mas identificadores */
+declaracionsimple2 ::= listaident:l ASIG expresion:e  /* Declaracion con asignacion de dos o mas identificadores */
                        {: 
 			l.setExpr(e);
 			RESULT = l;
@@ -781,39 +777,7 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		:}
              ;  
 
-asignacion2 ::= IDENTIFIER:i acceso:ac ASIG literales:e
-                {:
-		 Resultado r = parser.actual.exist(i); 
-		 Tipo state = r.getTipo();
-		 
-		 if (state == null) 
-		     parser.declaration_error(i);
-		 
-		 e.setState(state);
-		 e.update();
-		 
-		 if(!e.check())
-		     parser.custom_error("Error inicializando el literal");
-		 
-		 parser.literal = false;
-		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);
-		 id.update();
-		 
-		 if(!id.check())
-		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
-		 
-		 Tipo res = id.getState().asign(e.getState());
-		 
-		 if (res != null)
-		     state = res;
-		 else
-		     parser.type_error(id.getState(),e.getState() ,"asignar");
-		 
-		 ASTAsignacionExpr re = new ASTAsignacionExpr(id, e, state, parser.checkCast(id.getState(), e));
-		 RESULT = re.getASTAsignacion();
-                :}
-
-             |  IDENTIFIER:i acceso:ac ASIG READ tipos:t
+asignacion2 ::= IDENTIFIER:i acceso:ac ASIG READ tipos:t
                 {:
 		 Resultado r = parser.actual.exist(i); 
 		 Tipo state = r.getTipo();
@@ -892,7 +856,7 @@ asignacion2 ::= IDENTIFIER:i acceso:ac ASIG literales:e
 		 RESULT = new ASTAsignacion(l, re, c );
 	        :}
 
-             |  IDENTIFIER:i acceso:ac ASIG listaasig:l expresionliteral:e
+             |  IDENTIFIER:i acceso:ac ASIG listaasig:l expresion:e
                 {:
                  ASTIdentificador a;
 		 String id;
@@ -1346,6 +1310,7 @@ expresion ::= expresion:e1 EQ expresion:e2
            |  TRUE {: RESULT = new ASTConst(true); :}              
            |  COMILLAS CHAR:c COMILLAS {: RESULT = new ASTConst(c); :}
            |  expresionarit:e1 {: RESULT = e1; :}
+           |  literales:l {: RESULT = l; :}
            ;
 
 expresionarit ::= MINUS expresionarit:e1

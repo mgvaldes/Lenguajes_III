@@ -702,6 +702,16 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		 
 		 if (state == null) 
 		     parser.declaration_error(i);
+
+                 if(parser.literal) {
+		     e.setState(state);
+		     e.update();
+
+		     if(!e.check())
+			 parser.custom_error("Error inicializando el literal");
+		     
+		     parser.literal = false;
+                 }
 		 
 		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);		 
 		 id.update();
@@ -709,12 +719,12 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		 if (!id.check())
 		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
 
-		     Tipo res = id.getState().asign(e.getState());
+		 Tipo res = id.getState().asign(e.getState());
 		     
-		     if (res != null)
-			 state = res;
-		     else
-			 parser.type_error(id.getState(),e.getState() ,"asignar");
+		 if (res != null)
+		     state = res;
+		 else
+		     parser.type_error(id.getState(),e.getState() ,"asignar");
 		 		 
 	     	 RESULT = new ASTAsignacionExpr(id, e, state, parser.checkCast(id.getState(), e));
 	     	:}
@@ -1310,7 +1320,7 @@ expresion ::= expresion:e1 EQ expresion:e2
            |  TRUE {: RESULT = new ASTConst(true); :}              
            |  COMILLAS CHAR:c COMILLAS {: RESULT = new ASTConst(c); :}
            |  expresionarit:e1 {: RESULT = e1; :}
-           |  literales:l {: RESULT = l; :}
+           |  literales:l {: parser.literal = true; RESULT = l; :}
            ;
 
 expresionarit ::= MINUS expresionarit:e1

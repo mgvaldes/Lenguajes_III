@@ -556,7 +556,7 @@ declaraciontypedef ::= TYPEDEF tipos:ti IDENTIFIER:i
 
 tipos ::= basicos:b {: RESULT = b; :}
        |  complejos:c {: RESULT = c; :}
-       |  arreglos:a {: a.calcTam();RESULT = a; :}
+       |  arreglos:a {: RESULT = a; :}
        |  IDENTIFIER:i 
           {:
            Resultado r = parser.alias_actual.exist(i);

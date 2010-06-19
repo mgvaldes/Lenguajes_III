@@ -6,7 +6,7 @@ java -jar java-cup-11a.jar -parser Parser -symbols Symbols Parser.cup
 
 javac -source 1.4 -classpath java-cup-11a.jar *.java
 
-java CNC $1 NASM/$2.asm
+java -classpath .:java-cup-11a.jar CNC $1 NASM/$2.asm
 
 cd NASM
 

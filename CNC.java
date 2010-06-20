@@ -60,9 +60,7 @@ public class CNC {
         Writer fd = openFile(file_name);
   	AssemblerInfo ai = new AssemblerInfo();
 
-        ai.writeStart(fd, p.desplazamientoglobal, p.globales);
-	SymProc procedimiento = (SymProc)((SymTable)result).getSym("main");
-        ai.writeMain(fd, procedimiento);
+        ai.writeProgram(fd, p.desplazamientoglobal, (SymTable) result, p.globales, p.procedimientos);
 
         fd.close();
     }

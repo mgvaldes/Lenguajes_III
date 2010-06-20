@@ -57,7 +57,7 @@ public class ASTIdentificador extends ASTExpresion {
 		    fd.write("jmp " + no + "\n");
 		}
 	    }
-	    else if (aux_state instanceof Arreglo) {
+	    else if ((aux_state instanceof Arreglo) || (aux_state instanceof Registro)) {
 		if(getTable().getParent() == null) {
                     fd.write("mov " + reg + ", static \n");
 		    fd.write("add " + reg + ((SymVar)getTable().getSym(getValue())).getOffset() + "\n");

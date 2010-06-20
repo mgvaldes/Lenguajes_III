@@ -22,6 +22,24 @@ public class Registro extends Tipo {
 	    tam += ((Tipo)it.next()).getTam();
     }
 
+    public int getOffset(String campo) {
+	Iterator itc = campos.iterator();
+	Iterator itt = tipos.iterator();
+	int offset = 0;
+
+	while (itc.hasNext()) {
+	    
+	    if (((String)itc.next()).compareTo(campo) == 0) {
+		break;
+	    }
+	    else {
+		offset += ((Tipo)itt.next()).getTam();
+	    }
+	}
+
+	return offset;
+    }
+
     //@ requires c != null;
     public void setCampos(LinkedList c) {
   	campos = c;

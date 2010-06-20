@@ -47,9 +47,10 @@ section .rodata
     minus db "-", 0
     true db "true", 0
     false db "false", 0
+    error_indice db "Indice fuera de rango con valor ", 0
 
 section .text
-    global  print_string, print_nl, print_int, print_bool, print_char, print_float, print_reg, read_int, read_float, read_bool, read_char, memory_malloc
+    global  print_string, print_nl, print_int, print_bool, print_char, print_float, print_reg, read_int, read_float, read_bool, read_char, memory_malloc, print_error_indice
     extern printf, scanf, putchar, malloc ; fopen, fprintf, fclose
 
     memory_malloc:
@@ -169,6 +170,12 @@ section .text
         mov     rdi, dword int_format
         xor     rax,rax
         call    printf
+        epilogue
+
+    print_error_indice:
+	prologue
+        mov     rdi, error_indice
+        call    print_string	
         epilogue
 
     read_int:

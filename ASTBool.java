@@ -49,7 +49,7 @@ public class ASTBool extends ASTExpresion {
                 if (value.compareTo("==") == 0) {
 		    left.generateCode(fd, nextReg, si, no);
                     AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg+1, si, no);
+                    right.generateCode(fd, nextReg + 1, si, no);
                     fd.write("cmp " + reg + ", " + nreg + "\n");
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
                     fd.write("je " + si + "\n");

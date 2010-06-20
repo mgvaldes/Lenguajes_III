@@ -1,3 +1,6 @@
+import java.io.*;
+//import java.lang.System.*;
+
 public class ASTAccesoUR extends ASTAcceso {
 
     protected String campo;
@@ -52,5 +55,21 @@ public class ASTAccesoUR extends ASTAcceso {
 
 	return m;
     }
-
+    
+    public void generateCode(Writer fd, int nextReg, Tipo type) throws IOException {
+	try {
+	    String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
+	    
+	    if (((Registro)type).getCampos().contains(campo)) {
+		fd.write("add " + reg + ", " + ((Registro)type).getOffset(campo) + "\n");
+	    }
+	    else {
+		System.out.println("Acceso a campo " + campo + " invalido\n");
+		System.exit(1);
+	    }
+	}
+	catch (IOException e) {
+	    System.out.println("Error escribiendo en archivo de salida\n");
+	}
+    }
 }

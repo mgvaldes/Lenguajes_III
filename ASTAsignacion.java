@@ -78,7 +78,7 @@ public class ASTAsignacion extends ASTInstruccion {
 	    Tipo expr_state = new Basico(0); // Solo para inicializarlo
 
             if (expr != null) {		
-		if (!(expr instanceof ASTLiteralArreglo)) {
+		if (!(expr instanceof ASTLiteralArreglo) && !(expr instanceof ASTLiteralUR)) {
 		    if (expr instanceof ASTIdentificador) {
 			expr_state = ((SymVar)((ASTIdentificador)expr).getTable().getSym(expr.getValue())).getState();
 		    }
@@ -95,14 +95,15 @@ public class ASTAsignacion extends ASTInstruccion {
 			fd.write("mov " + reg + ", 0\n");    
 			fd.write(end + ":\n");
 		    }
-		    else if (expr_state instanceof Arreglo) {
+		    else if ((expr_state instanceof Arreglo) || (expr_state instanceof Registro)) {
 			expr.generateCode(fd, nextReg, si, no);	
 			if (((ASTIdentificador)expr).getAcceso().getHijo() != null) {
 			    fd.write("mov " + reg + ", [" + reg + "]\n");
 			}
 		    }
-		    else
+		    else {
 			expr.generateCode(fd, nextReg, si, no);
+		    }
 		}
             }
 
@@ -163,6 +164,33 @@ public class ASTAsignacion extends ASTInstruccion {
 			else {
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
 			}
+
+			AssemblerInfo.restoreReg(fd, nextReg + 1);
+		    }
+		}
+		else if (aux_state instanceof Registro) {		    
+		    AssemblerInfo.saveReg(fd, nextReg + 1);
+
+                    if (expr != null) { // Esto se verifica arriba.
+                        id.generateCode(fd, nextReg + 1, si, no);
+			if (expr instanceof ASTLiteralUR) {
+			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Registro)id.getState());
+			}
+			// else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			//     int tamBase = ((Arreglo)aux_state).getTipoBase().getTam();
+			//     int offs = 0;
+			//     String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
+
+			//     AssemblerInfo.saveReg(fd, nextReg + 2);
+			//     for (int i = 0; i < ((Arreglo)aux_state).getTam(); i++) {
+			// 	fd.write("mov " + reg2 + ", [" + reg + " - " + offs + "]\n");
+			// 	fd.write("mov [" + reg1 + " - " + offs + "], " + reg2 + "\n");
+			// 	offs += tamBase;
+			//     }
+			//     AssemblerInfo.restoreReg(fd, nextReg + 2);
+			// }
+			// else {
+			//}
 
 			AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    }

@@ -88,6 +88,21 @@ public class Union extends Tipo {
     }
 
     public Tipo asign(Tipo t) {
+
+        if(t instanceof Registro){
+
+            Registro reg = (Registro) t;
+
+            if(!reg.getPUnion())
+                return null;
+            else{
+                 if(checkUnion(reg))
+                     return this;
+                 else
+                     return null;
+            }
+       }
+
 	if(!(t instanceof Union))
 	    return null;
 
@@ -111,7 +126,7 @@ public class Union extends Tipo {
 	    if(s1.compareTo(s2)!=0)
 		return null;
 	    
-	    if(!((Tipo)iti1.next()).equals(((Tipo)iti2.next())))
+	    if(((Tipo)iti1.next()).asign(((Tipo)iti2.next())) == null)
 		return null;
 	}
 	
@@ -129,7 +144,23 @@ public class Union extends Tipo {
 
     }
 
+    private boolean checkUnion(Registro r){
+
+        Tipo t = (Tipo) r.getTipos().getFirst();
+        String id = (String) r.getCampos().getFirst();
+
+        int k = campos.indexOf(id);
+
+        if(k == -1 || ((Tipo) tipos.get(k)).asign(t) == null)
+            return false;
+        else
+            return true;
+
+    }
+
     public boolean equals(Tipo t) {
+
+        
 	if(!(t instanceof Union))
 	    return false;
 	
@@ -161,6 +192,21 @@ public class Union extends Tipo {
     }
 
     public String toString() {
-	return "union";
+
+	Iterator ica = campos.iterator();
+	Iterator iti = tipos.iterator();
+
+        String result = "union {";
+	
+	while(ica.hasNext()) {
+
+            result += (Tipo) iti.next()+" ";
+            result += (String) ica.next()+"; ";
+      
+	}
+
+        result += "}";
+
+        return result;
     }		
 }

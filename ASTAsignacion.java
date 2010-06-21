@@ -199,6 +199,7 @@ public class ASTAsignacion extends ASTInstruccion {
 
     	}
     	catch (Exception e) {
+            e.printStackTrace();
     	    System.out.println("Error escribiendo en archivo de salida");
     	}
     }

@@ -13,6 +13,13 @@ public class ASTLiteralUR extends ASTExpresion {
 	asignaciones = a;
     }
 
+    public void finalCheck(Tipo real){
+
+        if( real.asign(state) == null )
+            state = null;
+
+    }
+
     public Tipo inferType(){
 
        Iterator it = asignaciones.iterator();
@@ -51,90 +58,6 @@ public class ASTLiteralUR extends ASTExpresion {
     }
 
     public void update() {}
-
-    public void finalCheck(Tipo real){
-
-
-	boolean flag = false;
-        Registro reg = (Registro) state;
-
-        if(real instanceof Union){
-
-            if(!reg.getPUnion())
-                state = null;
-            else{
-                 if(!checkUnion((Union) real, reg))
-                     state = null;
-                 else
-                     state = real;
-            }
-
-       }
-       else if(real instanceof Registro){
-           if(reg.getCampos().size() == ((Registro) real).getCampos().size()) {
-
-               Iterator ica1 = ((Registro) real).getCampos().iterator();
-               Iterator iti1 = ((Registro) real).getTipos().iterator();
-
-               Iterator ica2 = reg.getCampos().iterator();
-               Iterator iti2 = reg.getTipos().iterator();	
-
-               String s1,s2;
-               Tipo t1, t2;
-	
-               while(ica1.hasNext()) {
-                   s1 = (String)ica1.next();
-                   s2 = (String)ica2.next();
-      
-                    if(s1.compareTo(s2)!=0){
-                        flag = true;
-                        break;
-                     }
-
-                    t1 = (Tipo) iti1.next();      
-                    t2 = (Tipo) iti2.next();
-
-                    if(t1 instanceof Union && t2 instanceof Registro){
-
-                        if(!checkUnion((Union) t1, (Registro) t2)){
-                            flag = true;
-                            break;
-                         }
-
-                    }
-                    else if( !t1.equals(t2) ){
-                        flag = true;
-                        break;
-                    }
-               }
-
-               if(flag)
-                   state = null;
-               else
-                   state = real;
-
-	   }
-
-		    
-       }
-       else
-           state = null;
-
-    } 
-
-    private boolean checkUnion(Union u, Registro r){
-
-        Tipo t = (Tipo) r.getTipos().getFirst();
-        String id = (String) r.getCampos().getFirst();
-
-        int k = u.getCampos().indexOf(id);
-
-        if(k == -1 || ((Tipo) u.getTipos().get(k)).asign(t) == null)
-            return false;
-        else
-            return true;
-
-    }
 
     public String printTree() {	
 	String m = new String(value);

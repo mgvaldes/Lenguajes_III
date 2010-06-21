@@ -26,7 +26,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
     public void finalCheck(Tipo real){
 
-        if( !(real instanceof Arreglo) || real.asign(state) == null )
+        if(real.asign(state) == null )
             state = null;
 
     }

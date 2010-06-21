@@ -121,12 +121,13 @@ public class Registro extends Tipo {
 	while(ica1.hasNext()) {
 	    s1 = (String)ica1.next();
 	    s2 = (String)ica2.next();
-      
+
 	    if(s1.compareTo(s2)!=0)
 		return null;
-      
-	    if(!((Tipo)iti1.next()).equals(((Tipo)iti2.next())))
+
+	    if(((Tipo)iti1.next()).asign(((Tipo)iti2.next())) == null)
 		return null;
+
 	}
 
 	return this;
@@ -174,7 +175,23 @@ public class Registro extends Tipo {
     }
     
     public String toString() {
-	return "struct";
+
+	Iterator ica = campos.iterator();
+	Iterator iti = tipos.iterator();
+
+        String result = "struct {";
+	
+	while(ica.hasNext()) {
+
+            result += (Tipo) iti.next()+" ";
+            result += (String) ica.next()+"; ";
+      
+	}
+
+        result += "}";
+
+        return result;
+
     }	
 
 }

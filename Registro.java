@@ -18,9 +18,13 @@ public class Registro extends Tipo {
 
         Iterator it = tipos.iterator();
         tam = 0;
+        Tipo ti;
 
-        while(it.hasNext())
-	    tam += ((Tipo)it.next()).getTam();
+        while(it.hasNext()){
+            ti = (Tipo) it.next();
+            if(ti != null)
+                tam += ti.getTam();
+        }
 
         pUnion = false;
     }

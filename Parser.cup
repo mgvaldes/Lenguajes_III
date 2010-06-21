@@ -354,8 +354,12 @@ declaracion ::= CONST tipos:t declaracionsimple:l
 		     parser.custom_error("Tiene que asignarle un valor a la variable(s) que son constantes");
 		 else {		     
 		     if(parser.literal) {
-			 e.setState(t);
-			 e.update();
+
+                         if(e instanceof ASTLiteralUR)
+                             ((ASTLiteralUR) e).finalCheck(t);
+                         else if(e instanceof ASTLiteralArreglo)
+                             ((ASTLiteralUR) e).finalCheck(t);
+
 			 if(!e.check())
 			     parser.custom_error("Error inicializando el literal");
 			 
@@ -400,14 +404,18 @@ declaracion ::= CONST tipos:t declaracionsimple:l
 		 
 		 if (e != null) {
                     if(parser.literal) {
-			e.setState(t);
-			e.update();
+
+                         if(e instanceof ASTLiteralUR)
+                             ((ASTLiteralUR) e).finalCheck(t);
+                         else if(e instanceof ASTLiteralArreglo)
+                             ((ASTLiteralUR) e).finalCheck(t);
+
 			if(!e.check())
 			    parser.custom_error("Error inicializando el literal");
 			
 			parser.literal = false;
 		    }
-		    
+
 		    res = t.asign(e.getState());
 		    
 		    if(res == null)
@@ -480,8 +488,16 @@ listaatributos ::= listaatributos:l tipos:t IDENTIFIER:i SEQ
 		   :}
                 ;
 
-literales ::= literalarreglo:la {: RESULT = new ASTLiteralArreglo(la); :}
-           |  literalstructunion:lur {: RESULT = new ASTLiteralUR(lur); :}
+literales ::= literalarreglo:la {: 
+                                  ASTLiteralArreglo res = new ASTLiteralArreglo(la);
+                                  res.updateState();
+                                  RESULT = res;
+                                :}
+           |  literalstructunion:lur {: 
+                                       ASTLiteralUR res = new ASTLiteralUR(lur);
+                                       res.updateState();
+                                       RESULT = res;
+                                     :}
            ;
 
 
@@ -705,8 +721,11 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		     parser.declaration_error(i);
 
                  if(parser.literal) {
-		     e.setState(state);
-		     e.update();
+
+                     if(e instanceof ASTLiteralUR)
+                         ((ASTLiteralUR) e).finalCheck(state);
+                     else if(e instanceof ASTLiteralArreglo)
+                         ((ASTLiteralUR) e).finalCheck(state);
 
 		     if(!e.check())
 			 parser.custom_error("Error inicializando el literal");
@@ -879,8 +898,10 @@ asignacion2 ::= IDENTIFIER:i acceso:ac ASIG READ tipos:t
 		     parser.declaration_error(i);
 
                  if(parser.literal) {
-		     e.setState(state);
-		     e.update();
+                     if(e instanceof ASTLiteralUR)
+                         ((ASTLiteralUR) e).finalCheck(state);
+                     else if(e instanceof ASTLiteralArreglo)
+                         ((ASTLiteralUR) e).finalCheck(state);
 
 		     if(!e.check())
 			 parser.custom_error("Error inicializando el literal");

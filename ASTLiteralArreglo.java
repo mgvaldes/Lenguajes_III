@@ -15,17 +15,37 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	flag = false;
     }
 
-    public void update() {
-	if(state != null) {
-	    if(state instanceof Arreglo)
-		checkList(((Arreglo) state).getSub(), arreglos);
-	    else
-		state = null;
-	}
+    public void updateState(){
+
+        state = inferType(arreglos);
+        checkList(((Arreglo) state).getSub(), arreglos);
+
     }
+
+    public void update() {}
+
+    public void finalCheck(Tipo real){
+
+        if( !(real instanceof Arreglo) || real.asign(state) == null )
+            state = null;
+
+    }
+
+    public Tipo inferType(LinkedList lista){
+
+       if(lista.getFirst() instanceof ASTConst)
+           return new Arreglo( lista.size(), ((ASTConst) lista.getFirst()).getState());
+
+       int size = lista.size();
+
+       return new Arreglo(size, inferType((LinkedList) lista.getFirst()));
+
+    }
+
+       
     
     //@ requires lista != null;
-    public void checkList(Tipo t, LinkedList lista) {
+    private void checkList(Tipo t, LinkedList lista) {
 	if(t == null)
 	    return;
 	else {
@@ -38,7 +58,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 		    flag = true;
 		    if(t.asign(((ASTConst) o).getState()) == null)
 			state = null;
-		}		
+		}
 	    }
 	    else {
 		LinkedList l = (LinkedList) o;
@@ -84,7 +104,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1); 
 	LinkedList elements = new LinkedList();
-	this.calcElements(arreglos, elements);
+	calcElements(arreglos, elements);
 	Iterator it = elements.iterator();
 	int tamBase = ((Arreglo)type).getTipoBase().getTam();
 	int offset = 0;

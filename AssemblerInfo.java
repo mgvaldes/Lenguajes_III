@@ -68,9 +68,9 @@ public class AssemblerInfo {
 
     public static void saveRegLlamado(Writer fd,int n){
 
-        if(n>nombresRegSize)
-            n = nombresRegSize;
+        try{
 
+<<<<<<< HEAD
         for(int i = 0; i<n; i++) {
 	    try {
 		fd.write("push "+nombresReg[i]+"\n");
@@ -79,13 +79,29 @@ public class AssemblerInfo {
 		System.out.println("Error escribiendo en archivo de salida\n");
 	    }	
 	}
+=======
+            if(n>nombresRegSize)
+                n = nombresRegSize;
+ 
+            for(int i = 0; i<n; i++)
+                fd.write("push "+nombresReg[i]+"\n");
+
+        }
+        catch(Exception e){
+	    System.out.println("Error escribiendo en archivo de salida\n");
+        }
+
+>>>>>>> afcd14b6016b683b604e9d0530796f1dcf4ab199
     }
 
     public static void restoreRegLlamado(Writer fd,int n){
 
-        if(n>nombresRegSize)
-            n = nombresRegSize;
+        try{
 
+            if(n>nombresRegSize)
+                n = nombresRegSize;
+
+<<<<<<< HEAD
         for(int i = n-1; i>=0; i--) {
 	    try {
 		fd.write("pop "+nombresReg[i]+"\n");
@@ -94,6 +110,16 @@ public class AssemblerInfo {
 		System.out.println("Error escribiendo en archivo de salida\n");
 	    }
 	}
+=======
+            for(int i = n-1; i>=0; i--)
+                fd.write("pop "+nombresReg[i]+"\n");
+
+        }
+        catch(Exception e){
+	    System.out.println("Error escribiendo en archivo de salida\n");
+        }
+
+>>>>>>> afcd14b6016b683b604e9d0530796f1dcf4ab199
     }
 
     public static void writeProc(Writer fd, SymProc pro) {

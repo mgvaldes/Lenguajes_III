@@ -53,6 +53,7 @@ public class CNC {
 		System.out.println("Programa sin errores estáticos.");
 	}
 	catch (Exception e) {
+            e.printStackTrace();
 	    System.out.println("Revise el error y vuelva a compilar.");
 	    System.exit(1);
 	}

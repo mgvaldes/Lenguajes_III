@@ -8,6 +8,7 @@ public class Registro extends Tipo {
     //@ invariant campos != null;
     private LinkedList tipos;
     private LinkedList campos;
+    private boolean pUnion;
 
     //@ requires t != null & c != null;
     public Registro(LinkedList t, LinkedList c) {
@@ -20,6 +21,17 @@ public class Registro extends Tipo {
 
         while(it.hasNext())
 	    tam += ((Tipo)it.next()).getTam();
+
+        pUnion = false;
+    }
+
+    public void setPUnion(boolean b){
+        pUnion = b;
+    }
+
+
+    public boolean getPUnion(){
+        return pUnion;
     }
 
     public int getOffset(String campo) {
@@ -89,6 +101,7 @@ public class Registro extends Tipo {
     }
 
     public Tipo asign(Tipo t) {
+
 	if(!(t instanceof Registro))
 	    return null;
 	

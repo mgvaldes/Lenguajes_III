@@ -97,8 +97,6 @@ public class ASTAsignacion extends ASTInstruccion {
 		    }
 		    else if ((expr_state instanceof Arreglo) || (expr_state instanceof Registro)) {
 			expr.generateCode(fd, nextReg, si, no);
-                        /*Creo que aqui puede haver un null pointer Gaby. Puedes tener una variable que sea un 
-                        Arreglo y esta no tiene pq tener un acceso y ahi te va un null. Creo pues. */
 			if (((ASTIdentificador)expr).getAcceso().getHijo() != null) {
 			    fd.write("mov " + reg + ", [" + reg + "]\n");
 			}

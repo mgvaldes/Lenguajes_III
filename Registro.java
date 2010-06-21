@@ -129,6 +129,7 @@ public class Registro extends Tipo {
     	}
 
     }
+
     public boolean equals(Tipo t) {
 	if(!(t instanceof Registro))
 	    return false;

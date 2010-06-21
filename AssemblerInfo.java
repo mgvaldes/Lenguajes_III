@@ -71,9 +71,14 @@ public class AssemblerInfo {
         if(n>nombresRegSize)
             n = nombresRegSize;
 
-        for(int i = 0; i<n; i++)
-            fd.write("push "+nombresReg[i]+"\n");
-
+        for(int i = 0; i<n; i++) {
+	    try {
+		fd.write("push "+nombresReg[i]+"\n");
+	    }
+	    catch (Exception e) {
+		System.out.println("Error escribiendo en archivo de salida\n");
+	    }	
+	}
     }
 
     public static void restoreRegLlamado(Writer fd,int n){
@@ -81,9 +86,14 @@ public class AssemblerInfo {
         if(n>nombresRegSize)
             n = nombresRegSize;
 
-        for(int i = n-1; i>=0; i--)
-            fd.write("pop "+nombresReg[i]+"\n");
-
+        for(int i = n-1; i>=0; i--) {
+	    try {
+		fd.write("pop "+nombresReg[i]+"\n");
+	    }
+	    catch (Exception e) {
+		System.out.println("Error escribiendo en archivo de salida\n");
+	    }
+	}
     }
 
     public static void writeProc(Writer fd, SymProc pro) {

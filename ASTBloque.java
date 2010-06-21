@@ -51,8 +51,9 @@ public class ASTBloque extends ASTInstruccion {
 	try {
 	    Iterator it = insts.iterator();
 	
-	    while (it.hasNext())
+	    while (it.hasNext()) {
 		((ASTInstruccion)it.next()).generateCode(fd, nextReg, breakLabel);
+	    }
 
     	}
     	catch (Exception e) {

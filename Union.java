@@ -133,7 +133,7 @@ public class Union extends Tipo {
 	if(!(t instanceof Union))
 	    return false;
 	
-	Registro r2 = (Registro) t;
+	Union r2 = (Union) t;
 	
 	if(r2.getCampos().size() != campos.size())
 	    return false;

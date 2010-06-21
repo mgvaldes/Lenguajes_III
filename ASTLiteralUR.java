@@ -13,77 +13,129 @@ public class ASTLiteralUR extends ASTExpresion {
 	asignaciones = a;
     }
 
-    public void update() {
-	String id;
-	ASTAsignacion a;
-	ASTExpresion e;
-	String campo;
-	Tipo t;
-	boolean flag = false;
+    public Tipo inferType(){
 
-	if(state != null) {
-	    if(state instanceof Registro) {
-		if(((Registro) state).getCampos().size() == asignaciones.size()) {
-		    Iterator ica = ((Registro) state).getCampos().iterator();
-		    Iterator iti = ((Registro) state).getTipos().iterator();
-		    Iterator iid = asignaciones.iterator();
+       Iterator it = asignaciones.iterator();
 
-		    while(ica.hasNext()) {
-			a = (ASTAsignacion) iid.next();			
-			id = ((ASTIdentificador) a.getIds().getFirst()).getValue();
-			e = a.getExpr();
-			campo = (String) ica.next();
-			t = (Tipo) iti.next();
+       ASTAsignacion a;
+       ASTExpresion e;
+       String id;
 
-			if(!id.equals(campo)) {
-			    flag = true; 
-			    break;
-			}
-			else {
-			    if(t.asign(e.getState()) == null)
-				state = null;
-			}
-		    }
+       LinkedList tipos = new LinkedList();
+       LinkedList campos = new LinkedList();
 
-		    if(flag)
-			state = null;
-		}
-		else
-		    state = null;
-	    }
-	    else if(state instanceof Union) {
-		if(asignaciones.size() == 1) {
-		    a = (ASTAsignacion) asignaciones.getFirst();
-		    id = ((ASTIdentificador) a.getIds().getFirst()).getValue();
-		    e = a.getExpr();
+			
+       while(it.hasNext()){
 
-		    Iterator ica = ((Union) state).getCampos().iterator();
-		    Iterator iti = ((Union) state).getTipos().iterator();
+           a = (ASTAsignacion) it.next();
+           e = a.getExpr();
+           id = ((ASTIdentificador) a.getIds().getFirst()).getValue();
 
-		    while(ica.hasNext()) {
-			campo = (String) ica.next();
-			t = (Tipo) iti.next();
+           tipos.add(e.getState());
+           campos.add(id);
 
-			if(id.equals(campo)) {   
-			    flag = true;
-			    if(t.asign(e.getState()) == null)
-				state = null;
-			    break;
-			}
-		    }
+       }
 
-		    if(!flag)
-			state = null;
-            
-		}
-		else
-		    state = null;
-	    }
-	    else
-		state = null;
-	}
+       Registro result = new Registro(tipos, campos);
+
+       if(tipos.size() == 1)
+           result.setPUnion(true);
+
+       return result;
+
+           
     }
-  
+
+    public void updateState(){
+        state = inferType();
+    }
+
+    public void update() {}
+
+    public void finalCheck(Tipo real){
+
+
+	boolean flag = false;
+        Registro reg = (Registro) state;
+
+        if(real instanceof Union){
+
+            if(!reg.getPUnion())
+                state = null;
+            else{
+                 if(!checkUnion((Union) real, reg))
+                     state = null;
+                 else
+                     state = real;
+            }
+
+       }
+       else if(real instanceof Registro){
+           if(reg.getCampos().size() == ((Registro) real).getCampos().size()) {
+
+               Iterator ica1 = ((Registro) real).getCampos().iterator();
+               Iterator iti1 = ((Registro) real).getTipos().iterator();
+
+               Iterator ica2 = reg.getCampos().iterator();
+               Iterator iti2 = reg.getTipos().iterator();	
+
+               String s1,s2;
+               Tipo t1, t2;
+	
+               while(ica1.hasNext()) {
+                   s1 = (String)ica1.next();
+                   s2 = (String)ica2.next();
+      
+                    if(s1.compareTo(s2)!=0){
+                        flag = true;
+                        break;
+                     }
+
+                    t1 = (Tipo) iti1.next();      
+                    t2 = (Tipo) iti2.next();
+
+                    if(t1 instanceof Union && t2 instanceof Registro){
+
+                        if(!checkUnion((Union) t1, (Registro) t2)){
+                            flag = true;
+                            break;
+                         }
+
+                    }
+                    else if( !t1.equals(t2) ){
+                        flag = true;
+                        break;
+                    }
+               }
+
+               if(flag)
+                   state = null;
+               else
+                   state = real;
+
+	   }
+
+		    
+       }
+       else
+           state = null;
+
+    } 
+
+    private boolean checkUnion(Union u, Registro r){
+
+        Tipo t = (Tipo) r.getTipos().getFirst();
+        String id = (String) r.getCampos().getFirst();
+
+        int k = u.getCampos().indexOf(id);
+
+        if(k == -1 || ((Tipo) u.getTipos().get(k)).asign(t) == null)
+            return false;
+        else
+            return true;
+
+    }
+
     public String printTree() {	
 	String m = new String(value);
 	return m;

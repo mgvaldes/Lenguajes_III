@@ -1,5 +1,5 @@
 import java.io.*;
-//import java.lang.System.*;
+import java.util.LinkedList;
 
 public class ASTAccesoUR extends ASTAcceso {
 
@@ -60,12 +60,32 @@ public class ASTAccesoUR extends ASTAcceso {
 	try {
 	    String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	    
-	    if (((Registro)type).getCampos().contains(campo)) {
-		fd.write("add " + reg + ", " + ((Registro)type).getOffset(campo) + "\n");
+	    if (type instanceof Union) {
+		String bien = AssemblerInfo.newLabel();
+		String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1); 
+		int pos = ((LinkedList)((Union)type).getCampos()).indexOf(campo);
+
+		AssemblerInfo.saveReg(fd, nextReg + 1);	
+		fd.write("mov " + reg1 + ", " + pos + "\n");		
+		fd.write("cmp [" + reg + "], " + reg1 + "\n");
+		AssemblerInfo.restoreReg(fd, nextReg + 1);
+		fd.write("je " + bien + "\n");
+		fd.write("call print_error_discriminante\n");
+		fd.write("call print_nl\n");
+		fd.write("mov eax, 1\n");
+		fd.write("int 80h\n");	
+
+		fd.write(bien + ":\n");
+		fd.write("add " + reg + ", 8\n");	
 	    }
 	    else {
-		System.out.println("Acceso a campo " + campo + " invalido\n");
-		System.exit(1);
+		if (((Registro)type).getCampos().contains(campo)) {
+		    fd.write("add " + reg + ", " + ((Registro)type).getOffset(campo) + "\n");
+		}
+		else {
+		    System.out.println("Acceso a campo " + campo + " invalido\n");
+		    System.exit(1);
+		}
 	    }
 	}
 	catch (IOException e) {

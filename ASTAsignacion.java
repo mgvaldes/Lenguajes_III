@@ -66,7 +66,7 @@ public class ASTAsignacion extends ASTInstruccion {
 	}
     }
     
-    public void generateCode( Writer fd, int nextReg, String breakLabel) throws IOException {
+    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
 	try {
 
 	    String si = AssemblerInfo.newLabel();
@@ -79,6 +79,7 @@ public class ASTAsignacion extends ASTInstruccion {
 
             if (expr != null) {
 		if (!(expr instanceof ASTLiteralArreglo) && !(expr instanceof ASTLiteralUR)) {
+		    //Esto tengo que hacerlo porque el state de los identificadores puede cambiar con los metodos de update().
 		    if (expr instanceof ASTIdentificador) {
 			expr_state = ((SymVar)((ASTIdentificador)expr).getTable().getSym(expr.getValue())).getState();
 		    }
@@ -86,6 +87,7 @@ public class ASTAsignacion extends ASTInstruccion {
 			expr_state = expr.getState();
 		    }
 		    
+		    //Caso especial para las expresiones booleanas
 		    if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
 			expr.generateCode(fd, nextReg, si, no);
 			fd.write(si + ":\n");
@@ -95,14 +97,16 @@ public class ASTAsignacion extends ASTInstruccion {
 			fd.write("mov " + reg + ", 0\n");    
 			fd.write(end + ":\n");
 		    }
-		    else if ((expr_state instanceof Arreglo) || (expr_state instanceof Registro)) {
+
+		    if (expr instanceof ASTIdentificador) {
 			expr.generateCode(fd, nextReg, si, no);
-			if (((ASTIdentificador)expr).getAcceso().getHijo() != null) {
+			if ((((ASTIdentificador)expr).getAcceso().getHijo() != null) || (expr_state instanceof Basico)) {
+			    //Esto es para evitar el caso de la asignacion directa de arreglos o registros, o asignacion de identificadores de tipo basico
 			    fd.write("mov " + reg + ", [" + reg + "]\n");
 			}
 		    }
 		    else {
-			expr.generateCode(fd, nextReg, si, no);
+			expr.generateCode(fd, nextReg, si, no);	       
 		    }
 		}
 
@@ -141,12 +145,13 @@ public class ASTAsignacion extends ASTInstruccion {
 	            }
 	            else if (aux_state instanceof Arreglo) {		    
 		        AssemblerInfo.saveReg(fd, nextReg + 1);
-
                         id.generateCode(fd, nextReg + 1, si, no);
+
                         if (expr instanceof ASTLiteralArreglo) {
 			    ((ASTLiteralArreglo)expr).generateCode(fd, nextReg + 1, (Arreglo)id.getState());
 			}
 			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			    //Caso de asignacion de arreglos.
 			    int tamBase = ((Arreglo)aux_state).getTipoBase().getTam();
 			    int offs = 0;
 			    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
@@ -164,15 +169,20 @@ public class ASTAsignacion extends ASTInstruccion {
 			}
 
                         AssemblerInfo.restoreReg(fd, nextReg + 1);
-
 		    }
 		    else if (aux_state instanceof Registro) {		    
 		        AssemblerInfo.saveReg(fd, nextReg + 1);
-
                         id.generateCode(fd, nextReg + 1, si, no);
+
                         if (expr instanceof ASTLiteralUR) {
 			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Registro)id.getState());
 			}
+			else {
+			    fd.write("mov [" + reg1 + "], " + reg + "\n");
+			}
+
+			AssemblerInfo.restoreReg(fd, nextReg + 1);
+
 			    // else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
 			    //     int tamBase = ((Arreglo)aux_state).getTipoBase().getTam();
 			    //     int offs = 0;
@@ -188,10 +198,21 @@ public class ASTAsignacion extends ASTInstruccion {
 			    // }
 			    // else {
 			    //}
+		    }
+		    else if (aux_state instanceof Union) {		    
+		        AssemblerInfo.saveReg(fd, nextReg + 1);			
+                        id.generateCode(fd, nextReg + 1, si, no);
 
+                        if (expr instanceof ASTLiteralUR) {
+			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Union)id.getState());
+			}
+			else {
+			    fd.write("mov [" + reg1 + "], " + reg + "\n");
+			}
+			
 			AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    }
-
+		    
                     if(ct != null)
                         AssemblerInfo.restoreSpecificReg(fd, reg);
                 }

@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 public class AssemblerInfo {
     
-    //Agregar "rdi" y "rax"
     private static String[] nombresReg = {"rax", "rbx", "rcx", "rdx", "rdi", "rsi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"};
     private static String fp = "rbp";
     private static String sp = "rsp";
@@ -49,7 +48,8 @@ public class AssemblerInfo {
                 proc = (String) it.next();
                 procedimiento = (SymProc)table.getSym(proc);
                 fd.write("proc"+proc+":\n");
-                writeProc(fd, procedimiento); 
+                writeProc(fd, procedimiento);
+                fd.write("\n");
             }
 	
             fd.write("   global main\n" +
@@ -64,6 +64,26 @@ public class AssemblerInfo {
 	catch (Exception e) {
 	    System.out.println("Error escribiendo en archivo de salida\n");
 	}	
+    }
+
+    public static void saveRegLlamado(Writer fd,int n){
+
+        if(n>nombresRegSize)
+            n = nombresRegSize;
+
+        for(int i = 0; i<n; i++)
+            fd.write("push "+nombresReg[i]+"\n");
+
+    }
+
+    public static void restoreRegLlamado(Writer fd,int n){
+
+        if(n>nombresRegSize)
+            n = nombresRegSize;
+
+        for(int i = n-1; i>=0; i--)
+            fd.write("pop "+nombresReg[i]+"\n");
+
     }
 
     public static void writeProc(Writer fd, SymProc pro) {

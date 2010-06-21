@@ -91,7 +91,18 @@ public class ASTInvocar extends ASTInstruccion {
     }
 
     public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
+        AssemblerInfo.saveRegLlamado(fd, nextReg);
 
+        Iterator it = expresionEntrada.iterator();
+
+        ASTExpresion argumento;
+
+        while(it.hasNext()){
+            argumento = (ASTExpresion) it.next();
+        }
+
+        AssemblerInfo.restoreRegLlamado(fd, nextReg);
+         
     }
 
 }

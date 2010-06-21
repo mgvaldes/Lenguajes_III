@@ -77,7 +77,7 @@ public class ASTAsignacion extends ASTInstruccion {
 	    String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1);
 	    Tipo expr_state = new Basico(0); // Solo para inicializarlo
 
-            if (expr != null) {		
+            if (expr != null) {
 		if (!(expr instanceof ASTLiteralArreglo) && !(expr instanceof ASTLiteralUR)) {
 		    if (expr instanceof ASTIdentificador) {
 			expr_state = ((SymVar)((ASTIdentificador)expr).getTable().getSym(expr.getValue())).getState();
@@ -96,7 +96,9 @@ public class ASTAsignacion extends ASTInstruccion {
 			fd.write(end + ":\n");
 		    }
 		    else if ((expr_state instanceof Arreglo) || (expr_state instanceof Registro)) {
-			expr.generateCode(fd, nextReg, si, no);	
+			expr.generateCode(fd, nextReg, si, no);
+                        /*Creo que aqui puede haver un null pointer Gaby. Puedes tener una variable que sea un 
+                        Arreglo y esta no tiene pq tener un acceso y ahi te va un null. Creo pues. */
 			if (((ASTIdentificador)expr).getAcceso().getHijo() != null) {
 			    fd.write("mov " + reg + ", [" + reg + "]\n");
 			}
@@ -105,47 +107,45 @@ public class ASTAsignacion extends ASTInstruccion {
 			expr.generateCode(fd, nextReg, si, no);
 		    }
 		}
-            }
 
-            Iterator it = ids.iterator();
-            Iterator itc = casts.iterator();
+                Iterator it = ids.iterator();
+                Iterator itc = casts.iterator();
 
-            ASTIdentificador id;
-            ASTCast ct;
-	    int offset;
-	    Tipo aux_state;
+                ASTIdentificador id;
+                ASTCast ct;
+	        int offset;
+	        Tipo aux_state;
 
-            while(it.hasNext()) {
+                while(it.hasNext()) {
 
-	        id = (ASTIdentificador)it.next();
-	        ct = (ASTCast)itc.next();
+	            id = (ASTIdentificador)it.next();
+	            ct = (ASTCast)itc.next();
 
-                if(ct != null){
-                    AssemblerInfo.saveSpecificReg(fd, reg);
-                    ct.generateCode(fd, nextReg, si, no);
-                }
+                    if(ct != null){
+                        AssemblerInfo.saveSpecificReg(fd, reg);
+                        ct.generateCode(fd, nextReg, si, no);
+                    }
 
-                offset = ((SymVar)id.getTable().getSym(id.getValue())).getOffset();
-		aux_state = ((SymVar)id.getTable().getSym(id.getValue())).getState();
+                    offset = ((SymVar)id.getTable().getSym(id.getValue())).getOffset();
+		    aux_state = ((SymVar)id.getTable().getSym(id.getValue())).getState();
 
-	        if (aux_state instanceof Basico && expr != null) {
-		    String signo = "-";
+	            if (aux_state instanceof Basico) {
+		        String signo = "-";
 
-                    if( ((SymVar)id.getTable().getSym(id.getValue())).getIsIn() )
-                        signo = "-";
+                        if( ((SymVar)id.getTable().getSym(id.getValue())).getIsIn() )
+                            signo = "-";
 
-                    if(id.getTable().getParent() == null)
-		        fd.write("mov [static + " + offset + "], " + reg + "\n");
-                      
-		    else
-		        fd.write("mov [" + AssemblerInfo.getFp() + " "+ signo + " " + offset + "], " + reg + "\n");
-	        }
-	        else if (aux_state instanceof Arreglo) {		    
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
+                        if(id.getTable().getParent() == null)
+		            fd.write("mov [static + " + offset + "], " + reg + "\n");
+                          
+		        else
+		            fd.write("mov [" + AssemblerInfo.getFp() + " "+ signo + " " + offset + "], " + reg + "\n");
+	            }
+	            else if (aux_state instanceof Arreglo) {		    
+		        AssemblerInfo.saveReg(fd, nextReg + 1);
 
-                    if (expr != null) { // Esto se verifica arriba.
                         id.generateCode(fd, nextReg + 1, si, no);
-			if (expr instanceof ASTLiteralArreglo) {
+                        if (expr instanceof ASTLiteralArreglo) {
 			    ((ASTLiteralArreglo)expr).generateCode(fd, nextReg + 1, (Arreglo)id.getState());
 			}
 			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
@@ -165,40 +165,40 @@ public class ASTAsignacion extends ASTInstruccion {
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
 			}
 
-			AssemblerInfo.restoreReg(fd, nextReg + 1);
-		    }
-		}
-		else if (aux_state instanceof Registro) {		    
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
+                        AssemblerInfo.restoreReg(fd, nextReg + 1);
 
-                    if (expr != null) { // Esto se verifica arriba.
+		    }
+		    else if (aux_state instanceof Registro) {		    
+		        AssemblerInfo.saveReg(fd, nextReg + 1);
+
                         id.generateCode(fd, nextReg + 1, si, no);
-			if (expr instanceof ASTLiteralUR) {
+                        if (expr instanceof ASTLiteralUR) {
 			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Registro)id.getState());
 			}
-			// else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
-			//     int tamBase = ((Arreglo)aux_state).getTipoBase().getTam();
-			//     int offs = 0;
-			//     String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
+			    // else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			    //     int tamBase = ((Arreglo)aux_state).getTipoBase().getTam();
+			    //     int offs = 0;
+			    //     String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
 
-			//     AssemblerInfo.saveReg(fd, nextReg + 2);
-			//     for (int i = 0; i < ((Arreglo)aux_state).getTam(); i++) {
-			// 	fd.write("mov " + reg2 + ", [" + reg + " - " + offs + "]\n");
-			// 	fd.write("mov [" + reg1 + " - " + offs + "], " + reg2 + "\n");
-			// 	offs += tamBase;
-			//     }
-			//     AssemblerInfo.restoreReg(fd, nextReg + 2);
-			// }
-			// else {
-			//}
+			    //     AssemblerInfo.saveReg(fd, nextReg + 2);
+			    //     for (int i = 0; i < ((Arreglo)aux_state).getTam(); i++) {
+			    // 	fd.write("mov " + reg2 + ", [" + reg + " - " + offs + "]\n");
+			    // 	fd.write("mov [" + reg1 + " - " + offs + "], " + reg2 + "\n");
+			    // 	offs += tamBase;
+			    //     }
+			    //     AssemblerInfo.restoreReg(fd, nextReg + 2);
+			    // }
+			    // else {
+			    //}
 
 			AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    }
-		}
 
-                if(ct != null)
-                    AssemblerInfo.restoreSpecificReg(fd, reg);
+                    if(ct != null)
+                        AssemblerInfo.restoreSpecificReg(fd, reg);
+                }
             }
+
     	}
     	catch (Exception e) {
     	    System.out.println("Error escribiendo en archivo de salida");

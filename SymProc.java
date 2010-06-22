@@ -67,6 +67,8 @@ public class SymProc extends Sym {
        Iterator iti = in.iterator();
        Iterator itr = ref.iterator();
 
+       tam += state.getTam();
+
        ASTIdentificador argumento;
 
        while(iti.hasNext()){

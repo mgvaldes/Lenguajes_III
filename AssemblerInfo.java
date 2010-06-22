@@ -47,105 +47,72 @@ public class AssemblerInfo {
             while(it.hasNext()){
                 proc = (String) it.next();
                 procedimiento = (SymProc)table.getSym(proc);
-                fd.write("proc"+proc+":\n");
-                writeProc(fd, procedimiento);
-                fd.write("\n");
+                if(!proc.equals("main")){
+                    fd.write("proc"+proc+":\n");
+                    writeProc(fd, procedimiento);
+                    fd.write("\n");
+               }
             }
 	
             fd.write("   global main\n" +
 		     "main:\n");
 
             while(it.hasNext())
-                ((ASTAsignacion)it.next()).generateCode(fd,0,"");
+                ((ASTAsignacion)it.next()).generateCode(fd,0,"","");
 
              writeProc(fd, (SymProc) table.getSym("main"));
 
 	}
 	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
+            e.printStackTrace();
+	    System.out.println("Error escribiendo en archivo de salida.\n");
 	}	
     }
 
-    public static void saveRegLlamado(Writer fd,int n){
+    public static void saveRegLlamado(Writer fd,int n) throws IOException{
 
-        try{
             if(n>nombresRegSize)
                 n = nombresRegSize;
 	    
             for(int i = 0; i<n; i++)
                 fd.write("push "+nombresReg[i]+"\n");
 
-        }
-        catch(Exception e){
-	    System.out.println("Error escribiendo en archivo de salida\n");
-        }
     }
 
-    public static void restoreRegLlamado(Writer fd,int n){
+    public static void restoreRegLlamado(Writer fd,int n) throws IOException{
 
-        try{
             if(n>nombresRegSize)
                 n = nombresRegSize;
 	    
             for(int i = n-1; i>=0; i--)
                 fd.write("pop "+nombresReg[i]+"\n");
-
-        }
-        catch(Exception e){
-	    System.out.println("Error escribiendo en archivo de salida\n");
-        }
     }
 
-    public static void writeProc(Writer fd, SymProc pro) {
+    public static void writeProc(Writer fd, SymProc pro) throws IOException {
 	int size = pro.getTamlocal();
+        String returnL = newLabel();
 	
-	try {
 	    fd.write("enter " + Integer.toString(size) + ", 0\n");
-	    pro.getBloque().generateCode(fd, 0,"");
+	    pro.getBloque().generateCode(fd, 0,"", returnL);
+            fd.write(returnL+":\n");
 	    fd.write("leave\nret\n");
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}	
     }
 
     public static void saveSpecificReg(Writer fd, String reg) throws IOException {
-	try {
 	    fd.write("push " + reg + "\n");
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}
     }
 
     public static void restoreSpecificReg(Writer fd, String reg) throws IOException {
-	try {
 	    fd.write("pop " + reg + "\n");
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}
     }
 
     public static void saveReg(Writer fd, int reg) throws IOException {
-	try {
-	    if (reg >= nombresRegSize) {
+	    if (reg >= nombresRegSize) 
 		fd.write("push " +  nombresReg[reg % nombresRegSize] + "\n");
-	    }	    
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}
     }
 
     public static void restoreReg(Writer fd, int reg) throws IOException {
-	try {
-	    if (reg >= nombresRegSize) {
+	    if (reg >= nombresRegSize) 
 		fd.write("pop " + nombresReg[reg % nombresRegSize] + "\n");
-	    }	    
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}
     }
 }

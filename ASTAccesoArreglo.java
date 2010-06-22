@@ -36,7 +36,6 @@ public class ASTAccesoArreglo extends ASTAcceso {
     }
 
     public void generateCode(Writer fd, int nextReg, Tipo type) throws IOException {
-	try {	   
 	    String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	    String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1);
 	    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
@@ -82,9 +81,5 @@ public class ASTAccesoArreglo extends ASTAcceso {
 	    fd.write(bien + ":\n");
 	    AssemblerInfo.restoreSpecificReg(fd, "rdi");
 	    AssemblerInfo.restoreReg(fd, nextReg + 3);	    	    
-	}
-	catch (IOException e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}
     }
 }

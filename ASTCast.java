@@ -19,7 +19,6 @@ public class ASTCast extends ASTExpresion {
     }
 
     public void generateCode(Writer fd, int nextReg, String si, String no) throws IOException {	
-	try {
             String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
 
             if(left != null)
@@ -75,10 +74,5 @@ public class ASTCast extends ASTExpresion {
                 break;
             }
                 
-                
-    	}
-    	catch (Exception e) {
-    	    System.out.println("Error escribiendo en archivo de salida\n");
-    	}
     }
 }

@@ -66,8 +66,7 @@ public class ASTAsignacion extends ASTInstruccion {
 	}
     }
     
-    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
-	try {
+    public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
 
 	    String si = AssemblerInfo.newLabel();
 	    String no = AssemblerInfo.newLabel();
@@ -217,12 +216,6 @@ public class ASTAsignacion extends ASTInstruccion {
                         AssemblerInfo.restoreSpecificReg(fd, reg);
                 }
             }
-
-    	}
-    	catch (Exception e) {
-            e.printStackTrace();
-    	    System.out.println("Error escribiendo en archivo de salida");
-    	}
     }
 }
 

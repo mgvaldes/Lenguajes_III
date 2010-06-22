@@ -40,7 +40,6 @@ public class ASTAritmetica extends ASTExpresion {
     }
 
     public void generateCode(Writer fd, int nextReg, String si, String no) throws IOException {	
-	try {
             String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
             String nreg = AssemblerInfo.getNombresRegAtPos(nextReg+1);	
 	    int basicType = ((Basico)state).getNBasico();
@@ -308,9 +307,5 @@ public class ASTAritmetica extends ASTExpresion {
 	    default:
 		break;
 	    }	    
-    	}
-	catch (Exception e) {
-    	    System.out.println("Error escribiendo en archivo de salida\n");
-    	}
     }
 }

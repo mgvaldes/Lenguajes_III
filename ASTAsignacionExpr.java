@@ -42,7 +42,6 @@ public class ASTAsignacionExpr extends ASTExpresion {
     }
 
     public void generateCode(Writer fd, int nextReg, String si, String no) throws IOException {
-	try {
 
 	    String newsi = AssemblerInfo.newLabel();
 	    String newno = AssemblerInfo.newLabel();
@@ -83,11 +82,6 @@ public class ASTAsignacionExpr extends ASTExpresion {
 		    fd.write("mov ["+AssemblerInfo.getFp()+" - " + ((SymVar)id.getTable().getSym(id.getValue())).getOffset() + "], "+reg+"\n");
 
 	    }
- 
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}
     }
 
 

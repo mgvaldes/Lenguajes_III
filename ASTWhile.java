@@ -41,8 +41,7 @@ public class ASTWhile extends ASTInstruccion {
 	return m;
     }
 
-    public void generateCode( Writer fd, int nextReg, String breakLabel) throws IOException {
-	try {
+    public void generateCode( Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
 
           String si = AssemblerInfo.newLabel();
           String exp = AssemblerInfo.newLabel();
@@ -52,7 +51,7 @@ public class ASTWhile extends ASTInstruccion {
 
           fd.write(si+":\n");
 
-          bloque.generateCode(fd,nextReg, no);
+          bloque.generateCode(fd,nextReg, no, returnLabel);
 
           fd.write(exp+":\n");
 
@@ -60,10 +59,5 @@ public class ASTWhile extends ASTInstruccion {
 
           fd.write(no+":\n");
 
-
-    	}
-    	catch (Exception e) {
-    	    System.out.println("Error escribiendo en archivo de salida\n");
-    	}
     }
 }

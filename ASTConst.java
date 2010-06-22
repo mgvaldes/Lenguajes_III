@@ -86,7 +86,6 @@ public class ASTConst extends ASTExpresion {
 	int basicType = ((Basico)state).getNBasico();
 	String reg = AssemblerInfo.getNombresRegAtPos(nextReg);	
 	
-	try {
 	    switch (basicType) {
 	    case 1:
 		fd.write("mov " + reg + ", " + caseInt + "\n");
@@ -107,9 +106,5 @@ public class ASTConst extends ASTExpresion {
 		break;
 	    default:
 	    }	       	    
-    	}
-    	catch (Exception e) {
-    	    System.out.println("Error escribiendo en archivo de salida\n");
-    	}
     }
 }

@@ -65,7 +65,7 @@ public class AssemblerInfo {
 	}
 	catch (Exception e) {
             e.printStackTrace();
-	    System.out.println("Error escribiendo en archivo de salida.\n");
+	    System.out.println("Error escribiendo en archivo de salida.");
 	}	
     }
 

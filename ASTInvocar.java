@@ -99,6 +99,8 @@ public class ASTInvocar extends ASTInstruccion {
 
         while(it.hasNext()){
             argumento = (ASTExpresion) it.next();
+            String si = AssemblerInfo.newLabel();
+            String no = AssemblerInfo.newLabel();
         }
 
         AssemblerInfo.restoreRegLlamado(fd, nextReg);

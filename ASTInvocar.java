@@ -8,7 +8,7 @@ public class ASTInvocar extends ASTInstruccion {
     private String nombre;
     private LinkedList expresionEntrada;
     private Tipo state;
-    private LinkedList ref;
+    private SymProc procInfo;
 
     //@ requires e != null;
     public ASTInvocar(String n, LinkedList e, Tipo s) {
@@ -16,7 +16,6 @@ public class ASTInvocar extends ASTInstruccion {
 	nombre = n;
 	expresionEntrada = e;
 	state = s;
-        ref = null;
     }
 
     public void setNombre(String n) {
@@ -36,8 +35,8 @@ public class ASTInvocar extends ASTInstruccion {
 	return expresionEntrada;
     }
 
-    public void setRef(LinkedList r){
-        ref = r;
+    public void setRef(SymProc p){
+        procInfo = p;
     }
 
     public ASTInvocarExpresion toExpresion() {
@@ -45,15 +44,16 @@ public class ASTInvocar extends ASTInstruccion {
 	return r;
     }
 
-    public LinkedList getRef(){
-        return ref;
+    public SymProc getProcInfo(){
+        return procInfo;
     }
 
     //@ requires proc != null;  
     public boolean check(SymProc proc) {
 	LinkedList nombres = proc.getIn();
 	SymTable tabla = proc.getTable();
-        ref = proc.getRef();
+        LinkedList ref = proc.getRef();
+        procInfo = proc;
 	Tipo res;
 
 	if(expresionEntrada == null)
@@ -84,7 +84,7 @@ public class ASTInvocar extends ASTInstruccion {
     public boolean check(Promesa pro) {
 
         LinkedList argumentos = pro.getArgumentos();
-        ref = pro.getReferencias();
+        LinkedList ref = pro.getReferencias();
 
 	Tipo res;
 
@@ -131,6 +131,8 @@ public class ASTInvocar extends ASTInstruccion {
 
         String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
         Iterator ite = expresionEntrada.iterator();
+        Iterator itt = procInfo.getIn().iterator();
+        LinkedList ref = procInfo.getRef();        
         Iterator itr = ref.iterator();
         ASTExpresion argumento;
 
@@ -153,6 +155,11 @@ public class ASTInvocar extends ASTInstruccion {
                fd.write(end + ":\n");
            }
            else if(argumento instanceof ASTIdentificador){
+
+               if(argumento.getState() instanceof Basico)
+                   fd.write("push ["+reg+"]\n");
+               else
+                   generatePushCastCode(fd, nextReg, (Tipo) itt.next() , argumento.getState());
            }
            else if(argumento instanceof ASTLiteralArreglo){
            }
@@ -167,6 +174,65 @@ public class ASTInvocar extends ASTInstruccion {
 
         }
 
+    }
+
+    public void generatePushCastCode(Writer fd, int nextReg, Tipo dest, Tipo source) throws IOException{
+
+        String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
+
+        if(source instanceof Arreglo){
+
+            Tipo bsource = ((Arreglo) source).getTipoBase();
+            Tipo bdest = ((Arreglo) dest).getTipoBase();
+
+            if(bsource instanceof Basico){
+                ASTCast cast = AssemblerInfo.checkCast(bdest, bsource);
+                for(int i = 0; i < source.getTam(); i += 8){
+                    if(cast != null){
+                        cast.generateCode(fd, nextReg, "", "");
+                    }
+                    fd.write("push ["+reg+"]\n");
+                    fd.write("add "+reg+",8\n");
+                }
+            }
+            else{
+                for(int i = 0; i < source.getTam(); i += bsource.getTam())
+                    generatePushCastCode(fd, nextReg, bdest, bsource);
+            }
+        }
+       else if(source instanceof Registro){
+
+            Iterator its = ((Registro) source).getTipos().iterator();
+            Iterator itd = ((Registro) dest).getTipos().iterator();
+
+            Tipo esource;
+            Tipo edest;
+
+            while(its.hasNext()){
+
+                esource = (Tipo) its.next();
+                edest = (Tipo) itd.next();
+
+                if(esource instanceof Basico){
+                    ASTCast cast = AssemblerInfo.checkCast(edest, esource);
+                    if(cast != null){
+                        cast.generateCode(fd, nextReg, "", "");
+                    }
+                    fd.write("push ["+reg+"]\n");
+                    fd.write("add "+reg+",8\n");
+                }
+                else
+                    generatePushCastCode(fd, nextReg, edest, esource);
+            }
+        }
+       else if(source instanceof Union){
+
+            for(int i = 0; i< ((Union) source).getTam(); i += 8){
+                fd.write("push ["+reg+"]\n");
+                fd.write("add "+reg+",8\n");
+            }
+
+        }
     }
 
 }

@@ -318,8 +318,7 @@ instruccion ::= declaracion:d SEQ {: RESULT = d; :}
              |  llamadafuncion:i SEQ {: RESULT = i; :}
              |  RETURN SEQ
                 {:
-		 ASTInstruccion i = new ASTInstruccion("return");
-		 i.setIreturn(true);
+		 ASTReturn i = new ASTReturn(parser.intam);
 		 
 		 Tipo t = parser.tipoactualfun;
 		 
@@ -330,8 +329,7 @@ instruccion ::= declaracion:d SEQ {: RESULT = d; :}
                 :}
              |  RETURN expresion:e SEQ 
                 {:
-		 ASTInstruccion i = new ASTInstruccion("return");
-		 i.setIreturn(true);
+		 ASTReturn i = new ASTReturn(parser.intam);
 		 
 		 Tipo t = parser.tipoactualfun;
 		 
@@ -1636,6 +1634,8 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
                          }
 			
 			SymProc p = new SymProc(i,t, parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
+
+                        parser.intam += 8 + t.getTam();
 		        
 			if(!error) {
 			    if(!parser.anterior.insert(p, parser.anidamiento))
@@ -1657,7 +1657,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			    SymProc p = (SymProc) s;
 			    p.setTamlocal(parser.maxdesplazamiento);
 			    p.getBloque().setInsts(b.getInsts());
-                            p.calcOffsets(parser.intam+8);
+                            p.calcOffsets(parser.intam-t.getTam());
                             parser.intam=0;
 			}
 			
@@ -1740,6 +1740,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			      }
 			      
 			      SymProc p = new SymProc(i,new Basico(0), parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
+                              parser.intam += 8;
 			      
 			      if(!error) {
 				  if(!parser.anterior.insert(p, parser.anidamiento))
@@ -1761,7 +1762,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 				  SymProc p = (SymProc) s;
 				  p.setTamlocal(parser.maxdesplazamiento);
 				  p.getBloque().setInsts(b.getInsts());
-                                  p.calcOffsets(parser.intam+8);
+                                  p.calcOffsets(parser.intam);
                                   parser.intam=0;
 			      }
 			      

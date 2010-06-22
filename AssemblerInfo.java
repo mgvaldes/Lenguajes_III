@@ -115,4 +115,21 @@ public class AssemblerInfo {
 	    if (reg >= nombresRegSize) 
 		fd.write("pop " + nombresReg[reg % nombresRegSize] + "\n");
     }
+
+    public static ASTCast checkCast(Tipo dest, Tipo source) {
+
+        if (source == null) return null;
+        if (source == null) return null;
+
+        if (dest.equals(new Basico(1)) && source.equals(new Basico(2)))
+            return new ASTCast(null, new Basico(1));
+
+        if (dest.equals(new Basico(2)) && source.equals(new Basico(1)))
+            return new ASTCast(null, new Basico(2));
+
+        if (dest.equals(new Basico(4)) && source.equals(new Basico(1)))
+            return new ASTCast(null, new Basico(4));
+
+	return null;
+    }
 }

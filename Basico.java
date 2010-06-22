@@ -10,7 +10,10 @@ public class Basico extends Tipo {
     public Basico(int n) {
 	super();
 	nBasico = n;
-        tam = 8;
+        if(n != 0)
+            tam = 8;
+        else
+            tam = 0;
     }
 
     public void setNBasico(int n) {

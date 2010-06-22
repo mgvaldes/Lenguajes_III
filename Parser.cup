@@ -358,7 +358,7 @@ declaracion ::= CONST tipos:t declaracionsimple:l
                          if(e instanceof ASTLiteralUR)
                              ((ASTLiteralUR) e).finalCheck(t);
                          else if(e instanceof ASTLiteralArreglo)
-                             ((ASTLiteralUR) e).finalCheck(t);
+                             ((ASTLiteralArreglo) e).finalCheck(t);
 
 			 if(!e.check())
 			     parser.custom_error("Error inicializando el literal");
@@ -408,7 +408,7 @@ declaracion ::= CONST tipos:t declaracionsimple:l
                          if(e instanceof ASTLiteralUR)
                              ((ASTLiteralUR) e).finalCheck(t);
                          else if(e instanceof ASTLiteralArreglo)
-                             ((ASTLiteralUR) e).finalCheck(t);
+                             ((ASTLiteralArreglo) e).finalCheck(t);
 
 			if(!e.check())
 			    parser.custom_error("Error inicializando el literal");
@@ -726,7 +726,7 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
                      if(e instanceof ASTLiteralUR)
                          ((ASTLiteralUR) e).finalCheck(state);
                      else if(e instanceof ASTLiteralArreglo)
-                         ((ASTLiteralUR) e).finalCheck(state);
+                         ((ASTLiteralArreglo) e).finalCheck(state);
 
 		     if(!e.check())
 			 parser.custom_error("Error inicializando el literal");
@@ -902,7 +902,7 @@ asignacion2 ::= IDENTIFIER:i acceso:ac ASIG READ tipos:t
                      if(e instanceof ASTLiteralUR)
                          ((ASTLiteralUR) e).finalCheck(state);
                      else if(e instanceof ASTLiteralArreglo)
-                         ((ASTLiteralUR) e).finalCheck(state);
+                         ((ASTLiteralArreglo) e).finalCheck(state);
 
 		     if(!e.check())
 			 parser.custom_error("Error inicializando el literal");

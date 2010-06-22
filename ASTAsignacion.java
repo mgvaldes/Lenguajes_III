@@ -66,8 +66,7 @@ public class ASTAsignacion extends ASTInstruccion {
 	}
     }
     
-    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
-	try {
+    public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
 
 	    String si = AssemblerInfo.newLabel();
 	    String no = AssemblerInfo.newLabel();

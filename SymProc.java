@@ -67,11 +67,13 @@ public class SymProc extends Sym {
        Iterator iti = in.iterator();
        Iterator itr = ref.iterator();
 
+       tam += state.getTam();
+
        ASTIdentificador argumento;
 
        while(iti.hasNext()){
            argumento = (ASTIdentificador) iti.next();
-           ((SymVar) bloque.getTable().getSym(argumento.getValue())).setOffset(tam);
+           ((SymVar) bloque.getTable().getSym(argumento.getValue())).setOffset(-tam);
            tam += -argumento.getTable().exist(argumento.getValue()).getTipo().getTam();
 
           if(((Boolean) itr.next()).booleanValue())

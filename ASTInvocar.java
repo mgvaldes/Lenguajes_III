@@ -90,7 +90,7 @@ public class ASTInvocar extends ASTInstruccion {
 	return nombre;
     }
 
-    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
+    public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
         AssemblerInfo.saveRegLlamado(fd, nextReg);
 
         Iterator it = expresionEntrada.iterator();
@@ -99,6 +99,8 @@ public class ASTInvocar extends ASTInstruccion {
 
         while(it.hasNext()){
             argumento = (ASTExpresion) it.next();
+            String si = AssemblerInfo.newLabel();
+            String no = AssemblerInfo.newLabel();
         }
 
         AssemblerInfo.restoreRegLlamado(fd, nextReg);

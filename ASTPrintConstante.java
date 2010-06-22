@@ -23,8 +23,7 @@ public class ASTPrintConstante extends ASTInstruccion {
 
     public void update() {}
 
-    public void generateCode(Writer fd, int nextReg) {
-	try {
+    public void generateCode(Writer fd, int nextReg) throws IOException {
 	    AssemblerInfo.saveSpecificReg(fd, "rdi");
 	    
 	    Basico t = (Basico) constante.getState();
@@ -54,9 +53,5 @@ public class ASTPrintConstante extends ASTInstruccion {
 	    
 	    AssemblerInfo.restoreSpecificReg(fd, "rdi");
 	    
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}        
     }
 }

@@ -57,7 +57,6 @@ public class ASTAccesoUR extends ASTAcceso {
     }
     
     public void generateCode(Writer fd, int nextReg, Tipo type) throws IOException {
-	try {
 	    String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	    
 	    if (type instanceof Union) {
@@ -88,9 +87,5 @@ public class ASTAccesoUR extends ASTAcceso {
 		    System.exit(1);
 		}
 	    }
-	}
-	catch (IOException e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}
     }
 }

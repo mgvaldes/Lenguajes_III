@@ -47,19 +47,11 @@ public class ASTBloque extends ASTInstruccion {
 
     }
 
-    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
-	try {
-	    System.out.println(insts.size());
-	    Iterator it = insts.iterator();
+    public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
+	Iterator it = insts.iterator();
 	
-	    while (it.hasNext()) {
-		System.out.println("---------");
-		((ASTInstruccion)it.next()).generateCode(fd, nextReg, breakLabel);
-	    }
-
-    	}
-    	catch (Exception e) {
-    	    System.out.println("Error escribiendo en archivo de salida\n");
-    	}
+	while (it.hasNext()) {
+	    ((ASTInstruccion)it.next()).generateCode(fd, nextReg, breakLabel, returnLabel);
+	}
     }
 }

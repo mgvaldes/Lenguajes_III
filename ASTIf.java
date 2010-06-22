@@ -101,8 +101,7 @@ public class ASTIf extends ASTInstruccion {
 
     }
 
-    public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
-	try {
+    public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
 	    Iterator itc = cond.iterator();
 	    Iterator itb = bloques.iterator();
 
@@ -112,7 +111,7 @@ public class ASTIf extends ASTInstruccion {
 
 	    ((ASTExpresion) itc.next()).generateCode(fd,nextReg, si, no);
 	    fd.write(si + ":\n");
-	    ((ASTBloque) itb.next()).generateCode(fd, nextReg, breakLabel);
+	    ((ASTBloque) itb.next()).generateCode(fd, nextReg, breakLabel, returnLabel);
 	    fd.write("jmp " + end + "\n");
 
 	    while(itc.hasNext()) {
@@ -121,20 +120,14 @@ public class ASTIf extends ASTInstruccion {
 		no = AssemblerInfo.newLabel();
 		((ASTExpresion) itc.next()).generateCode(fd, nextReg, si, no);
 		fd.write(si + ":\n");
-		((ASTBloque) itb.next()).generateCode(fd, nextReg, breakLabel);
+		((ASTBloque) itb.next()).generateCode(fd, nextReg, breakLabel, returnLabel);
 		fd.write("jmp " + end + "\n");
 	    }
 
 	    fd.write(no + ":\n");
 	    if(els != null)
-		els.generateCode(fd, nextReg, breakLabel);
+		els.generateCode(fd, nextReg, breakLabel, returnLabel);
 
 	    fd.write(end + ":\n");
-
-    	}
-    	catch (Exception e) {
-            e.printStackTrace();
-    	    System.out.println("Error escribiendo en archivo de salida");
-    	}
     }
 }

@@ -23,8 +23,7 @@ public class ASTPrintIdentificador extends ASTInstruccion {
 
     public void update() {}
 
-    public void generateCode(Writer fd, int nextReg, String breakLabel) {
-	try {
+    public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException{
 	    AssemblerInfo.saveSpecificReg(fd, "rdi");
 	    Basico t = new Basico(0);
 	    
@@ -58,9 +57,5 @@ public class ASTPrintIdentificador extends ASTInstruccion {
 	    }
 	    
 	    AssemblerInfo.restoreSpecificReg(fd, "rdi");	    
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}        
     }
 }

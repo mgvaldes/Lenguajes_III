@@ -41,7 +41,6 @@ public class ASTIdentificador extends ASTExpresion {
     }
 
     public void generateCode(Writer fd, int nextReg, String si, String no)  throws IOException {
-	try {	    
 	    String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
 	    Tipo aux_state = ((SymVar)getTable().getSym(getValue())).getState();
 
@@ -68,9 +67,5 @@ public class ASTIdentificador extends ASTExpresion {
 		    }
 		}
 	    }
-	}
-	catch (IOException e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}
     }
 }

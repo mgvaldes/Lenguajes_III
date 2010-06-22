@@ -13,8 +13,7 @@ public class ASTRead extends ASTExpresion {
 
     public void update() {}
 
-    public void generateCode(Writer fd, int nextReg, String si, String no) {
-	try {
+    public void generateCode(Writer fd, int nextReg, String si, String no) throws IOException {
             String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
 
 	    switch(((Basico) state).getNBasico()) {
@@ -54,9 +53,5 @@ public class ASTRead extends ASTExpresion {
 	        fd.write("pop rdi\n");
 	        break;
 	    }
-	}
-	catch (Exception e) {
-	    System.out.println("Error escribiendo en archivo de salida\n");
-	}        
     }
 }

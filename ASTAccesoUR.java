@@ -80,6 +80,7 @@ public class ASTAccesoUR extends ASTAcceso {
 	    }
 	    else {
 		if (((Registro)type).getCampos().contains(campo)) {
+		    System.out.println("aqui, offset de campo " + campo + ": " + ((Registro)type).getOffset(campo));
 		    fd.write("add " + reg + ", " + ((Registro)type).getOffset(campo) + "\n");
 		}
 		else {

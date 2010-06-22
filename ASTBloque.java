@@ -49,9 +49,11 @@ public class ASTBloque extends ASTInstruccion {
 
     public void generateCode(Writer fd, int nextReg, String breakLabel) throws IOException {
 	try {
+	    System.out.println(insts.size());
 	    Iterator it = insts.iterator();
 	
 	    while (it.hasNext()) {
+		System.out.println("---------");
 		((ASTInstruccion)it.next()).generateCode(fd, nextReg, breakLabel);
 	    }
 

@@ -488,18 +488,19 @@ listaatributos ::= listaatributos:l tipos:t IDENTIFIER:i SEQ
 		   :}
                 ;
 
-literales ::= literalarreglo:la {: 
-                                  ASTLiteralArreglo res = new ASTLiteralArreglo(la);
-                                  res.updateState();
-                                  RESULT = res;
-                                :}
-           |  literalstructunion:lur {: 
-                                       ASTLiteralUR res = new ASTLiteralUR(lur);
-                                       res.updateState();
-                                       RESULT = res;
-                                     :}
+literales ::= literalarreglo:la 
+              {: 
+	       ASTLiteralArreglo res = new ASTLiteralArreglo(la);
+	       res.updateState();
+	       RESULT = res;
+	      :}
+           |  literalstructunion:lur 
+	      {: 
+	       ASTLiteralUR res = new ASTLiteralUR(lur);
+	       res.updateState();
+	       RESULT = res;
+	      :}
            ;
-
 
 listaliteralarreglo ::= listaliteralarreglo:l SEQ literalarreglo:la
                         {:

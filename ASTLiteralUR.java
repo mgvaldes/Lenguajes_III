@@ -80,46 +80,52 @@ public class ASTLiteralUR extends ASTExpresion {
 		while (asigs.hasNext()) {
 		    aux = (ASTAsignacion)asigs.next();
 		    fd.write("add " + reg + ", " + ((Registro)type).getOffset((String)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue()) + "\n");
-		
-		    AssemblerInfo.saveReg(fd, nextReg + 1);		    
-		    if (!(aux.getExpr() instanceof ASTLiteralArreglo) && !(aux.getExpr() instanceof ASTLiteralUR)) {
-			if (aux.getExpr() instanceof ASTIdentificador) {
-			    expr_state = ((SymVar)((ASTIdentificador)aux.getExpr()).getTable().getSym(aux.getExpr().getValue())).getState();
-			}
-			else {
-			    expr_state = aux.getExpr().getState();
-			}
 		    
-			if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
-			    aux.getExpr().generateCode(fd, nextReg + 1, si, no);
-			    fd.write(si + ":\n");
-			    fd.write("mov " + reg1 + ", 1\n");    
-			    fd.write("jmp " + end + "\n");		    
-			    fd.write(no + ":\n");
-			    fd.write("mov " + reg1 + ", 0\n");    
-			    fd.write(end + ":\n");
-			}
+		    if (aux.getExpr() != null) {
+			AssemblerInfo.saveReg(fd, nextReg + 1);		    
+			if (!(aux.getExpr() instanceof ASTLiteralArreglo) && !(aux.getExpr() instanceof ASTLiteralUR)) {
+			    if (aux.getExpr() instanceof ASTIdentificador) {
+				expr_state = ((SymVar)((ASTIdentificador)aux.getExpr()).getTable().getSym(aux.getExpr().getValue())).getState();
+			    }
+			    else {
+				expr_state = aux.getExpr().getState();
+			    }
 		    
-			if (aux.getExpr() instanceof ASTIdentificador) {
-			    aux.getExpr().generateCode(fd, nextReg + 1, si, no);	
-			    if ((((ASTIdentificador)aux.getExpr()).getAcceso().getHijo() != null) || (expr_state instanceof Basico)) {
+			    if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
+				aux.getExpr().generateCode(fd, nextReg + 1, si, no);
+				fd.write(si + ":\n");
+				fd.write("mov " + reg1 + ", 1\n");    
+				fd.write("jmp " + end + "\n");		    
+				fd.write(no + ":\n");
+				fd.write("mov " + reg1 + ", 0\n");    
+				fd.write(end + ":\n");
+			    }
+			    else {
+				aux.getExpr().generateCode(fd, nextReg + 1, si, no);
+			    }
+
+			    if (aux.getExpr() instanceof ASTIdentificador) {
 				fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
-			    }			
+			    }
+
+			    fd.write("mov [" + reg + "], " + reg1 + "\n");
+			    AssemblerInfo.restoreReg(fd, nextReg + 1);
 			}
-			else {
-			    aux.getExpr().generateCode(fd, nextReg + 1, si, no);
+			else if (aux.getExpr() instanceof ASTLiteralArreglo) {
+			    // ASTIdentificador aux_id = (ASTIdentificador)((LinkedList)aux.getIds()).getFirst();
+			    // if (aux_id != null) {
+			    // 	aux_type = ((SymVar)aux_id.getTable().getSym(aux_id.getValue())).getState();
+			    // 	((ASTLiteralArreglo)aux.getExpr()).generateCode(fd, nextReg, aux_type);
+			    // }
+			    System.out.println("literal_arreglo");
 			}
-		    
-			fd.write("mov [" + reg + "], " + reg1 + "\n");
-			AssemblerInfo.restoreReg(fd, nextReg + 1);
-		    }
-		    else if (aux.getExpr() instanceof ASTLiteralArreglo) {
-			aux_type = ((SymVar)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getTable().getSym(((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue())).getState();
-			((ASTLiteralArreglo)aux.getExpr()).generateCode(fd, nextReg, aux_type);
-		    }
-		    else if (aux.getExpr() instanceof ASTLiteralUR) {
-			aux_type = ((SymVar)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getTable().getSym(((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue())).getState();
-			((ASTLiteralUR)aux.getExpr()).generateCode(fd, nextReg, aux_type);
+			else if (aux.getExpr() instanceof ASTLiteralUR) {
+			    // if (aux.getIds() != null) {
+			    // 	aux_type = ((SymVar)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getTable().getSym(((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue())).getState();
+			    // 	((ASTLiteralUR)aux.getExpr()).generateCode(fd, nextReg, aux_type);
+			    // }
+			    System.out.println("literal_ur");
+			}
 		    }
 		}
 	    }

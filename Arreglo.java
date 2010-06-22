@@ -125,9 +125,7 @@ public class Arreglo extends Tipo {
     }
     
     public String toString() {
-	String m = new String(sub.toString());
-	m = m.concat("[]");	
-	return m;
+	return sub+"[]";
     }
 
     public void generateCode(Writer fd, int nextReg, String region, int offset, int ani) {};

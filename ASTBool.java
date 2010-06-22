@@ -128,6 +128,8 @@ public class ASTBool extends ASTExpresion {
 	        }
 	        else if (value.compareTo("!=") == 0) {
 
+		    left.generateCode(fd, nextReg, si, no);
+
                     AssemblerInfo.saveReg(fd, nextReg + 1);
                     right.generateCode(fd, nextReg+1, si, no);
 

@@ -836,7 +836,7 @@ asignacion2 ::= IDENTIFIER:i acceso:ac ASIG READ tipos:t
 		     else
 			 parser.type_error(id.getState(),re.getState() ,"asignar");
 		 }
-		 
+
 		 ASTAsignacionExpr ae = new ASTAsignacionExpr(id, re, state, parser.checkCast(id.getState(), re));
 		 RESULT = ae.getASTAsignacion();
                 :}
@@ -1483,7 +1483,7 @@ llamadafuncion ::= IDENTIFIER:i PARLEFT PARRIGHT
 			}
 		    }
                     else {
-			if(flag && !re.check((LinkedList) ((Promesa) parser.promesas.get(i) ).getArgumentos()))
+			if(flag && !re.check((Promesa) parser.promesas.get(i)))
 			    parser.custom_error("Mala llamada al procedimiento/funcion "+i); 
                     }
                    
@@ -1518,7 +1518,7 @@ llamadafuncion ::= IDENTIFIER:i PARLEFT PARRIGHT
 			}
 		    }
                     else {
-			if(flag && !re.check((LinkedList) ((Promesa) parser.promesas.get(i) ).getArgumentos()))
+			if(flag && !re.check((Promesa) parser.promesas.get(i)))
 			    parser.custom_error("Mala llamada al procedimiento/funcion "+i); 
                     }
 		    

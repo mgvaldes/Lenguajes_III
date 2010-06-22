@@ -5,12 +5,14 @@ public class ASTInvocarExpresion extends ASTExpresion {
 
     private String nombre;
     private LinkedList expresionEntrada;
+    private LinkedList ref;
 
     public ASTInvocarExpresion(String n, LinkedList e, Tipo s) {
 	super("invocar", null, null);
 	nombre = n;
 	expresionEntrada = e;
 	state = s;
+        ref = null;
     }
 
     public void setNombre(String n) {
@@ -21,12 +23,21 @@ public class ASTInvocarExpresion extends ASTExpresion {
 	expresionEntrada = e;
     }
 
+
+    public void setRef(LinkedList r){
+        ref = r;
+    }
+
     public String getNombre() {
 	return nombre;
     }
 
     public LinkedList getExpresionEntrada() {
 	return expresionEntrada;
+    }
+
+    public LinkedList getRef(){
+        return ref;
     }
 
     public void update() {}

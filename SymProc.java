@@ -51,6 +51,10 @@ public class SymProc extends Sym {
 	return bloque;
     }  
 
+    public LinkedList getRef() {
+	return ref;
+    }  
+
     public int getTamlocal() {
   	return tamlocal;
     }

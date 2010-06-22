@@ -24,6 +24,9 @@ public class ASTCast extends ASTExpresion {
             if(left != null)
               left.generateCode(fd, nextReg, si, no);
 
+            if(left instanceof ASTIdentificador)
+                fd.write("mov "+reg+", ["+reg+"]\n");
+
             switch(((Basico) state).getNBasico()){
             case 1:
                 fd.write("push " + reg + "\n");

@@ -184,10 +184,11 @@ public class ASTAsignacion extends ASTInstruccion {
 			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Union)id.getState());
 			}
 			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			    //Caso de asignacion de uniones.
 			    int offs = 0;
 
 			    AssemblerInfo.saveReg(fd, nextReg + 2);
-			    while (offs < ((Registro)aux_state).getTam()) {
+			    while (offs < ((Union)aux_state).getTam()) {
 				fd.write("mov " + reg2 + ", [" + reg + " - " + offs + "]\n");
 				fd.write("mov [" + reg1 + " - " + offs + "], " + reg2 + "\n");
 				offs += 8;
@@ -195,11 +196,15 @@ public class ASTAsignacion extends ASTInstruccion {
 			    AssemblerInfo.restoreReg(fd, nextReg + 2);
 			}
 			else {
+			    if (expr instanceof ASTIdentificador) {
+				fd.write("mov " + reg + ", [" + reg + "]\n");
+			    }
+			    
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
-			}		    		       
+			}
 		    }
-
 		    AssemblerInfo.restoreReg(fd, nextReg + 1);
+
 		    if(ct != null)
 			AssemblerInfo.restoreSpecificReg(fd, reg);
 		}

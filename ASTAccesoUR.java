@@ -75,7 +75,7 @@ public class ASTAccesoUR extends ASTAcceso {
 	    fd.write("int 80h\n");	
 	    
 	    fd.write(bien + ":\n");
-	    fd.write("add " + reg + ", 8\n");		    
+	    fd.write("sub " + reg + ", 8\n");		    
 	    if (this.getHijo() != null) {
 		int pos_campo = ((LinkedList)((Union)type).getCampos()).indexOf(campo);
 		Tipo tipo_campo = (Tipo)((LinkedList)((Union)type).getTipos()).get(pos_campo);
@@ -83,19 +83,12 @@ public class ASTAccesoUR extends ASTAcceso {
 	    }
 	}
 	else {
-	    //if (((Registro)type).getCampos().contains(campo)) {		    
-	    //fd.write("add " + reg + ", " + ((Registro)type).getOffset(campo) + "\n");
 	    fd.write("sub " + reg + ", " + ((Registro)type).getOffset(campo) + "\n");
 	    if (this.getHijo() != null) {
 		int pos_campo = ((LinkedList)((Registro)type).getCampos()).indexOf(campo);
 		Tipo tipo_campo = (Tipo)((LinkedList)((Registro)type).getTipos()).get(pos_campo);
 		this.getHijo().generateCode(fd, nextReg, tipo_campo);
 	    }
-	    //}
-	    //else {
-	    //System.out.println("Acceso a campo " + campo + " invalido\n");
-	    //System.exit(1);
-	    //}
 	}
     }
 }

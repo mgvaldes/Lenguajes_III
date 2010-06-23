@@ -52,17 +52,11 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	    int size;	    
 	    Object o = it.next();
 	    
-	    if(o instanceof ASTConst || o instanceof ASTLiteralUR) {
+	    if(o instanceof ASTExpresion) {
 		if(!flag) { 
 		    flag = true;
-                    if(o instanceof ASTLiteralUR){
-                        if(t.asign(((ASTLiteralUR) o).getState()) == null)
-			    state = null;
-                    }
-                    else{
-                        if(t.asign(((ASTConst) o).getState()) == null)
-			    state = null;
-                    }
+                    if(t.asign(((ASTExpresion) o).getState()) == null)
+                        state = null;
 		}
 	    }
 	    else {
@@ -84,6 +78,55 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	}
 
     }
+/*
+    public void generatePushCastCode(Writer fd, int nextReg, Tipo dest, LinkedList lista){
+
+        Iterator it = lista.iterator();
+
+        while(it.hasNext()){
+
+            Object o = it.next();
+	        
+            if(o instanceof ASTConst) {
+
+                ASTConst con = (ASTConst) o;
+                Basico ba = (Basico) con.getState();
+                String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
+
+                ASTCast cast = AssemblerInfo.checkCast(dest, ba);
+
+                switch(ba.getNBasico()){
+                    case 1:
+                        fd.write("mov "+reg+", "+ba.getCaseInt()+"\n");
+                    case 2:
+                        fd.write("mov "+reg+", "+Long.toHexString(Double.doubleToLongBits(ba.getCaseFloat()))+"\n");
+                    case 3:
+                        if(ba.getCaseBool())
+                            fd.write("mov "+reg", 1\n");
+                        else
+                            fd.write("mov "+reg", 0\n");
+                    default:
+                        char c = ba.getCaseChar.charAt(0);
+                        int ascii = (int) c;
+                        fd.write("mov "+reg", "+ Integer.toString(ascii) +"\n");
+                }
+
+               if(cast != null)
+                   cast.generateCode(fd, nextReg, "", "");
+
+               fd.write("push "+reg+"\n");
+
+            }
+            else if(o instanceof ASTLiteralUR)
+                (ASTLiteralUR) o).generatePushCastCode(fd, nextReg, dest);
+            else
+                generatePushCastCode(fd, nextReg, dest, (LinkedList) o);
+
+        }
+            
+    }
+
+*/
 
     public String printTree() {	
 	String m = new String(value);

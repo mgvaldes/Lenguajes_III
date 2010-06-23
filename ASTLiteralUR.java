@@ -53,6 +53,36 @@ public class ASTLiteralUR extends ASTExpresion {
            
     }
 
+/*
+
+    public void generatePushCastCode(Writer fd, int nextReg, Tipo dest){
+
+        if(state instanceof Registro){
+            Iterator itt = dest.getTipos().iterator();
+            Iterator ita = asignaciones.iterator();
+
+            while(ita.hasNext()){
+
+                ASTAsignacion asig = ita.next();
+                Tipo edest = iit.next();
+
+                if(asig.getExpr().getState() instanceof Basico) {
+
+                    ASTCast cast = AssemblerInfo.checkCast(edest, asig.getExpr().getState());
+
+                    if(cast != null)
+                        cast.generateCode(fd, nextReg, "", "");
+
+                    fd.write("push ["+reg+"]\n");
+                    fd.write("add "+reg+",8\n");
+                }
+                else if(asig.getExpr())
+                        generatePushCastCode(fd, nextReg, edest, esource);
+
+    }
+
+*/
+
     public void updateState(){
         state = inferType();
     }

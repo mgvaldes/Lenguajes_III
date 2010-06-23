@@ -188,9 +188,8 @@ public class ASTInvocar extends ASTInstruccion {
             if(bsource instanceof Basico){
                 ASTCast cast = AssemblerInfo.checkCast(bdest, bsource);
                 for(int i = 0; i < source.getTam(); i += 8){
-                    if(cast != null){
+                    if(cast != null)
                         cast.generateCode(fd, nextReg, "", "");
-                    }
                     fd.write("push ["+reg+"]\n");
                     fd.write("add "+reg+",8\n");
                 }
@@ -215,9 +214,8 @@ public class ASTInvocar extends ASTInstruccion {
 
                 if(esource instanceof Basico){
                     ASTCast cast = AssemblerInfo.checkCast(edest, esource);
-                    if(cast != null){
+                    if(cast != null)
                         cast.generateCode(fd, nextReg, "", "");
-                    }
                     fd.write("push ["+reg+"]\n");
                     fd.write("add "+reg+",8\n");
                 }

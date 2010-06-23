@@ -51,6 +51,9 @@ public class ASTAccesoArreglo extends ASTAcceso {
 	    AssemblerInfo.saveReg(fd, nextReg + 2);
 	    expr.generateCode(fd, nextReg + 2, "", "");
 
+            if(expr instanceof ASTIdentificador)
+                fd.write("mov "+reg2+", ["+reg2+"]\n");
+
 	    // Chequeo dinamico de indice fuera de rango
 	    fd.write("cmp " + reg2 + ", 0\n");
 	    fd.write("mov " + reg3 + ", " + reg2 + "\n");

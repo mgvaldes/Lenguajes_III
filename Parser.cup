@@ -18,6 +18,7 @@ parser code {:
     public Hashtable promesas = new Hashtable();
     public Tipo tipoactual;
     public Tipo tipoactualfun;
+    public Tipo tipoactualur;
     public int canBreak = 0;
     public int anidamiento = -1;
     public int desplazamiento = 0;
@@ -138,7 +139,7 @@ non terminal Registro struct;
 non terminal Union union;
 non terminal Tipo tipos,complejos, basicos,voidfun;
 non terminal ASTBloque bloque, main;
-non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaconstantes, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor;
+non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaconstantes, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor, listaliteralesur;
 non terminal ASTAsignacion declaracion, declaracionsimple, declaracionsimple1, declaracionsimple2, listaident, asignacion,asignacion2, declaasig;
 non terminal ASTAsignacionExpr asignacion1;
 non terminal ASTExpresion expresionarit, expresion, literales;
@@ -318,8 +319,7 @@ instruccion ::= declaracion:d SEQ {: RESULT = d; :}
              |  llamadafuncion:i SEQ {: RESULT = i; :}
              |  RETURN SEQ
                 {:
-		 ASTInstruccion i = new ASTInstruccion("return");
-		 i.setIreturn(true);
+		 ASTReturn i = new ASTReturn(parser.intam);
 		 
 		 Tipo t = parser.tipoactualfun;
 		 
@@ -330,8 +330,7 @@ instruccion ::= declaracion:d SEQ {: RESULT = d; :}
                 :}
              |  RETURN expresion:e SEQ 
                 {:
-		 ASTInstruccion i = new ASTInstruccion("return");
-		 i.setIreturn(true);
+		 ASTReturn i = new ASTReturn(parser.intam);
 		 
 		 Tipo t = parser.tipoactualfun;
 		 
@@ -488,18 +487,17 @@ listaatributos ::= listaatributos:l tipos:t IDENTIFIER:i SEQ
 		   :}
                 ;
 
-literales ::= literalarreglo:la 
-              {: 
-	       ASTLiteralArreglo res = new ASTLiteralArreglo(la);
-	       res.updateState();
-	       RESULT = res;
-	      :}
-           |  literalstructunion:lur 
-	      {: 
-	       ASTLiteralUR res = new ASTLiteralUR(lur);
-	       res.updateState();
-	       RESULT = res;
-	      :}
+literales ::= literalarreglo:la {: 
+                                  ASTLiteralArreglo res = new ASTLiteralArreglo(la);
+                                  parser.tipoactualur = null;
+                                  res.updateState();
+                                  RESULT = res;
+                                :}
+           |  literalstructunion:lur {: 
+                                       ASTLiteralUR res = new ASTLiteralUR(lur);
+                                       res.updateState();
+                                       RESULT = res;
+                                     :}
            ;
 
 listaliteralarreglo ::= listaliteralarreglo:l SEQ literalarreglo:la
@@ -531,11 +529,39 @@ listaconstantes ::= listaconstantes:l COMA constantes:c
                     :}
                  ;
 
+listaliteralesur ::= listaliteralesur:l COMA literalstructunion:lur
+                    {:
+                      ASTLiteralUR res = new ASTLiteralUR(lur);
+                      res.updateState();
+
+                      if(!res.getState().equals(parser.tipoactualur))
+                          parser.custom_error("Los tipos del arreglo no concuerdan");
+
+                      l.add(res);
+                      RESULT = l;
+                    :}
+                 |  literalstructunion:lur
+                    {: 
+                     ASTLiteralUR res = new ASTLiteralUR(lur);
+                     res.updateState();
+		     if (parser.tipoactualur == null)
+			 parser.tipoactualur = res.getState();
+
+		     LinkedList l = new LinkedList();
+		     l.add(res);
+		     RESULT = l;
+                    :}
+                 ;
+
 literalarreglo ::= BRACKETLEFT listaliteralarreglo:l BRACKETRIGHT
                    {:
                      RESULT = l;
                    :}
                 |  BRACKETLEFT listaconstantes:l BRACKETRIGHT
+                   {:
+                     RESULT = l;
+                   :}
+                |  BRACKETLEFT listaliteralesur:l BRACKETRIGHT
                    {:
                      RESULT = l;
                    :}
@@ -837,7 +863,7 @@ asignacion2 ::= IDENTIFIER:i acceso:ac ASIG READ tipos:t
 		     else
 			 parser.type_error(id.getState(),re.getState() ,"asignar");
 		 }
-		 
+
 		 ASTAsignacionExpr ae = new ASTAsignacionExpr(id, re, state, parser.checkCast(id.getState(), re));
 		 RESULT = ae.getASTAsignacion();
                 :}
@@ -1484,7 +1510,7 @@ llamadafuncion ::= IDENTIFIER:i PARLEFT PARRIGHT
 			}
 		    }
                     else {
-			if(flag && !re.check((LinkedList) ((Promesa) parser.promesas.get(i) ).getArgumentos()))
+			if(flag && !re.check((Promesa) parser.promesas.get(i)))
 			    parser.custom_error("Mala llamada al procedimiento/funcion "+i); 
                     }
                    
@@ -1519,7 +1545,7 @@ llamadafuncion ::= IDENTIFIER:i PARLEFT PARRIGHT
 			}
 		    }
                     else {
-			if(flag && !re.check((LinkedList) ((Promesa) parser.promesas.get(i) ).getArgumentos()))
+			if(flag && !re.check((Promesa) parser.promesas.get(i)))
 			    parser.custom_error("Mala llamada al procedimiento/funcion "+i); 
                     }
 		    
@@ -1637,6 +1663,8 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
                          }
 			
 			SymProc p = new SymProc(i,t, parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
+
+                        parser.intam += 8 + t.getTam();
 		        
 			if(!error) {
 			    if(!parser.anterior.insert(p, parser.anidamiento))
@@ -1658,7 +1686,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			    SymProc p = (SymProc) s;
 			    p.setTamlocal(parser.maxdesplazamiento);
 			    p.getBloque().setInsts(b.getInsts());
-                            p.calcOffsets(parser.intam+8);
+                            p.calcOffsets(parser.intam-t.getTam());
                             parser.intam=0;
 			}
 			
@@ -1741,6 +1769,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			      }
 			      
 			      SymProc p = new SymProc(i,new Basico(0), parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
+                              parser.intam += 8;
 			      
 			      if(!error) {
 				  if(!parser.anterior.insert(p, parser.anidamiento))
@@ -1762,7 +1791,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 				  SymProc p = (SymProc) s;
 				  p.setTamlocal(parser.maxdesplazamiento);
 				  p.getBloque().setInsts(b.getInsts());
-                                  p.calcOffsets(parser.intam+8);
+                                  p.calcOffsets(parser.intam);
                                   parser.intam=0;
 			      }
 			      

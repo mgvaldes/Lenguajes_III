@@ -44,46 +44,34 @@ public class ASTAritmetica extends ASTExpresion {
             String nreg = AssemblerInfo.getNombresRegAtPos(nextReg+1);	
 	    int basicType = ((Basico)state).getNBasico();
 
+            left.generateCode(fd, nextReg, si, no);
+
+            if(left instanceof ASTIdentificador)
+                fd.write("mov "+reg+", ["+reg+"]\n");
+
+            if(right != null){
+                AssemblerInfo.saveReg(fd, nextReg + 1);
+                right.generateCode(fd, nextReg + 1, si, no);
+                if(right instanceof ASTIdentificador)
+                    fd.write("mov "+nreg+", ["+nreg+"]\n");
+            }
+
 	    switch (basicType) {
 	    case 1:
-		if (value.compareTo("+") == 0) {
-		    left.generateCode(fd, nextReg, si, no);		    
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);
+		if (value.compareTo("+") == 0)
 		    fd.write("add " + reg + ", " + nreg + "\n");		
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
-		}	 
 		else if (value.compareTo("-") == 0) {
 
-		    left.generateCode(fd, nextReg, si, no);
-		    if (right == null) {
-		    
+		    if (right == null) 
 			fd.write("neg " + reg + "\n");
-
-		    }
-		    else {
-
-			AssemblerInfo.saveReg(fd, nextReg + 1);
-			right.generateCode(fd, nextReg + 1, si, no);
+		    else
 			fd.write("sub " + reg + ", " + nreg + "\n");
-			AssemblerInfo.restoreReg(fd, nextReg + 1); 
 
-		    }
 		}
-		else if (value.compareTo("*") == 0) {
-
-		    left.generateCode(fd, nextReg, si, no);
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);
+		else if (value.compareTo("*") == 0)
 		    fd.write("imul " + reg + ", " + nreg + "\n");
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
-
-		}
 		else if (value.compareTo("/") == 0){
 
-		    left.generateCode(fd, nextReg, si, no);
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);
 
                     if( reg == "rax"){
                         fd.write("push rbx\n");
@@ -137,14 +125,8 @@ public class ASTAritmetica extends ASTExpresion {
                         fd.write("pop rax\n");
                     }
 
-
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
 		}
 		else if (value.compareTo("%") == 0) {
-
-		    left.generateCode(fd, nextReg, si, no);
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);
 
                     if( reg == "rax"){
                         fd.write("push rbx\n");
@@ -199,8 +181,6 @@ public class ASTAritmetica extends ASTExpresion {
                     }
 
 
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
-
 		}
 
 		break;
@@ -209,10 +189,6 @@ public class ASTAritmetica extends ASTExpresion {
 
 		if (value.compareTo("+") == 0) {
 		
-		    left.generateCode(fd, nextReg, si, no);		    
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);
-			
 		    fd.write("push "+reg+"\n");
 		    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
 			
@@ -224,15 +200,11 @@ public class ASTAritmetica extends ASTExpresion {
 		    fd.write("pop " + nreg + "\n");
 		    fd.write("pop " + reg + "\n");
 		    
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
-
 		}	 
 		else if (value.compareTo("-") == 0) {
 		
 		    if(right == null){
 
-			left.generateCode(fd, nextReg, si, no);		    
-			
 			fd.write("push "+reg+"\n");
 			fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
 			
@@ -245,10 +217,6 @@ public class ASTAritmetica extends ASTExpresion {
 		    }
 		    else{
 
-			left.generateCode(fd, nextReg, si, no);		    
-			AssemblerInfo.saveReg(fd, nextReg + 1);
-			right.generateCode(fd, nextReg + 1, si, no);
-			
 			fd.write("push "+reg+"\n");
 			fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
 			
@@ -260,15 +228,10 @@ public class ASTAritmetica extends ASTExpresion {
 			fd.write("pop " + nreg + "\n");
 			fd.write("pop " + reg + "\n");
 			
-			AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    }		    		    
 		}
 	        else if (value.compareTo("*") == 0) {
 		
-		    left.generateCode(fd, nextReg, si, no);		    
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);
-			
 		    fd.write("push "+reg+"\n");
 		    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
 			
@@ -280,16 +243,9 @@ public class ASTAritmetica extends ASTExpresion {
 		    fd.write("pop " + nreg + "\n");
 		    fd.write("pop " + reg + "\n");
 
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
-
-
 		}
 		else if ((value.compareTo("/") == 0)) {
 		
-		    left.generateCode(fd, nextReg, si, no);		    
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);
-			
 		    fd.write("push "+reg+"\n");
 		    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
 			
@@ -300,12 +256,15 @@ public class ASTAritmetica extends ASTExpresion {
 		    
 		    fd.write("pop " + nreg + "\n");
 		    fd.write("pop " + reg + "\n");
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 
 		}
 		break;
 	    default:
 		break;
-	    }	    
+	    }
+
+            if(right != null)
+                AssemblerInfo.restoreReg(fd, nextReg + 1);
+
     }
 }

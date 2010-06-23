@@ -36,6 +36,9 @@ public class ASTLiteralArreglo extends ASTExpresion {
        if(lista.getFirst() instanceof ASTConst)
            return new Arreglo( lista.size(), ((ASTConst) lista.getFirst()).getState());
 
+       if(lista.getFirst() instanceof ASTLiteralUR)
+           return new Arreglo( lista.size(), ((ASTLiteralUR) lista.getFirst()).getState());
+
        int size = lista.size();
 
        return new Arreglo(size, inferType((LinkedList) lista.getFirst()));
@@ -53,11 +56,17 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	    int size;	    
 	    Object o = it.next();
 	    
-	    if(o instanceof ASTConst) {
+	    if(o instanceof ASTConst || o instanceof ASTLiteralUR) {
 		if(!flag) { 
 		    flag = true;
-		    if(t.asign(((ASTConst) o).getState()) == null)
-			state = null;
+                    if(o instanceof ASTLiteralUR){
+                        if(t.asign(((ASTLiteralUR) o).getState()) == null)
+			    state = null;
+                    }
+                    else{
+                        if(t.asign(((ASTConst) o).getState()) == null)
+			    state = null;
+                    }
 		}
 	    }
 	    else {
@@ -79,7 +88,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	}
 
     }
-  
+
     public String printTree() {	
 	String m = new String(value);
 	return m;

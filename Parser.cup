@@ -18,6 +18,7 @@ parser code {:
     public Hashtable promesas = new Hashtable();
     public Tipo tipoactual;
     public Tipo tipoactualfun;
+    public Tipo tipoactualur;
     public int canBreak = 0;
     public int anidamiento = -1;
     public int desplazamiento = 0;
@@ -138,7 +139,7 @@ non terminal Registro struct;
 non terminal Union union;
 non terminal Tipo tipos,complejos, basicos,voidfun;
 non terminal ASTBloque bloque, main;
-non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaconstantes, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor;
+non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaconstantes, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor, listaliteralesur;
 non terminal ASTAsignacion declaracion, declaracionsimple, declaracionsimple1, declaracionsimple2, listaident, asignacion,asignacion2, declaasig;
 non terminal ASTAsignacionExpr asignacion1;
 non terminal ASTExpresion expresionarit, expresion, literales;
@@ -488,6 +489,7 @@ listaatributos ::= listaatributos:l tipos:t IDENTIFIER:i SEQ
 
 literales ::= literalarreglo:la {: 
                                   ASTLiteralArreglo res = new ASTLiteralArreglo(la);
+                                  parser.tipoactualur = null;
                                   res.updateState();
                                   RESULT = res;
                                 :}
@@ -528,11 +530,39 @@ listaconstantes ::= listaconstantes:l COMA constantes:c
                     :}
                  ;
 
+listaliteralesur ::= listaliteralesur:l COMA literalstructunion:lur
+                    {:
+                      ASTLiteralUR res = new ASTLiteralUR(lur);
+                      res.updateState();
+
+                      if(!res.getState().equals(parser.tipoactualur))
+                          parser.custom_error("Los tipos del arreglo no concuerdan");
+
+                      l.add(res);
+                      RESULT = l;
+                    :}
+                 |  literalstructunion:lur
+                    {: 
+                     ASTLiteralUR res = new ASTLiteralUR(lur);
+                     res.updateState();
+		     if (parser.tipoactualur == null)
+			 parser.tipoactualur = res.getState();
+
+		     LinkedList l = new LinkedList();
+		     l.add(res);
+		     RESULT = l;
+                    :}
+                 ;
+
 literalarreglo ::= BRACKETLEFT listaliteralarreglo:l BRACKETRIGHT
                    {:
                      RESULT = l;
                    :}
                 |  BRACKETLEFT listaconstantes:l BRACKETRIGHT
+                   {:
+                     RESULT = l;
+                   :}
+                |  BRACKETLEFT listaliteralesur:l BRACKETRIGHT
                    {:
                      RESULT = l;
                    :}

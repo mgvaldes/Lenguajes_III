@@ -19,6 +19,7 @@ parser code {:
     public Tipo tipoactual;
     public Tipo tipoactualfun;
     public Tipo tipoactualur;
+    public Tipo tipoactualarreglo;
     public int canBreak = 0;
     public int anidamiento = -1;
     public int desplazamiento = 0;
@@ -78,7 +79,7 @@ parser code {:
         if (t.equals(new Basico(4)) && estate.equals(new Basico(1)))
             return new ASTCast(null, new Basico(4));
 
-	return null;
+        return null;
     }
 
     public void warning(String msg) {
@@ -139,10 +140,10 @@ non terminal Registro struct;
 non terminal Union union;
 non terminal Tipo tipos,complejos, basicos,voidfun;
 non terminal ASTBloque bloque, main;
-non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaconstantes, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor, listaliteralesur;
+non terminal LinkedList listaasig, listainstrucciones, listaparametros, listaatributos, listaparametrosllamada, parametros, listaexpresiones, listaliteralarreglo, listaasignaciones, literalarreglo, literalstructunion, loopfor;
 non terminal ASTAsignacion declaracion, declaracionsimple, declaracionsimple1, declaracionsimple2, listaident, asignacion,asignacion2, declaasig;
 non terminal ASTAsignacionExpr asignacion1;
-non terminal ASTExpresion expresionarit, expresion, literales;
+non terminal ASTExpresion expresionarit, expresion, literales, expresionsinla;
 non terminal ASTAcceso acceso;
 non terminal ASTInstruccion instruccion, condicional;
 non terminal ASTInvocar llamadafuncion;
@@ -514,42 +515,18 @@ listaliteralarreglo ::= listaliteralarreglo:l SEQ literalarreglo:la
                         :}
                      ;
 
-listaconstantes ::= listaconstantes:l COMA constantes:c
+listaexpresiones ::= listaexpresiones:l COMA expresionsinla:e
                     {:
-                      l.add(c);
+                      l.add(e);
                       RESULT = l;
                     :}
-                 |  constantes:c 
+                 |  expresionsinla:e
                     {: 
-		     if (parser.tipoactual == null)
-			 parser.tipoactual = c.getState();
+		     if (parser.tipoactualarreglo == null)
+			 parser.tipoactualarreglo = e.getState();
 
 		     LinkedList l = new LinkedList();
-		     l.add(c);
-		     RESULT = l;
-                    :}
-                 ;
-
-listaliteralesur ::= listaliteralesur:l COMA literalstructunion:lur
-                    {:
-                      ASTLiteralUR res = new ASTLiteralUR(lur);
-                      res.updateState();
-
-                      if(!res.getState().equals(parser.tipoactualur))
-                          parser.custom_error("Los tipos del arreglo no concuerdan");
-
-                      l.add(res);
-                      RESULT = l;
-                    :}
-                 |  literalstructunion:lur
-                    {: 
-                     ASTLiteralUR res = new ASTLiteralUR(lur);
-                     res.updateState();
-		     if (parser.tipoactualur == null)
-			 parser.tipoactualur = res.getState();
-
-		     LinkedList l = new LinkedList();
-		     l.add(res);
+		     l.add(e);
 		     RESULT = l;
                     :}
                  ;
@@ -558,11 +535,7 @@ literalarreglo ::= BRACKETLEFT listaliteralarreglo:l BRACKETRIGHT
                    {:
                      RESULT = l;
                    :}
-                |  BRACKETLEFT listaconstantes:l BRACKETRIGHT
-                   {:
-                     RESULT = l;
-                   :}
-                |  BRACKETLEFT listaliteralesur:l BRACKETRIGHT
+                |  BRACKETLEFT listaexpresiones:l BRACKETRIGHT
                    {:
                      RESULT = l;
                    :}
@@ -1275,6 +1248,111 @@ loopwhile ::= WHILE {: parser.canBreak++; :}
 	       RESULT = new ASTWhile(e, b);
               :}  
            ;
+
+
+expresionsinla ::= expresion:e1 EQ expresion:e2
+              {: 
+	       ASTExpresion exp = new ASTBool("==", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"equivaler");
+
+	       RESULT = exp;
+	      :}
+           |  expresion:e1 NOTEQ expresion:e2
+              {: 
+	       ASTExpresion exp = new ASTBool("!=", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"desigualar");
+
+	       RESULT = exp;
+              :}
+           |  NOT expresion:e1
+              {: 
+               ASTExpresion exp = new ASTBool("!", e1, null);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), null,"negar");
+
+	       RESULT = exp;
+              :} %prec UNOT
+           |  expresion:e1 OR expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool("||", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"hacer un OR con");
+
+	       RESULT = exp;
+              :}
+           |  expresion:e1 AND expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool("&&", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"hacer un AND con");
+
+	       RESULT = exp;
+	      :}
+           |  expresion:e1 LESS expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool("<", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"comparar");
+
+	       RESULT = exp;
+	      :}
+           |  expresion:e1 LESSEQ expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool("<=", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"comparar");
+
+	       RESULT = exp;
+              :}
+           |  expresion:e1 MORE expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool(">", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"comparar");
+
+	       RESULT = exp;
+              :}
+           |  expresion:e1 MOREEQ expresion:e2
+              {: 
+               ASTExpresion exp = new ASTBool(">=", e1, e2);
+	       exp.update();
+
+	       if(!exp.check())
+		   parser.type_error(e1.getState(), e2.getState(),"comparar");
+
+	       RESULT = exp;
+              :}
+           |  FALSE {: RESULT = new ASTConst(false); :}              
+           |  TRUE {: RESULT = new ASTConst(true); :}              
+           |  COMILLAS CHAR:c COMILLAS {: RESULT = new ASTConst(c); :}
+           |  expresionarit:e1 {: RESULT = e1; :}
+           |  literalstructunion:lur 
+              {: 
+                parser.literal = true;
+                ASTLiteralUR res = new ASTLiteralUR(lur);
+                res.updateState();
+                RESULT = res;
+              :}
+           ;
+
 
 expresion ::= expresion:e1 EQ expresion:e2
               {: 

@@ -98,110 +98,89 @@ public class ASTLiteralUR extends ASTExpresion {
 	try {
 	    String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	    String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1);
+	    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
 	    Iterator asigs = asignaciones.iterator();
 	    ASTAsignacion aux;
+	    ASTIdentificador aux_id;
+	    ASTExpresion aux_expr;
+	    Tipo id_type;
+	    Tipo expr_type;
+	    Iterator campos_types;
+	    LinkedList aux_type;
+
 	    String si = AssemblerInfo.newLabel();
 	    String no = AssemblerInfo.newLabel();
 	    String end = AssemblerInfo.newLabel();
-	    Tipo expr_state = new Basico(0); // Solo para inicializarlo
-	    Tipo aux_type = new Basico(0); // Solo para inicializarol
 
-	    if (type instanceof Registro) {
-		while (asigs.hasNext()) {
-		    aux = (ASTAsignacion)asigs.next();
-		    fd.write("add " + reg + ", " + ((Registro)type).getOffset((String)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue()) + "\n");
+
+	    AssemblerInfo.saveReg(fd, nextReg + 1);		    
+	    AssemblerInfo.saveReg(fd, nextReg + 2);
+
+	    if (type instanceof Union) {
+		aux = (ASTAsignacion)asigs.next();
+		aux_id = (ASTIdentificador)((LinkedList)aux.getIds()).getFirst();
+	     	int pos = ((LinkedList)((Union)type).getCampos()).indexOf((String)aux_id.getValue());
 		
-		    AssemblerInfo.saveReg(fd, nextReg + 1);		    
-		    if (!(aux.getExpr() instanceof ASTLiteralArreglo) && !(aux.getExpr() instanceof ASTLiteralUR)) {
-			if (aux.getExpr() instanceof ASTIdentificador) {
-			    expr_state = ((SymVar)((ASTIdentificador)aux.getExpr()).getTable().getSym(aux.getExpr().getValue())).getState();
-			}
-			else {
-			    expr_state = aux.getExpr().getState();
-			}
-		    
-			if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
-			    aux.getExpr().generateCode(fd, nextReg + 1, si, no);
-			    fd.write(si + ":\n");
-			    fd.write("mov " + reg1 + ", 1\n");    
-			    fd.write("jmp " + end + "\n");		    
-			    fd.write(no + ":\n");
-			    fd.write("mov " + reg1 + ", 0\n");    
-			    fd.write(end + ":\n");
-			}
-		    
-			if (aux.getExpr() instanceof ASTIdentificador) {
-			    aux.getExpr().generateCode(fd, nextReg + 1, si, no);	
-			    if ((((ASTIdentificador)aux.getExpr()).getAcceso().getHijo() != null) || (expr_state instanceof Basico)) {
-				fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
-			    }			
-			}
-			else {
-			    aux.getExpr().generateCode(fd, nextReg + 1, si, no);
-			}
-		    
-			fd.write("mov [" + reg + "], " + reg1 + "\n");
-			AssemblerInfo.restoreReg(fd, nextReg + 1);
-		    }
-		    else if (aux.getExpr() instanceof ASTLiteralArreglo) {
-			aux_type = ((SymVar)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getTable().getSym(((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue())).getState();
-			((ASTLiteralArreglo)aux.getExpr()).generateCode(fd, nextReg, aux_type);
-		    }
-		    else if (aux.getExpr() instanceof ASTLiteralUR) {
-			aux_type = ((SymVar)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getTable().getSym(((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue())).getState();
-			((ASTLiteralUR)aux.getExpr()).generateCode(fd, nextReg, aux_type);
-		    }
-		}
+		//Seteando discriminante
+		fd.write("mov " + reg1 + ", " + pos + "\n");
+	     	fd.write("mov [" + reg + "], " + reg1 + "\n");
+	     	fd.write("sub " + reg + ", 8\n");
+
+		aux_type = new LinkedList();
+		aux_type.add(((LinkedList)((Union)type).getTipos()).get(pos));
+		campos_types = aux_type.iterator();
 	    }
 	    else {
-		aux = (ASTAsignacion)asigs.next();
-		int pos = ((LinkedList)((Union)type).getCampos()).indexOf((String)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue());
-
-		AssemblerInfo.saveReg(fd, nextReg + 1);	
-		fd.write("mov " + reg1 + ", " + pos + "\n");
-		fd.write("mov [" + reg + "], " + reg1 + "\n");
-		fd.write("add " + reg + ", 8\n");
-
-		if (!(aux.getExpr() instanceof ASTLiteralArreglo) && !(aux.getExpr() instanceof ASTLiteralUR)) {
-		    if (aux.getExpr() instanceof ASTIdentificador) {
-			expr_state = ((SymVar)((ASTIdentificador)aux.getExpr()).getTable().getSym(aux.getExpr().getValue())).getState();
-		    }
-		    else {
-			expr_state = aux.getExpr().getState();
-		    }
-		    
-		    if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
-			aux.getExpr().generateCode(fd, nextReg + 1, si, no);
-			fd.write(si + ":\n");
-			fd.write("mov " + reg1 + ", 1\n");    
-			fd.write("jmp " + end + "\n");		    
-			fd.write(no + ":\n");
-			fd.write("mov " + reg1 + ", 0\n");    
-			fd.write(end + ":\n");
-		    }
-		    
-		    if (aux.getExpr() instanceof ASTIdentificador) {
-			aux.getExpr().generateCode(fd, nextReg + 1, si, no);	
-			if ((((ASTIdentificador)aux.getExpr()).getAcceso().getHijo() != null) || (expr_state instanceof Basico)) {
-			    fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
-			}			
-		    }
-		    else {
-			aux.getExpr().generateCode(fd, nextReg + 1, si, no);
-		    }
-		    
-		    fd.write("mov [" + reg + "], " + reg1 + "\n");
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
-		}
-		else if (aux.getExpr() instanceof ASTLiteralArreglo) {
-		    aux_type = ((SymVar)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getTable().getSym(((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue())).getState();
-		    ((ASTLiteralArreglo)aux.getExpr()).generateCode(fd, nextReg, aux_type);
-		}
-		else if (aux.getExpr() instanceof ASTLiteralUR) {
-		    aux_type = ((SymVar)((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getTable().getSym(((ASTIdentificador)((LinkedList)aux.getIds()).getFirst()).getValue())).getState();
-		    ((ASTLiteralUR)aux.getExpr()).generateCode(fd, nextReg, aux_type);
-		}
+		campos_types = ((Registro)type).getTipos().iterator();
 	    }
+
+	    asigs = asignaciones.iterator();
+
+	    while (asigs.hasNext()) {
+		aux = (ASTAsignacion)asigs.next();
+		aux_id = (ASTIdentificador)((LinkedList)aux.getIds()).getFirst();
+		aux_expr = aux.getExpr();
+		id_type = (Tipo)campos_types.next();
+
+		aux_expr.generateCode(fd, nextReg + 1, si, no);
+		    
+		if (id_type instanceof Basico) {
+		    if (aux_expr instanceof ASTConst) {
+			fd.write("mov [" + reg + "], " + reg1 + "\n");
+		    }
+		    else if (aux_expr instanceof ASTIdentificador) {
+			fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
+			fd.write("mov [" + reg + "], " + reg1 + "\n");
+		    }
+		}
+		else if ((id_type instanceof Arreglo) || (id_type instanceof Registro) || (id_type instanceof Union)) {
+		    if (aux_expr instanceof ASTIdentificador) {			   
+			int offs = 0;
+			expr_type = ((SymVar)((ASTIdentificador)aux_expr).getTable().getSym(aux_expr.getValue())).getState();			
+			    
+			AssemblerInfo.saveReg(fd, nextReg + 2);
+			while (offs < expr_type.getTam()) {
+			    fd.write("mov " + reg2 + ", [" + reg1 + " - " + offs + "]\n");
+			    fd.write("mov [" + reg + " - " + offs + "], " + reg2 + "\n");
+			    offs += 8;
+			}
+			AssemblerInfo.restoreReg(fd, nextReg + 2);
+		    }
+		    else if (aux_expr instanceof ASTLiteralArreglo) {
+			((ASTLiteralArreglo)aux_expr).generateCode(fd, nextReg, id_type);
+		    }
+		    else if (aux_expr instanceof ASTLiteralUR) {
+			((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, id_type);
+		    }
+		}
+		    
+		fd.write("mov " + reg2 + ", " + id_type.getTam() + "\n");
+		fd.write("sub " + reg + ", " + reg2 + "\n");
+
+	    }
+
+	    AssemblerInfo.restoreReg(fd, nextReg + 2);		    
+	    AssemblerInfo.restoreReg(fd, nextReg + 1);
 	}
 	catch (IOException e) {
 	    System.out.println("Error escribiendo en archivo de salida\n");

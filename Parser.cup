@@ -501,7 +501,6 @@ literales ::= literalarreglo:la {:
                                      :}
            ;
 
-
 listaliteralarreglo ::= listaliteralarreglo:l SEQ literalarreglo:la
                         {:
                           l.add(la);

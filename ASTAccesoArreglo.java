@@ -69,8 +69,9 @@ public class ASTAccesoArreglo extends ASTAcceso {
 	    fd.write("sub " + reg + ", " + reg1 + "\n");
 	    AssemblerInfo.restoreReg(fd, nextReg + 1);	    
 	    
-	    if (this.getHijo() != null)
+	    if (this.getHijo() != null) {
 		this.getHijo().generateCode(fd, nextReg, ((Arreglo)type).getSub());
+	    }
 	    fd.write("jmp " + bien + "\n");	    
 	    
 	    fd.write(error + ":\n");

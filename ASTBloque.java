@@ -48,10 +48,10 @@ public class ASTBloque extends ASTInstruccion {
     }
 
     public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
-	    Iterator it = insts.iterator();
+	Iterator it = insts.iterator();
 	
-	    while (it.hasNext()) {
-		((ASTInstruccion)it.next()).generateCode(fd, nextReg, breakLabel, returnLabel);
-	    }
+	while (it.hasNext()) {
+	    ((ASTInstruccion)it.next()).generateCode(fd, nextReg, breakLabel, returnLabel);
+	}
     }
 }

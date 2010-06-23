@@ -67,13 +67,14 @@ public class ASTAsignacion extends ASTInstruccion {
     }
     
     public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
-
+	try {
 	    String si = AssemblerInfo.newLabel();
 	    String no = AssemblerInfo.newLabel();
 	    String end = AssemblerInfo.newLabel();
 
             String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	    String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1); 
+	    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
 	    Tipo expr_state = new Basico(0); // Solo para inicializarlo
 	    
 	    if (expr != null) {
@@ -110,8 +111,6 @@ public class ASTAsignacion extends ASTInstruccion {
 		Tipo aux_state;
 
 		while(it.hasNext()) {
-		    System.out.println("que es esto?");
-
 		    id = (ASTIdentificador)it.next();
 		    ct = (ASTCast)itc.next();
 
@@ -122,6 +121,7 @@ public class ASTAsignacion extends ASTInstruccion {
 
 		    offset = ((SymVar)id.getTable().getSym(id.getValue())).getOffset();
 		    aux_state = ((SymVar)id.getTable().getSym(id.getValue())).getState();
+		    AssemblerInfo.saveReg(fd, nextReg + 1);
 		    id.generateCode(fd, nextReg + 1, si, no);
 
 		    if (aux_state instanceof Basico) {
@@ -131,44 +131,37 @@ public class ASTAsignacion extends ASTInstruccion {
 
 			fd.write("mov [" + reg1 + "], " + reg + "\n");
 		    }
-		    else if (aux_state instanceof Arreglo) {		    
-			AssemblerInfo.saveReg(fd, nextReg + 1);
-
+		    else if (aux_state instanceof Arreglo) { 
 			if (expr instanceof ASTLiteralArreglo) {
 			    ((ASTLiteralArreglo)expr).generateCode(fd, nextReg + 1, (Arreglo)id.getState());
 			}
 			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
 			    //Caso de asignacion de arreglos.
-			    int tamBase = ((Arreglo)aux_state).getTipoBase().getTam();
 			    int offs = 0;
-			    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
 
 			    AssemblerInfo.saveReg(fd, nextReg + 2);
-
 			    while (offs < ((Arreglo)aux_state).getTam()) {
 				fd.write("mov " + reg2 + ", [" + reg + " - " + offs + "]\n");
 				fd.write("mov [" + reg1 + " - " + offs + "], " + reg2 + "\n");
-				//offs += tamBase;
-				System.out.println("offs: " + offs);
 				offs += 8;
 			    }
 			    AssemblerInfo.restoreReg(fd, nextReg + 2);
 			}
 			else {
+			    if (expr instanceof ASTIdentificador) {
+				fd.write("mov " + reg + ", [" + reg + "]\n");
+			    }
+			    
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
 			}
-
-			AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    }
-		    else if (aux_state instanceof Registro) {		    		    
-			AssemblerInfo.saveReg(fd, nextReg + 1);
-
+		    else if (aux_state instanceof Registro) {
 			if (expr instanceof ASTLiteralUR) {
 			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Registro)id.getState());
 			}
 			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			    //Caso de asignacion de registros.
 			    int offs = 0;
-			    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
 
 			    AssemblerInfo.saveReg(fd, nextReg + 2);
 			    while (offs < ((Registro)aux_state).getTam()) {
@@ -179,20 +172,19 @@ public class ASTAsignacion extends ASTInstruccion {
 			    AssemblerInfo.restoreReg(fd, nextReg + 2);
 			}
 			else {
+			    if (expr instanceof ASTIdentificador) {
+				fd.write("mov " + reg + ", [" + reg + "]\n");
+			    }
+			    
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
 			}
-
-			AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    }
-		    else if (aux_state instanceof Union) {		    
-			AssemblerInfo.saveReg(fd, nextReg + 1);			
-
+		    else if (aux_state instanceof Union) {  
 			if (expr instanceof ASTLiteralUR) {
 			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Union)id.getState());
 			}
 			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
 			    int offs = 0;
-			    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
 
 			    AssemblerInfo.saveReg(fd, nextReg + 2);
 			    while (offs < ((Registro)aux_state).getTam()) {
@@ -204,11 +196,10 @@ public class ASTAsignacion extends ASTInstruccion {
 			}
 			else {
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
-			}		    
-			
-			AssemblerInfo.restoreReg(fd, nextReg + 1);
+			}		    		       
 		    }
-		    
+
+		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    if(ct != null)
 			AssemblerInfo.restoreSpecificReg(fd, reg);
 		}

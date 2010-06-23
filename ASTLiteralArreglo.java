@@ -103,6 +103,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
     public void generateCode(Writer fd, int nextReg, Tipo type) throws IOException {
 	String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1); 
+	//String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2); 
 	LinkedList elements = new LinkedList();
 	calcElements(arreglos, elements);
 	Iterator it = elements.iterator();
@@ -110,11 +111,15 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	int offset = 0;
 
 	AssemblerInfo.saveReg(fd, nextReg + 1);
+	//AssemblerInfo.saveReg(fd, nextReg + 2);
 	while (it.hasNext()) {
 	    ((ASTConst)it.next()).generateCode(fd, nextReg + 1, "", "");
-	    fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");
+	    //fd.write("mov " + reg2 + ", " + offset + "\n");
+	    //fd.write("");
+	    fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");	    
 	    offset += tamBase;
 	}
+	//AssemblerInfo.restoreReg(fd, nextReg + 2);
 	AssemblerInfo.restoreReg(fd, nextReg + 1);
     }
 }

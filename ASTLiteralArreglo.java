@@ -31,21 +31,17 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
     }
 
-    public Tipo inferType(LinkedList lista){
-
+    public Tipo inferType(LinkedList lista) {
        if(lista.getFirst() instanceof ASTConst)
-           return new Arreglo( lista.size(), ((ASTConst) lista.getFirst()).getState());
+           return new Arreglo(lista.size(), ((ASTConst) lista.getFirst()).getState());
 
        if(lista.getFirst() instanceof ASTLiteralUR)
-           return new Arreglo( lista.size(), ((ASTLiteralUR) lista.getFirst()).getState());
+           return new Arreglo(lista.size(), ((ASTLiteralUR) lista.getFirst()).getState());
 
        int size = lista.size();
 
        return new Arreglo(size, inferType((LinkedList) lista.getFirst()));
-
     }
-
-       
     
     //@ requires lista != null;
     private void checkList(Tipo t, LinkedList lista) {
@@ -104,7 +100,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 		calcElements((LinkedList)aux, finalList);
 	    }
 	    else {
-		finalList.add((ASTConst)aux);
+		finalList.add(aux);
 	    }
 	}
     }
@@ -112,23 +108,38 @@ public class ASTLiteralArreglo extends ASTExpresion {
     public void generateCode(Writer fd, int nextReg, Tipo type) throws IOException {
 	String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1); 
-	//String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2); 
 	LinkedList elements = new LinkedList();
 	calcElements(arreglos, elements);
 	Iterator it = elements.iterator();
 	int tamBase = ((Arreglo)type).getTipoBase().getTam();
 	int offset = 0;
-
+	ASTExpresion aux_expr;
+	String si = AssemblerInfo.newLabel();
+	String no = AssemblerInfo.newLabel();
+	String end = AssemblerInfo.newLabel();
+	
 	AssemblerInfo.saveReg(fd, nextReg + 1);
-	//AssemblerInfo.saveReg(fd, nextReg + 2);
 	while (it.hasNext()) {
-	    ((ASTConst)it.next()).generateCode(fd, nextReg + 1, "", "");
-	    //fd.write("mov " + reg2 + ", " + offset + "\n");
-	    //fd.write("");
-	    fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");	    
-	    offset += tamBase;
+	    aux_expr = it.next();
+	    
+	    if (aux_expr instanceof Basico) {
+		if (((Basico)aux_expr).getState().getNBasico() == 3) {
+		    aux_expr.generateCode(fd, nextReg + 1, si, no);
+		    fd.write(si + ":\n");
+		    fd.write("mov " + reg1 + ", 1\n");    
+		    fd.write("jmp " + end + "\n");		    
+		    fd.write(no + ":\n");
+		    fd.write("mov " + reg1 + ", 0\n");    
+		    fd.write(end + ":\n");
+		}
+		else {
+		    aux_expr.generateCode(fd, nextReg + 1, "", "");
+		}
+
+		fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");	    
+		offset += tamBase;
+	    }	    
 	}
-	//AssemblerInfo.restoreReg(fd, nextReg + 2);
 	AssemblerInfo.restoreReg(fd, nextReg + 1);
     }
 }

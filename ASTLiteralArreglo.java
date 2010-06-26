@@ -120,7 +120,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
                        if(cast != null)
                            cast.generateCode(fd, nextReg, "","");
 
-                       fd.write("push ["+reg+"]\n");
+                       fd.write("push qword ["+reg+"]\n");
                    }
                    else
                        AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , expr.getState());

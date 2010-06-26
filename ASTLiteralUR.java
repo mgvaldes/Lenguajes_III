@@ -79,7 +79,7 @@ public class ASTLiteralUR extends ASTExpresion {
                     fd.write("push 1\n");    
                     fd.write("jmp " + end + "\n");		    
                     fd.write(no + ":\n");
-                    fd.write("psuh 0\n");    
+                    fd.write("push 0\n");    
                     fd.write(end + ":\n");
 
                 }
@@ -87,7 +87,7 @@ public class ASTLiteralUR extends ASTExpresion {
                     expr.generateCode(fd, nextReg, "", "");
 
                     if(expr.getState() instanceof Basico)
-                        fd.write("push ["+reg+"]\n");
+                        fd.write("push qword ["+reg+"]\n");
                     else
                         AssemblerInfo.generateIdenPushCastCode(fd, nextReg, (Tipo) itt.next() , expr.getState());
                 }

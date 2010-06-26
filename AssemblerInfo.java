@@ -147,7 +147,7 @@ public class AssemblerInfo {
                 for(int i = 0; i < source.getTam(); i += 8){
                     if(cast != null)
                         cast.generateCode(fd, nextReg, "", "");
-                    fd.write("push ["+reg+"]\n");
+                    fd.write("push qword ["+reg+"]\n");
                     fd.write("add "+reg+",8\n");
                 }
             }
@@ -173,7 +173,7 @@ public class AssemblerInfo {
                     ASTCast cast = AssemblerInfo.checkCast(edest, esource);
                     if(cast != null)
                         cast.generateCode(fd, nextReg, "", "");
-                    fd.write("push ["+reg+"]\n");
+                    fd.write("push qword ["+reg+"]\n");
                     fd.write("add "+reg+",8\n");
                 }
                 else
@@ -199,7 +199,7 @@ public class AssemblerInfo {
         Iterator itts = source.getTipos().iterator();
 
         fd.write("mov "+nreg+", ["+reg+"]\n");
-        fd.write("push ["+reg+"]\n");
+        fd.write("push qword ["+reg+"]\n");
         fd.write("add "+reg+",8\n");
 
         int i = 0;
@@ -218,7 +218,7 @@ public class AssemblerInfo {
                 ASTCast cast = AssemblerInfo.checkCast(edest, esource);
                 if(cast != null)
                     cast.generateCode(fd, nextReg, "", "");
-                fd.write("push ["+reg+"]\n");
+                fd.write("push qword ["+reg+"]\n");
                 fd.write("add "+reg+",8\n");
             }
             else

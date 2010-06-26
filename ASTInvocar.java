@@ -121,11 +121,11 @@ public class ASTInvocar extends ASTInstruccion {
 
         AssemblerInfo.saveRegLlamado(fd, nextReg);
 
-        empilarParametros(fd, nextReg);
+        empilarParametros(fd, 0);
 
         fd.write("call proc"+nombre+"\n");
 
-        desempilarParametros(fd, nextReg);
+        desempilarParametros(fd, 0);
 
         AssemblerInfo.restoreRegLlamado(fd, nextReg); 
          
@@ -137,8 +137,6 @@ public class ASTInvocar extends ASTInstruccion {
         String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
         String nreg = AssemblerInfo.getNombresRegAtPos(nextReg+1);
 
-        AssemblerInfo.saveSpecificReg(fd, nreg);
-
         Iterator itr = procInfo.getRef().iterator();
 
         for(int i = expresionEntrada.size() -1; i>=0; i--){
@@ -148,7 +146,7 @@ public class ASTInvocar extends ASTInstruccion {
 
             if(flag){
                 fd.write("pop "+nreg+"\n");
-                fd.write("add "+nreg+", "+tam+"\n");
+                fd.write("add "+nreg+", "+tam+"-8\n");
             }
             
             for(int k = 0; k < tam; k+=8){
@@ -178,7 +176,7 @@ public class ASTInvocar extends ASTInstruccion {
         while(ite.hasNext()){
 
            argumento = (ASTExpresion) ite.next();
-           Tipo dest = (Tipo) itt.next();
+           Tipo dest = procInfo.getTable().exist((String) itt.next()).getTipo();
 
            String si = AssemblerInfo.newLabel();
            String no = AssemblerInfo.newLabel();
@@ -197,7 +195,7 @@ public class ASTInvocar extends ASTInstruccion {
            else if(argumento instanceof ASTIdentificador){
 
                if(argumento.getState() instanceof Basico)
-                   fd.write("push ["+reg+"]\n");
+                   fd.write("push qword ["+reg+"]\n");
                else
                    AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState());
            }

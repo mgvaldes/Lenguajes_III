@@ -48,11 +48,11 @@ public class ASTInvocarExpresion extends ASTExpresion {
 
         AssemblerInfo.saveRegLlamado(fd, nextReg);
 
-        empilarParametros(fd, nextReg);
+        empilarParametros(fd, 0);
 
         fd.write("call proc"+nombre+"\n");
 
-        desempilarParametros(fd, nextReg, si, no);
+        desempilarParametros(fd, 0, si, no);
 
         AssemblerInfo.restoreRegLlamado(fd, nextReg);
          
@@ -63,8 +63,6 @@ public class ASTInvocarExpresion extends ASTExpresion {
         Object [] expresiones = expresionEntrada.toArray();
         String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
         String nreg = AssemblerInfo.getNombresRegAtPos(nextReg+1);
-
-        AssemblerInfo.saveSpecificReg(fd, nreg);
 
         Iterator itr = procInfo.getRef().iterator();
 
@@ -109,7 +107,7 @@ public class ASTInvocarExpresion extends ASTExpresion {
         while(ite.hasNext()){
 
            argumento = (ASTExpresion) ite.next();
-           Tipo dest = (Tipo) itt.next();
+           Tipo dest = procInfo.getTable().exist((String) itt.next()).getTipo();
 
            String si = AssemblerInfo.newLabel();
            String no = AssemblerInfo.newLabel();
@@ -128,7 +126,7 @@ public class ASTInvocarExpresion extends ASTExpresion {
            else if(argumento instanceof ASTIdentificador){
 
                if(argumento.getState() instanceof Basico)
-                   fd.write("push ["+reg+"]\n");
+                   fd.write("push qword ["+reg+"]\n");
                else
                    AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState());
            }

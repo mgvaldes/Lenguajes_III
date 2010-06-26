@@ -53,35 +53,57 @@ public class ASTLiteralUR extends ASTExpresion {
            
     }
 
-/*
-
-    public void generatePushCastCode(Writer fd, int nextReg, Tipo dest){
+    public void generatePushCastCode(Writer fd, int nextReg, Tipo dest) throws IOException{
 
         if(state instanceof Registro){
-            Iterator itt = dest.getTipos().iterator();
+
+            Iterator itt = ((Registro) dest).getTipos().iterator();
             Iterator ita = asignaciones.iterator();
 
             while(ita.hasNext()){
 
-                ASTAsignacion asig = ita.next();
-                Tipo edest = iit.next();
+                ASTAsignacion asig = (ASTAsignacion) ita.next();
+                Tipo edest = (Tipo) itt.next();
+                ASTExpresion expr = asig.getExpr();
+                String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 
-                if(asig.getExpr().getState() instanceof Basico) {
+                if(expr.getState() instanceof Basico && ((Basico) expr.getState()).getNBasico() == 3){
 
-                    ASTCast cast = AssemblerInfo.checkCast(edest, asig.getExpr().getState());
+                    String si = AssemblerInfo.newLabel();
+                    String no = AssemblerInfo.newLabel();
+                    String end = AssemblerInfo.newLabel();
+ 
+                    expr.generateCode(fd, nextReg, si, no);
+ 
+                    fd.write(si + ":\n");
+                    fd.write("push 1\n");    
+                    fd.write("jmp " + end + "\n");		    
+                    fd.write(no + ":\n");
+                    fd.write("psuh 0\n");    
+                    fd.write(end + ":\n");
 
-                    if(cast != null)
-                        cast.generateCode(fd, nextReg, "", "");
-
-                    fd.write("push ["+reg+"]\n");
-                    fd.write("add "+reg+",8\n");
                 }
-                else if(asig.getExpr())
-                        generatePushCastCode(fd, nextReg, edest, esource);
+                else if(expr instanceof ASTIdentificador){
+                    expr.generateCode(fd, nextReg, "", "");
+
+                    if(expr.getState() instanceof Basico)
+                        fd.write("push ["+reg+"]\n");
+                    else
+                        AssemblerInfo.generateIdenPushCastCode(fd, nextReg, (Tipo) itt.next() , expr.getState());
+                }
+                else if(expr instanceof ASTLiteralArreglo)
+                    ((ASTLiteralArreglo) expr).generatePushCastCode(fd,nextReg, edest, ((ASTLiteralArreglo) expr).getArreglos());
+                else if(expr instanceof ASTLiteralUR)
+                    ((ASTLiteralUR) expr).generatePushCastCode(fd, nextReg, edest);
+                else if(!(expr instanceof ASTInvocarExpresion)){
+                    expr.generateCode(fd, nextReg, "", "");
+                    fd.write("push "+reg+"\n");
+                }
+
+            }
+        }
 
     }
-
-*/
 
     public void updateState(){
         state = inferType();

@@ -132,4 +132,110 @@ public class AssemblerInfo {
 
 	return null;
     }
+
+    public static void generateIdenPushCastCode(Writer fd, int nextReg, Tipo dest, Tipo source) throws IOException{
+
+        String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
+
+        if(source instanceof Arreglo){
+
+            Tipo bsource = ((Arreglo) source).getTipoBase();
+            Tipo bdest = ((Arreglo) dest).getTipoBase();
+
+            if(bsource instanceof Basico){
+                ASTCast cast = AssemblerInfo.checkCast(bdest, bsource);
+                for(int i = 0; i < source.getTam(); i += 8){
+                    if(cast != null)
+                        cast.generateCode(fd, nextReg, "", "");
+                    fd.write("push ["+reg+"]\n");
+                    fd.write("add "+reg+",8\n");
+                }
+            }
+            else{
+                for(int i = 0; i < source.getTam(); i += bsource.getTam())
+                    generateIdenPushCastCode(fd, nextReg, bdest, bsource);
+            }
+        }
+       else if(source instanceof Registro){
+
+            Iterator its = ((Registro) source).getTipos().iterator();
+            Iterator itd = ((Registro) dest).getTipos().iterator();
+
+            Tipo esource;
+            Tipo edest;
+
+            while(its.hasNext()){
+
+                esource = (Tipo) its.next();
+                edest = (Tipo) itd.next();
+
+                if(esource instanceof Basico){
+                    ASTCast cast = AssemblerInfo.checkCast(edest, esource);
+                    if(cast != null)
+                        cast.generateCode(fd, nextReg, "", "");
+                    fd.write("push ["+reg+"]\n");
+                    fd.write("add "+reg+",8\n");
+                }
+                else
+                    generateIdenPushCastCode(fd, nextReg, edest, esource);
+            }
+        }
+       else if(source instanceof Union){
+
+            generateUnionPushCastCode(fd, nextReg, (Union) dest, (Union) source);
+
+        }
+    }
+
+    private static void generateUnionPushCastCode(Writer fd, int nextReg, Union dest, Union source) throws IOException{
+
+        String end = newLabel();
+        String reg = getNombresRegAtPos(nextReg);
+        String nreg = getNombresRegAtPos(nextReg+1);  
+
+        saveSpecificReg(fd, nreg);
+
+        Iterator ittd = dest.getTipos().iterator();
+        Iterator itts = source.getTipos().iterator();
+
+        fd.write("mov "+nreg+", ["+reg+"]\n");
+        fd.write("push ["+reg+"]\n");
+        fd.write("add "+reg+",8\n");
+
+        int i = 0;
+
+        while(itts.hasNext()){
+
+            Tipo edest = (Tipo) ittd.next();
+            Tipo esource = (Tipo) ittd.next();
+
+            String nextLabel = newLabel();
+
+            fd.write("cmp "+nreg+", "+i+"\n");
+            fd.write("jne "+nextLabel+"\n");
+
+            if(esource instanceof Basico){
+                ASTCast cast = AssemblerInfo.checkCast(edest, esource);
+                if(cast != null)
+                    cast.generateCode(fd, nextReg, "", "");
+                fd.write("push ["+reg+"]\n");
+                fd.write("add "+reg+",8\n");
+            }
+            else
+                generateIdenPushCastCode(fd, nextReg, edest, esource);
+
+            fd.write("jmp "+end+"\n");
+
+            fd.write(nextLabel+":\n");
+
+        }
+
+        fd.write(end+":\n");
+
+        restoreSpecificReg(fd, nreg);
+
+    }
+
+
+        
 }

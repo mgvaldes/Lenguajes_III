@@ -22,6 +22,10 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
     }
 
+    public LinkedList getArreglos(){
+        return arreglos;
+    }
+
     public void update() {}
 
     public void finalCheck(Tipo real){
@@ -42,8 +46,6 @@ public class ASTLiteralArreglo extends ASTExpresion {
        return new Arreglo(size, inferType((LinkedList) lista.getFirst()));
 
     }
-
-       
     
     //@ requires lista != null;
     private void checkList(Tipo t, LinkedList lista) {
@@ -80,55 +82,64 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	}
 
     }
-/*
-    public void generatePushCastCode(Writer fd, int nextReg, Tipo dest, LinkedList lista){
+
+    public void generatePushCastCode(Writer fd, int nextReg, Tipo dest, LinkedList lista) throws IOException{
 
         Iterator it = lista.iterator();
-
         while(it.hasNext()){
 
             Object o = it.next();
 	        
-            if(o instanceof ASTConst) {
+            if(o instanceof ASTExpresion) {
 
-                ASTConst con = (ASTConst) o;
-                Basico ba = (Basico) con.getState();
+                ASTExpresion expr = (ASTExpresion) o;
                 String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 
-                ASTCast cast = AssemblerInfo.checkCast(dest, ba);
+               if(expr.getState() instanceof Basico && ((Basico) expr.getState()).getNBasico() == 3){
 
-                switch(ba.getNBasico()){
-                    case 1:
-                        fd.write("mov "+reg+", "+ba.getCaseInt()+"\n");
-                    case 2:
-                        fd.write("mov "+reg+", "+Long.toHexString(Double.doubleToLongBits(ba.getCaseFloat()))+"\n");
-                    case 3:
-                        if(ba.getCaseBool())
-                            fd.write("mov "+reg", 1\n");
-                        else
-                            fd.write("mov "+reg", 0\n");
-                    default:
-                        char c = ba.getCaseChar.charAt(0);
-                        int ascii = (int) c;
-                        fd.write("mov "+reg", "+ Integer.toString(ascii) +"\n");
-                }
+                   String si = AssemblerInfo.newLabel();
+                   String no = AssemblerInfo.newLabel();
+                   String end = AssemblerInfo.newLabel();
 
-               if(cast != null)
-                   cast.generateCode(fd, nextReg, "", "");
+                   expr.generateCode(fd, nextReg, si, no);
 
-               fd.write("push "+reg+"\n");
+                   fd.write(si + ":\n");
+                   fd.write("push 1\n");    
+                   fd.write("jmp " + end + "\n");		    
+                   fd.write(no + ":\n");
+                   fd.write("push 0\n");    
+                   fd.write(end + ":\n");
+
+               }
+               else if(expr instanceof ASTIdentificador){
+                   expr.generateCode(fd, nextReg, "", "");
+
+                   if(expr.getState() instanceof Basico){
+                       ASTCast cast = AssemblerInfo.checkCast(dest, expr.getState());
+
+                       if(cast != null)
+                           cast.generateCode(fd, nextReg, "","");
+
+                       fd.write("push ["+reg+"]\n");
+                   }
+                   else
+                       AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , expr.getState());
+               }
+               else if(expr instanceof ASTLiteralUR)
+                    ((ASTLiteralUR) expr).generatePushCastCode(fd, nextReg, dest);
+               else if(!(expr instanceof ASTInvocarExpresion)){
+                   expr.generateCode(fd, nextReg, "", "");
+                   fd.write("push "+reg+"\n");
+               }
 
             }
-            else if(o instanceof ASTLiteralUR)
-                (ASTLiteralUR) o).generatePushCastCode(fd, nextReg, dest);
             else
-                generatePushCastCode(fd, nextReg, dest, (LinkedList) o);
-
+                generatePushCastCode(fd, nextReg, ((Arreglo) dest).getSub(), (LinkedList) o);
         }
+
             
     }
 
-*/
 
     public String printTree() {	
 	String m = new String(value);

@@ -127,7 +127,7 @@ public class ASTInvocar extends ASTInstruccion {
 
         desempilarParametros(fd, nextReg);
 
-        AssemblerInfo.restoreRegLlamado(fd, nextReg);
+        AssemblerInfo.restoreRegLlamado(fd, nextReg); 
          
     }
 

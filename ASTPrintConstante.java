@@ -23,7 +23,7 @@ public class ASTPrintConstante extends ASTInstruccion {
 
     public void update() {}
 
-    public void generateCode(Writer fd, int nextReg) throws IOException {
+    public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
 	    AssemblerInfo.saveSpecificReg(fd, "rdi");
 	    
 	    Basico t = (Basico) constante.getState();

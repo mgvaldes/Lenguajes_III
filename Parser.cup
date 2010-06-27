@@ -1742,7 +1742,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			
 			SymProc p = new SymProc(i,t, parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
 
-                        parser.intam += 8 + t.getTam();
+                        parser.intam += 16 + t.getTam();
 		        
 			if(!error) {
 			    if(!parser.anterior.insert(p, parser.anidamiento))
@@ -1847,7 +1847,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			      }
 			      
 			      SymProc p = new SymProc(i,new Basico(0), parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
-                              parser.intam += 8;
+                              parser.intam += 16;
 			      
 			      if(!error) {
 				  if(!parser.anterior.insert(p, parser.anidamiento))

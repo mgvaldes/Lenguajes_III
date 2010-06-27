@@ -92,8 +92,9 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	        
             if(o instanceof ASTExpresion) {
 
-                ASTExpresion expr = (ASTExpresion) o;
-                String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
+               ASTExpresion expr = (ASTExpresion) o;
+               String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
+               String nreg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 
                if(expr.getState() instanceof Basico && ((Basico) expr.getState()).getNBasico() == 3){
 
@@ -117,10 +118,13 @@ public class ASTLiteralArreglo extends ASTExpresion {
                    if(expr.getState() instanceof Basico){
                        ASTCast cast = AssemblerInfo.checkCast(dest, expr.getState());
 
-                       if(cast != null)
-                           cast.generateCode(fd, nextReg, "","");
-
-                       fd.write("push qword ["+reg+"]\n");
+                       if(cast != null){
+                            fd.write("mov "+nreg+", ["+reg+"]\n");
+                            cast.generateCode(fd, nextReg+1, "", "");
+                            fd.write("push qword ["+nreg+"]\n");
+                       }
+                       else
+                           fd.write("push qword ["+reg+"]\n");
                    }
                    else
                        AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , expr.getState());
@@ -129,6 +133,9 @@ public class ASTLiteralArreglo extends ASTExpresion {
                     ((ASTLiteralUR) expr).generatePushCastCode(fd, nextReg, dest);
                else if(!(expr instanceof ASTInvocarExpresion)){
                    expr.generateCode(fd, nextReg, "", "");
+                   ASTCast cast = AssemblerInfo.checkCast(dest, expr.getState());
+                   if(cast != null)
+                       cast.generateCode(fd, nextReg, "","");
                    fd.write("push "+reg+"\n");
                }
 

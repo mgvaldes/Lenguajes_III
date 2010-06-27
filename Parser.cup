@@ -1641,6 +1641,9 @@ listaparametros ::= listaparametros:l COMA tipos:t referencia:r IDENTIFIER:i
 
                      parser.referencias.add(r);
                      parser.intam += t.getTam();
+
+                     if(r.booleanValue())
+                         parser.intam += 8;
 		     
 		     parser.in.add(i);
 		     l.add(id);
@@ -1651,6 +1654,9 @@ listaparametros ::= listaparametros:l COMA tipos:t referencia:r IDENTIFIER:i
                      parser.in = new LinkedList();
 		     parser.in.add(i);
                      parser.intam += t.getTam();
+
+                     if(r.booleanValue())
+                         parser.intam += 8;
 
                      parser.referencias = new LinkedList();
 		     
@@ -1742,7 +1748,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			
 			SymProc p = new SymProc(i,t, parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
 
-                        parser.intam += 16 + t.getTam();
+                        parser.intam += 8 + t.getTam();
 		        
 			if(!error) {
 			    if(!parser.anterior.insert(p, parser.anidamiento))
@@ -1847,7 +1853,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			      }
 			      
 			      SymProc p = new SymProc(i,new Basico(0), parser.in, parser.referencias, new ASTBloque(new LinkedList(),parser.actual));
-                              parser.intam += 16;
+                              parser.intam += 8;
 			      
 			      if(!error) {
 				  if(!parser.anterior.insert(p, parser.anidamiento))

@@ -66,6 +66,7 @@ public class ASTLiteralUR extends ASTExpresion {
                 Tipo edest = (Tipo) itt.next();
                 ASTExpresion expr = asig.getExpr();
                 String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
+                String nreg = AssemblerInfo.getNombresRegAtPos(nextReg+1); 
 
                 if(expr.getState() instanceof Basico && ((Basico) expr.getState()).getNBasico() == 3){
 
@@ -86,10 +87,18 @@ public class ASTLiteralUR extends ASTExpresion {
                 else if(expr instanceof ASTIdentificador){
                     expr.generateCode(fd, nextReg, "", "");
 
-                    if(expr.getState() instanceof Basico)
-                        fd.write("push qword ["+reg+"]\n");
+                    if(expr.getState() instanceof Basico){
+                        ASTCast cast = AssemblerInfo.checkCast(edest,expr.getState());
+                        if(cast != null){
+                            fd.write("mov "+nreg+", ["+reg+"]\n");
+                            cast.generateCode(fd, nextReg+1, "", "");
+                            fd.write("push qword ["+nreg+"]\n");
+                        }
+                        else
+                            fd.write("push qword ["+reg+"]\n");
+                    }
                     else
-                        AssemblerInfo.generateIdenPushCastCode(fd, nextReg, (Tipo) itt.next() , expr.getState());
+                        AssemblerInfo.generateIdenPushCastCode(fd, nextReg, edest, expr.getState());
                 }
                 else if(expr instanceof ASTLiteralArreglo)
                     ((ASTLiteralArreglo) expr).generatePushCastCode(fd,nextReg, edest, ((ASTLiteralArreglo) expr).getArreglos());
@@ -97,6 +106,9 @@ public class ASTLiteralUR extends ASTExpresion {
                     ((ASTLiteralUR) expr).generatePushCastCode(fd, nextReg, edest);
                 else if(!(expr instanceof ASTInvocarExpresion)){
                     expr.generateCode(fd, nextReg, "", "");
+                    ASTCast cast = AssemblerInfo.checkCast(edest,expr.getState());
+                    if(cast != null)
+                        cast.generateCode(fd, nextReg, "", "");
                     fd.write("push "+reg+"\n");
                 }
 

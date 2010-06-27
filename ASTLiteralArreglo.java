@@ -31,6 +31,8 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
         if(real.asign(state) == null )
             state = null;
+        else
+            state = real;
 
     }
 

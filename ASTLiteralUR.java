@@ -17,6 +17,8 @@ public class ASTLiteralUR extends ASTExpresion {
 
         if( real.asign(state) == null )
             state = null;
+        else
+            state = real;
 
     }
 

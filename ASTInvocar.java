@@ -54,7 +54,6 @@ public class ASTInvocar extends ASTInstruccion {
 	SymTable tabla = proc.getTable();
         LinkedList ref = proc.getRef();
         procInfo = proc;
-	Tipo res;
 
 	if(expresionEntrada == null)
 	    return nombres.size() == 0;
@@ -68,13 +67,20 @@ public class ASTInvocar extends ASTInstruccion {
      
 	while(it1.hasNext()) {
 
+            Tipo tin = tabla.exist((String)it1.next()).getTipo();
 	    ASTExpresion e = (ASTExpresion)it2.next();
 
-            if(((Boolean) it3.next()).booleanValue() && !(e instanceof ASTIdentificador))
-                return false;
+            if(((Boolean) it3.next()).booleanValue()){
 
-	    res = e.getState().asign(tabla.exist((String)it1.next()).getTipo());
-	    if(res == null)
+                if(!(e instanceof ASTIdentificador))
+                    return false;
+
+                if(tin.asign(e.getState()) == null)
+                    return false;
+
+            }
+
+	    if(e.getState().asign(tin) == null)
 		return false;
 	}
 
@@ -99,14 +105,21 @@ public class ASTInvocar extends ASTInstruccion {
 	Iterator it3 = ref.iterator();
 
 	while(it1.hasNext()) {
+
+            Tipo tin = ((ASTIdentificador)it1.next()).getState();
 	    ASTExpresion e = (ASTExpresion)it2.next();
 
-            if(((Boolean) it3.next()).booleanValue() && !(e instanceof ASTIdentificador))
-                return false;
+            if(((Boolean) it3.next()).booleanValue()){
 
-	    res = e.getState().asign( ((ASTIdentificador)it1.next()).getState() );
+                if(!(e instanceof ASTIdentificador))
+                    return false;
 
-	    if(res == null)
+                if(tin.asign(e.getState()) == null)
+                    return false;
+
+            }
+
+	    if(e.getState().asign(tin) == null)
 		return false;
 	}
 

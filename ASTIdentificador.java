@@ -53,12 +53,6 @@ public class ASTIdentificador extends ASTExpresion {
 		fd.write("mov " + reg + ", " + AssemblerInfo.getFp() + "\n");	
 		fd.write("sub " + reg + ", " + ((SymVar)getTable().getSym(getValue())).getOffset() + "\n");
 	    }
-
-            if (aux_state instanceof Basico && ((Basico)aux_state).getNBasico() == 3) {
-                fd.write("cmp [" + reg + "], 1\n");
-		fd.write("je " + si + "\n");
-		fd.write("jmp " + no + "\n");
-            }
 	    
 	    if ((aux_state instanceof Arreglo) || (aux_state instanceof Registro) || (aux_state instanceof Union)) {
 		if (acceso != null) {

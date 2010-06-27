@@ -94,10 +94,12 @@ public class ASTConst extends ASTExpresion {
 		fd.write("mov " + reg + ", 0x" + Long.toHexString(Double.doubleToLongBits(caseFloat)) + "\n");
 		break;
 	    case 3:
-		if (caseBool)
+		if (caseBool) {
 		    fd.write("jmp " + si + "\n");
-		else
+		}
+		else {
 		    fd.write("jmp " + no + "\n");
+		}
 		break;
 	    case 4:
 		char c = caseChar.charAt(0);

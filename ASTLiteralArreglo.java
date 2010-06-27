@@ -15,8 +15,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	flag = false;
     }
 
-    public void updateState(){
-
+    public void updateState() {
         state = inferType(arreglos);
         checkList(((Arreglo) state).getSub(), arreglos);
 
@@ -157,16 +156,19 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	int tamBase = ((Arreglo)type).getTipoBase().getTam();
 	int offset = 0;
 	ASTExpresion aux_expr;
-	String si = AssemblerInfo.newLabel();
-	String no = AssemblerInfo.newLabel();
-	String end = AssemblerInfo.newLabel();
+	String si;
+	String no;
+	String end;
 	
 	AssemblerInfo.saveReg(fd, nextReg + 1);
 	while (it.hasNext()) {
-	    aux_expr = it.next();
+	    aux_expr = (ASTExpresion)it.next();
+	    si = AssemblerInfo.newLabel();
+	    no = AssemblerInfo.newLabel();
+	    end = AssemblerInfo.newLabel();
 	    
-	    if (aux_expr instanceof Basico) {
-		if (((Basico)aux_expr).getState().getNBasico() == 3) {
+	    if (aux_expr.getState() instanceof Basico) {
+		if (((Basico)aux_expr.getState()).getNBasico() == 3) {
 		    aux_expr.generateCode(fd, nextReg + 1, si, no);
 		    fd.write(si + ":\n");
 		    fd.write("mov " + reg1 + ", 1\n");    
@@ -181,7 +183,10 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
 		fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");	    
 		offset += tamBase;
-	    }	    
+	    }
+	    else if ((aux_expr.getState() instanceof Registro) || (aux_expr.getState() instanceof Union)) {
+		((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, aux_expr.getState());
+	    }
 	}
 	AssemblerInfo.restoreReg(fd, nextReg + 1);
     }

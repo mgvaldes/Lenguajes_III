@@ -48,8 +48,14 @@ public class ASTBool extends ASTExpresion {
                 case 4:
                 if (value.compareTo("==") == 0) {
 		    left.generateCode(fd, nextReg, si, no);
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
                     AssemblerInfo.saveReg(fd, nextReg + 1);
                     right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
                     fd.write("cmp " + reg + ", " + nreg + "\n");
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
                     fd.write("je " + si + "\n");
@@ -57,8 +63,14 @@ public class ASTBool extends ASTExpresion {
 	        }
 	        else if (value.compareTo("!=") == 0) {
 		    left.generateCode(fd, nextReg, si, no);
+                    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
                     AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg+1, si, no);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
                     fd.write("cmp " + reg + ", " + nreg + "\n");
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
                     fd.write("jne " + si + "\n");
@@ -66,8 +78,14 @@ public class ASTBool extends ASTExpresion {
 	        }
 	        else if (value.compareTo("<") == 0) {
 		    left.generateCode(fd, nextReg, si, no);
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);	       
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
+                    AssemblerInfo.saveReg(fd, nextReg + 1);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
 		    fd.write("cmp " + reg + ", " + nreg + "\n");
 		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    fd.write("jl " + si + "\n");
@@ -75,8 +93,14 @@ public class ASTBool extends ASTExpresion {
 	        }
 	        else if (value.compareTo("<=") == 0) {
 		    left.generateCode(fd, nextReg, si, no);
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);	       
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
+                    AssemblerInfo.saveReg(fd, nextReg + 1);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
 		    fd.write("cmp " + reg + ", " + nreg + "\n");
 		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    fd.write("jle " + si + "\n");
@@ -84,17 +108,29 @@ public class ASTBool extends ASTExpresion {
 	        }
 	        else if (value.compareTo(">") == 0) {
 		    left.generateCode( fd, nextReg, si, no);
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);	       
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
+                    AssemblerInfo.saveReg(fd, nextReg + 1);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
 		    fd.write("cmp " + reg + ", " + nreg + "\n");
 		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    fd.write("jg " + si + "\n");
 		    fd.write("jmp " + no + "\n");
 	        }
-	        else{
+	        else {
 		    left.generateCode(fd, nextReg, si, no);
-		    AssemblerInfo.saveReg(fd, nextReg + 1);
-		    right.generateCode(fd, nextReg + 1, si, no);	       
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
+                    AssemblerInfo.saveReg(fd, nextReg + 1);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
 		    fd.write("cmp " + reg + ", " + nreg + "\n");
 		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    fd.write("jge " + si + "\n");
@@ -105,21 +141,27 @@ public class ASTBool extends ASTExpresion {
 	        if (value.compareTo("==") == 0) {
 
 		    left.generateCode(fd, nextReg, si, no);
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
 
                     AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg+1, si, no);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
 
-                    fd.write("push "+reg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + reg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 			
-                    fd.write("push "+nreg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + nreg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
                     fd.write("fincstp\n");
 
-                    fd.write("pop "+nreg+"\n");
-                    fd.write("pop "+reg+"\n");
+                    fd.write("pop " + nreg + "\n");
+                    fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
                     fd.write("je " + si + "\n");
@@ -130,20 +172,27 @@ public class ASTBool extends ASTExpresion {
 
 		    left.generateCode(fd, nextReg, si, no);
 
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg+1, si, no);
+                    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
 
-                    fd.write("push "+reg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    AssemblerInfo.saveReg(fd, nextReg + 1);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
+
+                    fd.write("push " + reg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 			
-                    fd.write("push "+nreg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + nreg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
                     fd.write("fincstp\n");
 
-                    fd.write("pop "+nreg+"\n");
-                    fd.write("pop "+reg+"\n");
+                    fd.write("pop " + nreg + "\n");
+                    fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
                     fd.write("jne " + si + "\n");
@@ -154,20 +203,27 @@ public class ASTBool extends ASTExpresion {
 
 		    left.generateCode(fd, nextReg, si, no);
 
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg+1, si, no);
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
 
-                    fd.write("push "+reg+"\n");
+                    AssemblerInfo.saveReg(fd, nextReg + 1);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
+
+                    fd.write("push " + reg + "\n");
                     fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
 			
-                    fd.write("push "+nreg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + nreg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
                     fd.write("fincstp\n");
 
-                    fd.write("pop "+nreg+"\n");
-                    fd.write("pop "+reg+"\n");
+                    fd.write("pop " + nreg + "\n");
+                    fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    fd.write("jl " + si + "\n");
@@ -176,21 +232,26 @@ public class ASTBool extends ASTExpresion {
 	        else if (value.compareTo("<=") == 0) {
 
 		    left.generateCode(fd, nextReg, si, no);
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
 
                     AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg+1, si, no);
-
-                    fd.write("push "+reg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
+                    fd.write("push " + reg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 			
-                    fd.write("push "+nreg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + nreg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
                     fd.write("fincstp\n");
 
-                    fd.write("pop "+nreg+"\n");
-                    fd.write("pop "+reg+"\n");
+                    fd.write("pop " + nreg + "\n");
+                    fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    fd.write("jle " + si + "\n");
@@ -199,21 +260,27 @@ public class ASTBool extends ASTExpresion {
 	        else if (value.compareTo(">") == 0) {
 
 		    left.generateCode(fd, nextReg, si, no);
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
 
                     AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg+1, si, no);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
 
-                    fd.write("push "+reg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + reg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 			
-                    fd.write("push "+nreg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + nreg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
                     fd.write("fincstp\n");
 
-                    fd.write("pop "+nreg+"\n");
-                    fd.write("pop "+reg+"\n");
+                    fd.write("pop " + nreg + "\n");
+                    fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
 		    fd.write("jg " + si + "\n");
@@ -222,24 +289,29 @@ public class ASTBool extends ASTExpresion {
 	        else{
 
 		    left.generateCode(fd, nextReg, si, no);
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+		    }
 
                     AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg+1, si, no);
+                    right.generateCode(fd, nextReg + 1, si, no);
+		    if (right instanceof ASTIdentificador) {
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+		    }
 
-                    fd.write("push "+reg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + reg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 			
-                    fd.write("push "+nreg+"\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+                    fd.write("push " + nreg + "\n");
+                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
                     fd.write("fincstp\n");
 
-                    fd.write("pop "+nreg+"\n");
-                    fd.write("pop "+reg+"\n");
+                    fd.write("pop " + nreg + "\n");
+                    fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
-
 		    fd.write("jge " + si + "\n");
 		    fd.write("jmp " + no + "\n");
 	        }
@@ -247,37 +319,184 @@ public class ASTBool extends ASTExpresion {
             default:
 	        if (value.compareTo("!") == 0) {
 		    left.generateCode(fd, nextReg, no, si);
+
+		    if (left instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+			fd.write("cmp " + reg + ", 1\n");
+			fd.write("je " + no + "\n");
+			fd.write("jmp " + si + "\n");
+		    }
 	        }
                 else if (value.compareTo("==") == 0) {
 		    String newsi = AssemblerInfo.newLabel();
 		    String newno = AssemblerInfo.newLabel();
-		    left.generateCode(fd, nextReg, newsi, newno);
-		    fd.write(newsi + ": \n");
-                    right.generateCode(fd, nextReg, si, no);
-                    fd.write(newno + ": \n");
-                    right.generateCode(fd, nextReg, no, si);
-	        }
-	        else if (value.compareTo("!=") == 0) {
 
+		    if ((left instanceof ASTIdentificador) && (right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n");			
+			AssemblerInfo.saveReg(fd, nextReg + 1);
+			right.generateCode(fd, nextReg + 1, si, no);
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+
+			fd.write("cmp " + reg + ", " + nreg + "\n");
+			AssemblerInfo.restoreReg(fd, nextReg + 1);
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");
+		    }
+		    else if ((left instanceof ASTIdentificador) && !(right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n");			
+			right.generateCode(fd, nextReg, newsi, newno);
+			fd.write(newsi + ": \n");
+			fd.write("cmp " + reg + ", 1\n");
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");
+			fd.write(newno + ": \n");
+			fd.write("cmp " + reg + ", 0\n");
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");
+		    }
+		    else if (!(left instanceof ASTIdentificador) && (right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, newsi, newno);
+			right.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n"); 			
+			fd.write(newsi + ": \n");			
+			fd.write("cmp " + reg + ", 1\n");
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");
+			fd.write(newno + ": \n");			
+			fd.write("cmp " + reg + ", 0\n");
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");			
+		    }
+		    else {
+			left.generateCode(fd, nextReg, newsi, newno);	       	
+			fd.write(newsi + ": \n");
+			right.generateCode(fd, nextReg, si, no);
+			fd.write(newno + ": \n");
+			right.generateCode(fd, nextReg, no, si);			
+		    }
+	        }
+	        else if (value.compareTo("!=") == 0) {		    
 		    String newsi = AssemblerInfo.newLabel();
 		    String newno = AssemblerInfo.newLabel();
-		    left.generateCode(fd, nextReg, newsi, newno);
-		    fd.write(newsi + ": \n");
-                    right.generateCode(fd, nextReg, no, si);
-                    fd.write(newno + ": \n");
-                    right.generateCode(fd, nextReg, si, no);
+
+		    if ((left instanceof ASTIdentificador) && (right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n");			
+			right.generateCode(fd, nextReg + 1, si, no);
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+			fd.write("cmp " + reg + ", " + nreg + "\n");
+			fd.write("jne " + si + "\n");
+			fd.write("jmp " + no + "\n");
+		    }
+		    else if ((left instanceof ASTIdentificador) && !(right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n");			
+			right.generateCode(fd, nextReg + 1, newsi, newno);
+			fd.write(newsi + ": \n");
+			fd.write("cmp " + reg + ", 1\n");
+			fd.write("jne " + si + "\n");
+			fd.write("jmp " + no + "\n");
+			fd.write(newno + ": \n");
+			fd.write("cmp " + reg + ", 0\n");
+			fd.write("jne " + si + "\n");
+			fd.write("jmp " + no + "\n");
+		    }
+		    else if (!(left instanceof ASTIdentificador) && (right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, newsi, newno);
+			right.generateCode(fd, nextReg + 1, si, no);
+			fd.write("mov " + nreg + ", [" + nreg + "]\n"); 		    
+			fd.write(newsi + ": \n");			
+			fd.write("cmp " + nreg + ", 1\n");
+			fd.write("jne " + si + "\n");
+			fd.write("jmp " + no + "\n");
+			fd.write(newno + ": \n");			
+			fd.write("cmp " + nreg + ", 0\n");
+			fd.write("jne " + si + "\n");
+			fd.write("jmp " + no + "\n");			
+		    }
+		    else {
+			left.generateCode(fd, nextReg, newsi, newno);
+			fd.write(newsi + ": \n");
+			right.generateCode(fd, nextReg + 1, no, si);
+			fd.write(newno + ": \n");
+			right.generateCode(fd, nextReg + 1, si, no);
+		    }
                 }
 	        else if (value.compareTo("&&") == 0) {
 		    String nextL = AssemblerInfo.newLabel();
-		    left.generateCode(fd, nextReg, nextL, no);
-		    fd.write(nextL + ": \n");
-                    right.generateCode(fd, nextReg, si, no);				
+		    AssemblerInfo.saveReg(fd, nextReg + 1);
+
+		    if ((left instanceof ASTIdentificador) && (right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n");			
+			right.generateCode(fd, nextReg + 1, si, no);
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+			fd.write("cmp " + reg + ", " + nreg + "\n");
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");
+		    }
+		    else if ((left instanceof ASTIdentificador) && !(right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n");			
+			right.generateCode(fd, nextReg + 1, nextL, no);
+			fd.write(nextL + ": \n");
+			fd.write("cmp " + reg + ", 1\n");
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");
+		    }
+		    else if (!(left instanceof ASTIdentificador) && (right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, nextL, no);
+			fd.write(nextL + ": \n");			
+			right.generateCode(fd, nextReg + 1, si, no);
+			fd.write("mov " + nreg + ", [" + nreg + "]\n"); 		   
+			fd.write("cmp " + nreg + ", 1\n");
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");
+		    }
+		    else {
+			left.generateCode(fd, nextReg, nextL, no);
+			fd.write(nextL + ": \n");
+			right.generateCode(fd, nextReg + 1, si, no);      
+		    }
+		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 	        }
 	        else if (value.compareTo("||") == 0) {
 		    String nextL = AssemblerInfo.newLabel();
-		    left.generateCode(fd, nextReg, si, nextL);
-		    fd.write(nextL + ": \n");
-                    right.generateCode(fd, nextReg, si, no);
+
+		    if ((left instanceof ASTIdentificador) && (right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+			fd.write("cmp " + reg + ", 1\n");
+			fd.write("je " + si + "\n");			
+			right.generateCode(fd, nextReg + 1, si, no);
+			fd.write("mov " + nreg + ", [" + nreg + "]\n");
+			fd.write("cmp " + nreg + ", 1\n");
+			fd.write("je " + si + "\n");			
+			fd.write("jmp " + no + "\n");
+		    }
+		    else if ((left instanceof ASTIdentificador) && !(right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, no);
+			fd.write("mov " + reg + ", [" + reg + "]\n");	
+			fd.write("cmp " + reg + ", 1\n");
+			fd.write("je " + si + "\n");					
+			right.generateCode(fd, nextReg + 1, si, no);
+		    }
+		    else if (!(left instanceof ASTIdentificador) && (right instanceof ASTIdentificador)) {
+			left.generateCode(fd, nextReg, si, nextL);
+			fd.write(nextL + ": \n");	
+			right.generateCode(fd, nextReg + 1, si, no);
+			fd.write("mov " + nreg + ", [" + nreg + "]\n"); 	
+			fd.write("cmp " + nreg + ", 1\n");
+			fd.write("je " + si + "\n");
+			fd.write("jmp " + no + "\n");
+		    }
+		    else {
+			left.generateCode(fd, nextReg, si, nextL);
+			fd.write(nextL + ": \n");
+			right.generateCode(fd, nextReg + 1, si, no);
+		    }
                 }
             }   
                 

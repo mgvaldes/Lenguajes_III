@@ -108,10 +108,9 @@ public class ASTLiteralUR extends ASTExpresion {
 	    Iterator campos_types;
 	    LinkedList aux_type;
 
-	    String si = AssemblerInfo.newLabel();
-	    String no = AssemblerInfo.newLabel();
-	    String end = AssemblerInfo.newLabel();
-
+	    String si;
+	    String no;
+	    String end;
 
 	    AssemblerInfo.saveReg(fd, nextReg + 1);		    
 	    AssemblerInfo.saveReg(fd, nextReg + 2);
@@ -120,7 +119,7 @@ public class ASTLiteralUR extends ASTExpresion {
 		aux = (ASTAsignacion)asigs.next();
 		aux_id = (ASTIdentificador)((LinkedList)aux.getIds()).getFirst();
 	     	int pos = ((LinkedList)((Union)type).getCampos()).indexOf((String)aux_id.getValue());
-		
+
 		//Seteando discriminante
 		fd.write("mov " + reg1 + ", " + pos + "\n");
 	     	fd.write("mov [" + reg + "], " + reg1 + "\n");
@@ -141,15 +140,35 @@ public class ASTLiteralUR extends ASTExpresion {
 		aux_id = (ASTIdentificador)((LinkedList)aux.getIds()).getFirst();
 		aux_expr = aux.getExpr();
 		id_type = (Tipo)campos_types.next();
+		si = AssemblerInfo.newLabel();
+		no = AssemblerInfo.newLabel();
+		end = AssemblerInfo.newLabel();
 
 		aux_expr.generateCode(fd, nextReg + 1, si, no);
 		    
 		if (id_type instanceof Basico) {
-		    if (aux_expr instanceof ASTConst) {
+		    if (aux_expr instanceof ASTIdentificador) {
+			fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
 			fd.write("mov [" + reg + "], " + reg1 + "\n");
 		    }
-		    else if (aux_expr instanceof ASTIdentificador) {
-			fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
+		    else if (aux_expr instanceof ASTConst) {
+			if (((Basico)id_type).getNBasico() == 3) {
+			    fd.write(si + ":\n");
+			    fd.write("mov " + reg1 + ", 1\n");    
+			    fd.write("jmp " + end + "\n");		    
+			    fd.write(no + ":\n");
+			    fd.write("mov " + reg1 + ", 0\n");    
+			    fd.write(end + ":\n");
+			}
+			fd.write("mov [" + reg + "], " + reg1 + "\n");
+		    }
+		    else if (aux_expr instanceof ASTBool) {
+			fd.write(si + ":\n");
+			fd.write("mov " + reg1 + ", 1\n");    
+			fd.write("jmp " + end + "\n");		    
+			fd.write(no + ":\n");
+			fd.write("mov " + reg1 + ", 0\n");    
+			fd.write(end + ":\n");
 			fd.write("mov [" + reg + "], " + reg1 + "\n");
 		    }
 		}
@@ -176,7 +195,6 @@ public class ASTLiteralUR extends ASTExpresion {
 		    
 		fd.write("mov " + reg2 + ", " + id_type.getTam() + "\n");
 		fd.write("sub " + reg + ", " + reg2 + "\n");
-
 	    }
 
 	    AssemblerInfo.restoreReg(fd, nextReg + 2);		    

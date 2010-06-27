@@ -90,12 +90,14 @@ public class ASTAsignacion extends ASTInstruccion {
 		    //Caso especial para las expresiones booleanas
 		    if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
 			expr.generateCode(fd, nextReg, si, no);
-			fd.write(si + ":\n");
-			fd.write("mov " + reg + ", 1\n");    
-			fd.write("jmp " + end + "\n");		    
-			fd.write(no + ":\n");
-			fd.write("mov " + reg + ", 0\n");    
-			fd.write(end + ":\n");
+			if (!(expr instanceof ASTIdentificador)) {
+			    fd.write(si + ":\n");
+			    fd.write("mov " + reg + ", 1\n");    
+			    fd.write("jmp " + end + "\n");		    
+			    fd.write(no + ":\n");
+			    fd.write("mov " + reg + ", 0\n");    
+			    fd.write(end + ":\n");
+			}		       
 		    }
 		    else {
 			expr.generateCode(fd, nextReg, si, no);

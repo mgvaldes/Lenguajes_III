@@ -43,15 +43,23 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	    return;
 	else {
 	    Iterator it = lista.iterator();	    
-	    int size;	    
 	    Object o = it.next();
 	    
 	    if(o instanceof ASTExpresion) {
+
                 if(o instanceof ASTLiteralUR)
                     ((ASTLiteralUR) o).refreshState(real);
+
+                while(it.hasNext()){
+                    o = it.next();
+                    if(o instanceof ASTLiteralUR)
+                        ((ASTLiteralUR) o).refreshState(real);
+                }
 	    }
 	    else {
 		LinkedList l = (LinkedList) o;
+
+		refreshState(((Arreglo) real).getSub(),l);
 		
 		while(it.hasNext()) 
 		    refreshState(((Arreglo) real).getSub(),l);
@@ -89,9 +97,11 @@ public class ASTLiteralArreglo extends ASTExpresion {
 		}
 	    }
 	    else {
+
 		LinkedList l = (LinkedList) o;
 		size = l.size();
-		
+		checkList(((Arreglo) t).getSub(),l);
+
 		while(it.hasNext()) {
 		    l = (LinkedList) it.next();
 
@@ -231,7 +241,6 @@ public class ASTLiteralArreglo extends ASTExpresion {
 		offset += tamBase;
 	    }
 	    else if ((aux_expr.getState() instanceof Registro) || (aux_expr.getState() instanceof Union)) {
-                System.out.println(aux_expr.getState());
 		((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, aux_expr.getState());
 	    }
 	}

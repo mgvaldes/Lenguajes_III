@@ -29,11 +29,35 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
     public void finalCheck(Tipo real){
 
+
         if(real.asign(state) == null )
             state = null;
         else
-            state = real;
+            refreshState(((Arreglo) real).getSub(), arreglos);
 
+    }
+
+    public void refreshState(Tipo real, LinkedList lista){
+
+	if(real == null)
+	    return;
+	else {
+	    Iterator it = lista.iterator();	    
+	    int size;	    
+	    Object o = it.next();
+	    
+	    if(o instanceof ASTExpresion) {
+                if(o instanceof ASTLiteralUR)
+                    ((ASTLiteralUR) o).refreshState(real);
+	    }
+	    else {
+		LinkedList l = (LinkedList) o;
+		
+		while(it.hasNext()) 
+		    refreshState(((Arreglo) real).getSub(),l);
+		    
+	    }		
+	}
     }
 
     public Tipo inferType(LinkedList lista) {
@@ -207,6 +231,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 		offset += tamBase;
 	    }
 	    else if ((aux_expr.getState() instanceof Registro) || (aux_expr.getState() instanceof Union)) {
+                System.out.println(aux_expr.getState());
 		((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, aux_expr.getState());
 	    }
 	}

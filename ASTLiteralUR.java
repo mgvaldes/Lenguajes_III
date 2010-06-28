@@ -18,11 +18,51 @@ public class ASTLiteralUR extends ASTExpresion {
         if( real.asign(state) == null )
             state = null;
         else
+            refreshState(real);
+    }
+
+    public void refreshState(Tipo real){
+
+        Iterator ita = asignaciones.iterator();
+        ASTAsignacion a;
+
+        if(real instanceof Union){
+
             state = real;
+
+            a = (ASTAsignacion) ita.next();
+
+            if(a.getExpr() instanceof ASTLiteralUR){
+  
+                int pos = ((Union) real).getCampos().indexOf(((ASTIdentificador) a.getIds().getFirst()).getValue());
+
+                if(pos != -1){
+                    Tipo ureal = (Tipo) ((Union) real).getTipos().get(pos);
+                    ((ASTLiteralUR) a.getExpr()).refreshState(ureal);
+                }
+            }
+
+        }
+        else if(real instanceof Registro){
+
+            Iterator itt = ((Registro) real).getTipos().iterator();
+
+            while(ita.hasNext()){
+
+                Tipo rreal = (Tipo) itt.next();
+
+                a = (ASTAsignacion) ita.next();
+
+                if(a.getExpr() instanceof ASTLiteralUR)
+                    ((ASTLiteralUR) a.getExpr()).refreshState(rreal);
+            }
+
+        }
 
     }
 
-    public Tipo inferType(){
+
+    private Tipo inferType(){
 
        Iterator it = asignaciones.iterator();
 

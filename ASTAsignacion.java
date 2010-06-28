@@ -6,15 +6,11 @@ public class ASTAsignacion extends ASTInstruccion {
 
     private LinkedList ids;
     private ASTExpresion expr;
-    private LinkedList casts;
-    private boolean isDeclaration;
 
-    public ASTAsignacion(LinkedList l, ASTExpresion e, LinkedList c) {
+    public ASTAsignacion(LinkedList l, ASTExpresion e) {
 	super("asig");
 	ids = l;
 	expr = e;
-        casts = c;
-        isDeclaration = false;
     }
 
     public void setIds(LinkedList l) {
@@ -23,10 +19,6 @@ public class ASTAsignacion extends ASTInstruccion {
 
     public void setExpr(ASTExpresion e) {
 	expr = e;
-    }
-
-    public void setIsDeclaration(boolean b) {
-	isDeclaration = b;
     }
 
     public LinkedList getIds() {
@@ -39,10 +31,6 @@ public class ASTAsignacion extends ASTInstruccion {
 
     public Tipo getState() {
 	return expr.getState();
-    }
-
-    public LinkedList getCasts(){
-        return casts;
     }
 
     public void update() {}
@@ -105,7 +93,6 @@ public class ASTAsignacion extends ASTInstruccion {
 		}       
 
 		Iterator it = ids.iterator();
-		Iterator itc = casts.iterator();
 
 		ASTIdentificador id;
 		ASTCast ct;
@@ -114,12 +101,6 @@ public class ASTAsignacion extends ASTInstruccion {
 
 		while(it.hasNext()) {
 		    id = (ASTIdentificador)it.next();
-		    ct = (ASTCast)itc.next();
-
-		    if(ct != null){
-			AssemblerInfo.saveSpecificReg(fd, reg);
-			ct.generateCode(fd, nextReg, si, no);
-		    }
 
 		    offset = ((SymVar)id.getTable().getSym(id.getValue())).getOffset();
 		    aux_state = ((SymVar)id.getTable().getSym(id.getValue())).getState();
@@ -207,8 +188,6 @@ public class ASTAsignacion extends ASTInstruccion {
 		    }
 		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 
-		    if(ct != null)
-			AssemblerInfo.restoreSpecificReg(fd, reg);
 		}
 	    }
     	}

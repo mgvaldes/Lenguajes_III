@@ -63,25 +63,6 @@ parser code {:
 	System.out.println(" en la linea "+symbol.left+", columna "+symbol.right);
     }
 
-    public ASTCast checkCast(Tipo t, ASTExpresion e) {
-        if (t == null) return null;
-
-        Tipo estate = e.getState();
-
-        if (estate == null) return null;
-
-        if (t.equals(new Basico(1)) && estate.equals(new Basico(2)))
-            return new ASTCast(null, new Basico(1));
-
-        if (t.equals(new Basico(2)) && estate.equals(new Basico(1)))
-            return new ASTCast(null, new Basico(2));
-
-        if (t.equals(new Basico(4)) && estate.equals(new Basico(1)))
-            return new ASTCast(null, new Basico(4));
-
-        return null;
-    }
-
     public void warning(String msg) {
 	error = true;
 	System.out.println("Precaucion: "+msg+" en la linea "+lexer.getLine()+", columna "+lexer.getColumn()+".");
@@ -370,8 +351,6 @@ declaracion ::= CONST tipos:t declaracionsimple:l
 
 		     if (res == null)
 			 parser.type_error(t,e.getState(),"asignar");
-	             else
-			 l.getCasts().add(parser.checkCast(t, e));
 		 }
                    
 		 while(it.hasNext()) {
@@ -391,7 +370,6 @@ declaracion ::= CONST tipos:t declaracionsimple:l
 			 parser.used_error(i.getValue());                     
 		 }
 
-                 l.setIsDeclaration(true);		 
 		 RESULT = l;
                 :}
              |  tipos:t declaracionsimple:l 
@@ -420,8 +398,6 @@ declaracion ::= CONST tipos:t declaracionsimple:l
 		    
 		    if(res == null)
 			parser.type_error(t,e.getState(),"asignar");
-		    else
-			l.getCasts().add(parser.checkCast(t, e));
 		 }                   
 		 
 		 while(it.hasNext()) {
@@ -441,7 +417,6 @@ declaracion ::= CONST tipos:t declaracionsimple:l
 			 parser.used_error(i.getValue());                     
 		 }
 
-                 l.setIsDeclaration(true);
 		 RESULT = l;
                 :}
              ;
@@ -550,7 +525,7 @@ listaasignaciones ::= listaasignaciones:l SEQ IDENTIFIER:i ASIG expresion:el
                       {:
                         LinkedList ids = new LinkedList();
                         ids.add(new ASTIdentificador(i,null, null, null));
-                        l.add(new ASTAsignacion(ids, el, new LinkedList()));
+                        l.add(new ASTAsignacion(ids, el));
                         RESULT = l;
                       :}
                    |  IDENTIFIER:i ASIG expresion:el
@@ -558,7 +533,7 @@ listaasignaciones ::= listaasignaciones:l SEQ IDENTIFIER:i ASIG expresion:el
                         LinkedList l = new LinkedList();
                         LinkedList ids = new LinkedList();
                         ids.add(new ASTIdentificador(i,null, null, null));
-                        l.add(new ASTAsignacion(ids, el, new LinkedList()));
+                        l.add(new ASTAsignacion(ids, el));
                         RESULT = l;
                       :}
                    ;
@@ -633,14 +608,12 @@ basicos ::= INT {: RESULT = new Basico(1); :}
 listaident ::= listaident:l COMA IDENTIFIER:i 
                {: 
                 l.getIds().add(new ASTIdentificador(i, parser.actual, null, null));
-                l.getCasts().add(null);
                 RESULT = l; 
 	       :}
             |  IDENTIFIER:i
                {:
-		ASTAsignacion a = new ASTAsignacion(new LinkedList(), null, new LinkedList()); 
+		ASTAsignacion a = new ASTAsignacion(new LinkedList(), null); 
 		a.getIds().add(new ASTIdentificador(i, parser.actual, null, null));
-                a.getCasts().add(null);
 		RESULT = a;
 	       :}
             ;
@@ -720,24 +693,24 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		 if (state == null) 
 		     parser.declaration_error(i);
 
+		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);		 
+		 id.update();
+
+		 if (!id.check())
+		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
+
                  if(parser.literal) {
 
                      if(e instanceof ASTLiteralUR)
-                         ((ASTLiteralUR) e).finalCheck(state);
+                         ((ASTLiteralUR) e).finalCheck(id.getState());
                      else if(e instanceof ASTLiteralArreglo)
-                         ((ASTLiteralArreglo) e).finalCheck(state);
+                         ((ASTLiteralArreglo) e).finalCheck(id.getState());
 
 		     if(!e.check())
 			 parser.custom_error("Error inicializando el literal");
 		     
 		     parser.literal = false;
                  }
-		 
-		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);		 
-		 id.update();
-
-		 if (!id.check())
-		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
 
 		 Tipo res = id.getState().asign(e.getState());
 		     
@@ -746,7 +719,7 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		 else
 		     parser.type_error(id.getState(),e.getState() ,"asignar");
 		 		 
-	     	 RESULT = new ASTAsignacionExpr(id, e, state, parser.checkCast(id.getState(), e));
+	     	 RESULT = new ASTAsignacionExpr(id, e, state);
 	     	:}
              |  IDENTIFIER:i acceso:ac PLUSPLUS
                 {:
@@ -775,7 +748,7 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		 else
 		     parser.type_error(id.getState(),exp.getState() ,"asignar");
 		 
-		 RESULT = new ASTAsignacionExpr(id, exp, res, parser.checkCast(id.getState(), exp));
+		 RESULT = new ASTAsignacionExpr(id, exp, res);
 		:}
              |  IDENTIFIER:i acceso:ac MINUSMINUS
                 {:
@@ -803,7 +776,7 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 		 else
 		     parser.type_error(id.getState(),exp.getState() ,"asignar");
 		 
-		 RESULT = new ASTAsignacionExpr(id, exp, res, parser.checkCast(id.getState(), exp));
+		 RESULT = new ASTAsignacionExpr(id, exp, res);
 		:}
              ;  
 
@@ -837,7 +810,7 @@ asignacion2 ::= IDENTIFIER:i acceso:ac ASIG READ tipos:t
 			 parser.type_error(id.getState(),re.getState() ,"asignar");
 		 }
 
-		 ASTAsignacionExpr ae = new ASTAsignacionExpr(id, re, state, parser.checkCast(id.getState(), re));
+		 ASTAsignacionExpr ae = new ASTAsignacionExpr(id, re, state);
 		 RESULT = ae.getASTAsignacion();
                 :}
 
@@ -864,26 +837,37 @@ asignacion2 ::= IDENTIFIER:i acceso:ac ASIG READ tipos:t
 		 
 		 Iterator it = l.iterator();
 
-                 LinkedList c = new LinkedList();
-		 
-		 while(it.hasNext()) {		     
-		     a = (ASTIdentificador) it.next();
-		     id = a.getValue();		     
-		     a.update();
-		     
-		     if(!a.check())
-			 parser.custom_error("Mal acceso al idenficicador "+id);
-		     
-                     if(!flag)
-			 res = a.getState().asign(re.getState());
-		     
-                     c.add(parser.checkCast(res, re));
-		     
-		     if(res == null)
-			 parser.type_error(a.getState(),state ,"asignar");
-		 }
+                 if(flag){
 
-		 RESULT = new ASTAsignacion(l, re, c );
+                     a = (ASTIdentificador) it.next();
+                     id = a.getValue();		     
+                     a.update();
+		     
+                     if(!a.check())
+                         parser.custom_error("Mal acceso al idenficicador "+id);
+
+                    res = a.getState().asign(re.getState());
+		     
+                    if(res == null)
+                        parser.type_error(a.getState(),state ,"asignar");       
+
+                    while(it.hasNext()) {		     
+                        a = (ASTIdentificador) it.next();
+                        id = a.getValue();		     
+                        a.update();
+
+                        if(!a.check())
+                            parser.custom_error("Mal acceso al idenficicador "+id);
+
+                        res = a.getState().asign(res);
+
+                        if(res == null)
+                            parser.type_error(a.getState(),state ,"asignar");
+                    }
+
+                }
+
+		 RESULT = new ASTAsignacion(l, re );
 	        :}
 
              |  IDENTIFIER:i acceso:ac ASIG listaasig:l expresion:e
@@ -897,40 +881,50 @@ asignacion2 ::= IDENTIFIER:i acceso:ac ASIG READ tipos:t
 		 if (state == null) 
 		     parser.declaration_error(i);
 
+		 l.add(new ASTIdentificador(i, r.getTable(), ac, state));
+		 
+		 Iterator it = l.iterator();
+
+                 a = (ASTIdentificador) it.next();
+                 id = a.getValue();		     
+                 a.update();
+	     
+                 if(!a.check())
+                     parser.custom_error("Mal acceso al idenficicador "+id);
+
                  if(parser.literal) {
                      if(e instanceof ASTLiteralUR)
-                         ((ASTLiteralUR) e).finalCheck(state);
+                         ((ASTLiteralUR) e).finalCheck(e.getState());
                      else if(e instanceof ASTLiteralArreglo)
-                         ((ASTLiteralArreglo) e).finalCheck(state);
+                         ((ASTLiteralArreglo) e).finalCheck(e.getState());
 
 		     if(!e.check())
 			 parser.custom_error("Error inicializando el literal");
 		     
 		     parser.literal = false;
                  }
-		 
-		 l.add(new ASTIdentificador(i, r.getTable(), ac, state));
-		 
-		 Iterator it = l.iterator();
 
-                 LinkedList c = new LinkedList();
-		 
-		 while(it.hasNext()) {		     
-		     a = (ASTIdentificador) it.next();
-		     id = a.getValue();		     
-		     a.update();
-		     
-		     if (!a.check())
-			 parser.custom_error("Mal acceso al idenficicador "+id);
-		     
-		     res = a.getState().asign(e.getState());		     
-                     c.add(parser.checkCast(res, e));
-			 
-		     if (res == null)
-			 parser.type_error(a.getState(),state ,"asignar");
-		 }
+                res = a.getState().asign(e.getState());
+	     
+                if(res == null)
+                    parser.type_error(a.getState(),state ,"asignar");       
 
-		 RESULT = new ASTAsignacion(l, e, c );
+                while(it.hasNext()) {		     
+                    a = (ASTIdentificador) it.next();
+                    id = a.getValue();		     
+                    a.update();
+
+                    if(!a.check())
+                        parser.custom_error("Mal acceso al idenficicador "+id);
+
+                    res = a.getState().asign(res);
+
+                    if(res == null)
+                        parser.type_error(a.getState(),state ,"asignar");
+                }
+
+
+		 RESULT = new ASTAsignacion(l, e );
 	        :}
              ;   
 

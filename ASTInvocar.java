@@ -70,17 +70,23 @@ public class ASTInvocar extends ASTInstruccion {
             Tipo tin = tabla.exist((String)it1.next()).getTipo();
 	    ASTExpresion e = (ASTExpresion)it2.next();
 
+            if(e instanceof ASTLiteralUR)
+                ((ASTLiteralUR) e).finalCheck(tin);
+
+            else if(e instanceof ASTLiteralArreglo)
+                ((ASTLiteralArreglo) e).finalCheck(tin);
+
             if(((Boolean) it3.next()).booleanValue()){
 
                 if(!(e instanceof ASTIdentificador))
                     return false;
 
-                if(tin.asign(e.getState()) == null)
+                if(e.getState().asign(tin) == null)
                     return false;
 
             }
 
-	    if(e.getState().asign(tin) == null)
+	    if(tin.asign(e.getState()) == null)
 		return false;
 	}
 
@@ -109,17 +115,22 @@ public class ASTInvocar extends ASTInstruccion {
             Tipo tin = ((ASTIdentificador)it1.next()).getState();
 	    ASTExpresion e = (ASTExpresion)it2.next();
 
+            if(e instanceof ASTLiteralUR)
+                ((ASTLiteralUR) e).finalCheck(tin);
+            else if(e instanceof ASTLiteralArreglo)
+                ((ASTLiteralArreglo) e).finalCheck(tin);
+
             if(((Boolean) it3.next()).booleanValue()){
 
                 if(!(e instanceof ASTIdentificador))
                     return false;
 
-                if(tin.asign(e.getState()) == null)
+                if(e.getState().asign(tin) == null)
                     return false;
 
             }
 
-	    if(e.getState().asign(tin) == null)
+	    if(tin.asign(e.getState()) == null)
 		return false;
 	}
 
@@ -156,7 +167,8 @@ public class ASTInvocar extends ASTInstruccion {
         for(int i = expresionEntrada.size() -1; i>=0; i--){
 
             boolean flag = ((Boolean) ref[i]).booleanValue();
-            int tam = ((ASTExpresion) expresiones[i]).getState().getTam();
+            ASTExpresion expr = (ASTExpresion) expresiones[i];
+            int tam = expr.getState().getTam();
 
             if(flag){
 
@@ -166,10 +178,13 @@ public class ASTInvocar extends ASTInstruccion {
 
                 if(source instanceof Basico){
                     fd.write("pop "+nreg+"\n");
+                    ASTCast cast = AssemblerInfo.checkCast(expr.getState(), source);
+                    if(cast != null)
+                        cast.generateCode(fd, nextReg+1, "", "");
                     fd.write("mov ["+reg+"], "+nreg+"\n");
                 }
                 else
-                    AssemblerInfo.generateIdenPopCastCode(fd, nextReg, ((ASTExpresion) expresiones[i]).getState(), source);
+                    InvocarUtilities.generateIdenPopCastCode(fd, nextReg, expr.getState(), source, ((ASTIdentificador) expr).getTable().getParent() == null);
             }
             else
                 for(int k = 0; k < tam; k+=8)
@@ -222,13 +237,13 @@ public class ASTInvocar extends ASTInstruccion {
                     if(cast != null){
                         fd.write("mov "+nreg+", ["+reg+"]\n");
                         cast.generateCode(fd, nextReg+1, "", "");
-                        fd.write("push qword ["+nreg+"]\n");
+                        fd.write("push qword "+nreg+"\n");
                     }
                     else
                         fd.write("push qword ["+reg+"]\n");
                }
                else
-                   AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState());
+                   InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), ((ASTIdentificador) argumento).getTable().getParent() == null);
 
                if(((Boolean) itr.next()).booleanValue()){
                    fd.write("sub "+reg+", "+argumento.getState().getTam()+"-8\n");

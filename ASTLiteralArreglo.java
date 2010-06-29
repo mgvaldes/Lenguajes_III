@@ -81,9 +81,9 @@ public class ASTLiteralArreglo extends ASTExpresion {
     }
     
     //@ requires lista != null;
-    private void checkList(Tipo t, LinkedList lista) {
+    private boolean checkList(Tipo t, LinkedList lista) {
 	if(t == null)
-	    return;
+	    return false;
 	else {
 	    Iterator it = lista.iterator();	    
 	    int size;	    
@@ -92,8 +92,10 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	    if(o instanceof ASTExpresion) {
 		if(!flag) { 
 		    flag = true;
-                    if(t.asign(((ASTExpresion) o).getState()) == null)
+                    if(t.asign(((ASTExpresion) o).getState()) == null){
                         state = null;
+                        return false;
+                    }
 		}
 	    }
 	    else {
@@ -107,20 +109,23 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
 		    if(l.size() != size) {
 			state = null;
-			return;
+			return false;
 		    }
 		    else
-			checkList(((Arreglo) t).getSub(),l);
+			if(!checkList(((Arreglo) t).getSub(),l)) return false;
 		}        
 		    
 	    }		
 	}
+
+        return true;
 
     }
 
     public void generatePushCastCode(Writer fd, int nextReg, Tipo dest, LinkedList lista) throws IOException{
 
         Iterator it = lista.iterator();
+
         while(it.hasNext()){
 
             Object o = it.next();
@@ -162,7 +167,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
                            fd.write("push qword ["+reg+"]\n");
                    }
                    else
-                       AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , expr.getState());
+                       InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , expr.getState(),  ((ASTIdentificador) expr).getTable().getParent() == null);
                }
                else if(expr instanceof ASTLiteralUR)
                     ((ASTLiteralUR) expr).generatePushCastCode(fd, nextReg, dest);

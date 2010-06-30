@@ -22,7 +22,7 @@ parser code {:
     public Tipo tipoactualarreglo;
     public int canBreak = 0;
     public int anidamiento = -1;
-    public int desplazamiento = 0;
+    public int desplazamiento = 8;
     public int desplazamientoglobal = 0;
     public int maxdesplazamiento = 0;
     public int intam = 0;
@@ -35,6 +35,7 @@ parser code {:
     public boolean inFun = false;
     public boolean inProc = false;
     public boolean cambiada = false;
+    public boolean noGlobal = false;
     public boolean procDeclared = false;
     public boolean promiseDeclared = false;
     public ASTAcceso last;
@@ -148,7 +149,9 @@ precedence nonassoc UMINUS, UNOT, MINUSMINUS, PLUSPLUS;
 
 programa ::= listadeclaraciones voidfun:t 
              {: 
+               parser.promiseDeclared = true;
                parser.procDeclared = true;
+               parser.noGlobal = true;
 	       parser.tipoactualfun = t; 
 	     :} 
              main:m
@@ -163,7 +166,7 @@ programa ::= listadeclaraciones voidfun:t
                }
 
                SymProc pro =new SymProc("main", t, null, null, m);
-               pro.setTamlocal(parser.maxdesplazamiento);
+               pro.setTamlocal(parser.maxdesplazamiento-8);
                parser.actual.insert(pro, parser.anidamiento);
 
                parser.procedimientos.add("main");
@@ -192,6 +195,7 @@ listadeclaraciones ::= listadeclaraciones declaracion:d
                        {:
                         if(parser.procDeclared)
 			  parser.crash_error("Se tienen que declarar las promesas antes de los procedimientos y funciones");
+			parser.promiseDeclared = true;
                        :}
                     |  listadeclaraciones declaracionfuncion:f
                        {:
@@ -202,6 +206,7 @@ listadeclaraciones ::= listadeclaraciones declaracion:d
                        {:
                         if(parser.procDeclared)
 			  parser.crash_error("Se tienen que declarar las promesas antes de los procedimientos y funciones");
+			parser.promiseDeclared = true;
                        :}
                     |  listadeclaraciones declaracionprocedimiento:p
                        {:
@@ -281,7 +286,7 @@ instruccion ::= declaracion:d SEQ {: RESULT = d; :}
 		     if (!iden.check())
 			 parser.custom_error("Mal acceso al idenficicador "+i);
 		     
-		     if (!(state instanceof Basico))
+		     if (!(iden.getState() instanceof Basico))
 			 parser.custom_error("Solo se puede imprimir tipos basico");
 		 } 
 		 else 
@@ -357,7 +362,7 @@ declaracion ::= CONST tipos:t declaracionsimple:l
 		     i = (ASTIdentificador) it.next();
 		     i.setState(t);
 		     
-                     if(!parser.procDeclared && !parser.promiseDeclared) {
+                     if(!parser.noGlobal) {
 			 s = new SymVar(i.getValue(), t, true, parser.desplazamientoglobal);
 			 parser.desplazamientoglobal += t.getTam();
                      }
@@ -404,7 +409,7 @@ declaracion ::= CONST tipos:t declaracionsimple:l
 		     i = (ASTIdentificador) it.next();
 		     i.setState(t);
 		     
-                     if(!parser.procDeclared && !parser.promiseDeclared) {
+                     if(!parser.noGlobal) {
 			 s = new SymVar(i.getValue(), t, false, parser.desplazamientoglobal);
 			 parser.desplazamientoglobal += t.getTam();
                      }
@@ -1751,7 +1756,8 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 				if(parser.promesas.containsKey(i))
 				    ((Promesa) parser.promesas.get(i)).setHecha(true);
 			    }
-			} 			
+			}
+                        parser.noGlobal = true;
                        :} 
                        bloque:b
                        {:
@@ -1762,7 +1768,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			
 			if( s != null && (s instanceof SymProc)) {
 			    SymProc p = (SymProc) s;
-			    p.setTamlocal(parser.maxdesplazamiento);
+			    p.setTamlocal(parser.maxdesplazamiento-8);
 			    p.getBloque().setInsts(b.getInsts());
                             p.calcOffsets(parser.intam-t.getTam());
                             parser.intam=0;
@@ -1772,7 +1778,8 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			
 			if(!b.getIreturn())
 			    parser.custom_error("Tiene que retornar "+t+" en la funcion "+i);
-						
+
+                        parser.noGlobal = true;						
 			RESULT = i;                              
                        :}
                     ;
@@ -1857,6 +1864,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 					  ((Promesa) parser.promesas.get(i)).setHecha(true);
 				  }
 			      } 
+                              parser.noGlobal = true;
                              :} 
                              bloque:b
                              {:
@@ -1867,13 +1875,14 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			      
 			      if( s != null && (s instanceof SymProc)) {
 				  SymProc p = (SymProc) s;
-				  p.setTamlocal(parser.maxdesplazamiento);
+				  p.setTamlocal(parser.maxdesplazamiento-8);
 				  p.getBloque().setInsts(b.getInsts());
                                   p.calcOffsets(parser.intam);
                                   parser.intam=0;
 			      }
 			      
-			      parser.maxdesplazamiento = 0;		                          
+			      parser.maxdesplazamiento = 0;
+                              parser.noGlobal = false;
 			      RESULT = i;                              
                              :}
                           ;

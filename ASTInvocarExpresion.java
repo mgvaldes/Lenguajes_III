@@ -163,6 +163,7 @@ public class ASTInvocarExpresion extends ASTExpresion {
            else if(argumento instanceof ASTLiteralUR)
                ((ASTLiteralUR) argumento).generatePushCastCode(fd, nextReg, dest);
            else if(!(argumento instanceof ASTInvocarExpresion)){
+               argumento.generateCode(fd, nextReg, "", "");
                ASTCast cast = AssemblerInfo.checkCast(dest,argumento.getState());
                if(cast != null)
                    cast.generateCode(fd, nextReg, "", "");

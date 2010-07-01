@@ -78,10 +78,11 @@ public class ASTAsignacion extends ASTInstruccion {
 	    Tipo expr_state = new Basico(0); // Solo para inicializarlo
 	    
 	    if (expr != null) {
-		if (!(expr instanceof ASTLiteralArreglo) && !(expr instanceof ASTLiteralUR)) {
+		if (!(expr instanceof ASTLiteralArreglo) && 
+		    !(expr instanceof ASTLiteralUR)) {
 		    //Esto tengo que hacerlo porque el state de los identificadores puede cambiar con los metodos de update().
 		    if (expr instanceof ASTIdentificador) {
-			expr_state = ((SymVar)((ASTIdentificador)expr).getTable().getSym(expr.getValue())).getState();
+			expr_state = ((SymVar)((ASTIdentificador)expr). getTable().getSym(expr.getValue())).getState();
 		    }
 		    else {
 			expr_state = expr.getState();
@@ -105,39 +106,47 @@ public class ASTAsignacion extends ASTInstruccion {
 		}       
 
 		Iterator it = ids.iterator();
-		Iterator itc = casts.iterator();
 
 		ASTIdentificador id;
-		ASTCast ct;
+		ASTCast aux_cast;
 		int offset;
 		Tipo aux_state;
 
 		while(it.hasNext()) {
 		    id = (ASTIdentificador)it.next();
-		    ct = (ASTCast)itc.next();
-
-		    if(ct != null){
-			AssemblerInfo.saveSpecificReg(fd, reg);
-			ct.generateCode(fd, nextReg, si, no);
-		    }
-
 		    offset = ((SymVar)id.getTable().getSym(id.getValue())).getOffset();
 		    aux_state = ((SymVar)id.getTable().getSym(id.getValue())).getState();
 		    AssemblerInfo.saveReg(fd, nextReg + 1);
 		    id.generateCode(fd, nextReg + 1, si, no);
 
-		    if (aux_state instanceof Basico) {
+		    if (aux_state instanceof Basico) {	
 			if (expr instanceof ASTIdentificador) {
 			    fd.write("mov " + reg + ", [" + reg + "]\n");
 			}
 
 			fd.write("mov [" + reg1 + "], " + reg + "\n");
+			
+			// aux_cast = AssemblerInfo.checkCast(aux_state, expr_state);
+			// if (aux_cast != null) {
+			//     System.out.println("cast");
+			//     if (expr instanceof ASTIdentificador) {
+			// 	System.out.println("idddd");
+			// 	fd.write("mov " + reg + ", [" + reg + "]\n");
+			//     }
+			//     aux_cast.generateCode(fd, nextReg, "", "");
+			// }
+			// else {
+			//     System.out.println("no cast");
+			// }
+
+			// fd.write("mov [" + reg1 + "], " + reg + "\n");
 		    }
 		    else if (aux_state instanceof Arreglo) { 
 			if (expr instanceof ASTLiteralArreglo) {
 			    ((ASTLiteralArreglo)expr).generateCode(fd, nextReg + 1, (Arreglo)id.getState());
 			}
-			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			else if ((expr instanceof ASTIdentificador) && 
+				 (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
 			    //Caso de asignacion de arreglos.
 			    int offs = 0;
 
@@ -205,10 +214,8 @@ public class ASTAsignacion extends ASTInstruccion {
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
 			}
 		    }
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 
-		    if(ct != null)
-			AssemblerInfo.restoreSpecificReg(fd, reg);
+		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 		}
 	    }
     	}

@@ -88,17 +88,14 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
         Iterator it = lista.iterator();
         while(it.hasNext()){
-
             Object o = it.next();
 	        
             if(o instanceof ASTExpresion) {
-
                ASTExpresion expr = (ASTExpresion) o;
                String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
                String nreg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 
-               if(expr.getState() instanceof Basico && ((Basico) expr.getState()).getNBasico() == 3){
-
+               if(expr.getState() instanceof Basico && ((Basico) expr.getState()).getNBasico() == 3) {
                    String si = AssemblerInfo.newLabel();
                    String no = AssemblerInfo.newLabel();
                    String end = AssemblerInfo.newLabel();
@@ -111,7 +108,6 @@ public class ASTLiteralArreglo extends ASTExpresion {
                    fd.write(no + ":\n");
                    fd.write("push 0\n");    
                    fd.write(end + ":\n");
-
                }
                else if(expr instanceof ASTIdentificador){
                    expr.generateCode(fd, nextReg, "", "");
@@ -132,20 +128,19 @@ public class ASTLiteralArreglo extends ASTExpresion {
                }
                else if(expr instanceof ASTLiteralUR)
                     ((ASTLiteralUR) expr).generatePushCastCode(fd, nextReg, dest);
-               else if(!(expr instanceof ASTInvocarExpresion)){
+               else if(!(expr instanceof ASTInvocarExpresion)) {
                    expr.generateCode(fd, nextReg, "", "");
                    ASTCast cast = AssemblerInfo.checkCast(dest, expr.getState());
+
                    if(cast != null)
                        cast.generateCode(fd, nextReg, "","");
+
                    fd.write("push "+reg+"\n");
                }
-
             }
             else
                 generatePushCastCode(fd, nextReg, ((Arreglo) dest).getSub(), (LinkedList) o);
-        }
-
-            
+        }       
     }
 
 
@@ -175,6 +170,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	LinkedList elements = new LinkedList();
 	calcElements(arreglos, elements);
 	Iterator it = elements.iterator();
+	Tipo base_type = ((Arreglo)type).getTipoBase();
 	int tamBase = ((Arreglo)type).getTipoBase().getTam();
 	int offset = 0;
 	ASTExpresion aux_expr;
@@ -201,12 +197,18 @@ public class ASTLiteralArreglo extends ASTExpresion {
 		}
 		else {
 		    aux_expr.generateCode(fd, nextReg + 1, "", "");
+
+		    if (aux_expr instanceof ASTIdentificador) {
+			fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
+		    }
 		}
 
 		fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");	    
 		offset += tamBase;
 	    }
-	    else if ((aux_expr.getState() instanceof Registro) || (aux_expr.getState() instanceof Union)) {
+	    else if ((aux_expr.getState() instanceof Registro) || 
+		     (aux_expr.getState() instanceof Union)) {
+		//System.out.println("tipo: " + aux_expr.getState().toString());
 		((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, aux_expr.getState());
 	    }
 	}

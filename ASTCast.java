@@ -22,12 +22,13 @@ public class ASTCast extends ASTExpresion {
             String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
 
             if(left != null)
-              left.generateCode(fd, nextReg, si, no);
+		left.generateCode(fd, nextReg, si, no);
 
-            if(left instanceof ASTIdentificador)
-                fd.write("mov "+reg+", ["+reg+"]\n");
+            if(left instanceof ASTIdentificador) {
+                fd.write("mov " + reg + ", [" + reg + "]\n");
+	    }
 
-            switch(((Basico) state).getNBasico()){
+            switch(((Basico)state).getNBasico()) {
             case 1:
                 fd.write("push " + reg + "\n");
                 fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
@@ -44,7 +45,6 @@ public class ASTCast extends ASTExpresion {
                 String nreg = AssemblerInfo.getNombresRegAtPos(nextReg + 1);
 
                 AssemblerInfo.saveReg(fd, nextReg + 1);
-
                 fd.write("mov " + nreg + ", 256\n");
 
                 if( reg == "rax")
@@ -58,9 +58,7 @@ public class ASTCast extends ASTExpresion {
 
                 fd.write("mov rdx, 0\n");
                 fd.write("mov rax, " + reg + "\n");
-
                 fd.write("idiv " + nreg + "\n");
-
                 fd.write("mov "+ reg +", rdx \n");
 
                 if( reg == "rax")
@@ -72,10 +70,8 @@ public class ASTCast extends ASTExpresion {
                     fd.write("pop rdx\n");
                 }
 
-                AssemblerInfo.restoreReg(fd, nextReg + 1);
-
+                AssemblerInfo.restoreReg(fd, nextReg + 1);		
                 break;
-            }
-                
+            }                
     }
 }

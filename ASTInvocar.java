@@ -183,7 +183,7 @@ public class ASTInvocar extends ASTInstruccion {
     }
 
     public void empilarParametros(Writer fd, int nextReg) throws IOException{
-
+	
         String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
         String nreg = AssemblerInfo.getNombresRegAtPos(nextReg+1); 
         Iterator ite = expresionEntrada.iterator();
@@ -228,7 +228,7 @@ public class ASTInvocar extends ASTInstruccion {
                         fd.write("push qword ["+reg+"]\n");
                }
                else
-                   AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState());
+                   AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest, argumento.getState());
 
                if(((Boolean) itr.next()).booleanValue()){
                    fd.write("sub "+reg+", "+argumento.getState().getTam()+"-8\n");

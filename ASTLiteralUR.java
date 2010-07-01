@@ -18,11 +18,52 @@ public class ASTLiteralUR extends ASTExpresion {
         if( real.asign(state) == null )
             state = null;
         else
-            state = real;
+            refreshState(real);
+    }
+
+    public void refreshState(Tipo real){
+
+        Iterator ita = asignaciones.iterator();
+        ASTAsignacion a;
+
+        state = real;
+
+        if(real instanceof Union){
+
+            a = (ASTAsignacion) ita.next();
+
+            if(a.getExpr() instanceof ASTLiteralUR){
+  
+                int pos = ((Union) real).getCampos().indexOf(((ASTIdentificador) a.getIds().getFirst()).getValue());
+
+                if(pos != -1){
+                    Tipo ureal = (Tipo) ((Union) real).getTipos().get(pos);
+                    ((ASTLiteralUR) a.getExpr()).refreshState(ureal);
+                }
+            }
+
+        }
+        else if(real instanceof Registro){
+
+            Iterator itt = ((Registro) real).getTipos().iterator();
+
+            while(ita.hasNext()){
+
+                Tipo rreal = (Tipo) itt.next();
+
+                a = (ASTAsignacion) ita.next();
+
+                if(a.getExpr() instanceof ASTLiteralUR)
+                    ((ASTLiteralUR) a.getExpr()).refreshState(rreal);
+
+            }
+
+        }
 
     }
 
-    public Tipo inferType(){
+
+    private Tipo inferType(){
 
        Iterator it = asignaciones.iterator();
 
@@ -94,13 +135,13 @@ public class ASTLiteralUR extends ASTExpresion {
                         if(cast != null){
                             fd.write("mov "+nreg+", ["+reg+"]\n");
                             cast.generateCode(fd, nextReg+1, "", "");
-                            fd.write("push qword ["+nreg+"]\n");
+                            fd.write("push qword "+nreg+"\n");
                         }
                         else
                             fd.write("push qword ["+reg+"]\n");
                     }
                     else
-                        AssemblerInfo.generateIdenPushCastCode(fd, nextReg, edest, expr.getState());
+                        InvocarUtilities.generateIdenPushCastCode(fd, nextReg, edest, expr.getState(), ((ASTIdentificador) expr).getTable().getParent() == null);
                 }
                 else if(expr instanceof ASTLiteralArreglo)
                     ((ASTLiteralArreglo) expr).generatePushCastCode(fd,nextReg, edest, ((ASTLiteralArreglo) expr).getArreglos());
@@ -115,6 +156,63 @@ public class ASTLiteralUR extends ASTExpresion {
                 }
 
             }
+        }
+        else if(state instanceof Union){
+
+            ASTAsignacion asig = (ASTAsignacion) asignaciones.getFirst();
+            int pos = ((Union) dest).getCampos().indexOf((((ASTIdentificador) asig.getIds().getFirst()).getValue()));
+            Tipo edest = (Tipo) ((Union) dest).getTipos().get(pos);
+            ASTExpresion expr = asig.getExpr();
+
+            String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
+            String nreg = AssemblerInfo.getNombresRegAtPos(nextReg+1); 
+
+            fd.write("push "+pos+"\n");
+
+            if(expr.getState() instanceof Basico && ((Basico) expr.getState()).getNBasico() == 3){
+
+                String si = AssemblerInfo.newLabel();
+                String no = AssemblerInfo.newLabel();
+                String end = AssemblerInfo.newLabel();
+
+                expr.generateCode(fd, nextReg, si, no);
+
+                fd.write(si + ":\n");
+                fd.write("push 1\n");    
+                fd.write("jmp " + end + "\n");		    
+                fd.write(no + ":\n");
+                fd.write("push 0\n");    
+                fd.write(end + ":\n");
+
+            }
+            else if(expr instanceof ASTIdentificador){
+                expr.generateCode(fd, nextReg, "", "");
+
+                if(expr.getState() instanceof Basico){
+                    ASTCast cast = AssemblerInfo.checkCast(edest,expr.getState());
+                    if(cast != null){
+                        fd.write("mov "+nreg+", ["+reg+"]\n");
+                        cast.generateCode(fd, nextReg+1, "", "");
+                        fd.write("push qword ["+nreg+"]\n");
+                    }
+                    else
+                        fd.write("push qword ["+reg+"]\n");
+                }
+                else
+                    InvocarUtilities.generateIdenPushCastCode(fd, nextReg, edest, expr.getState(), ((ASTIdentificador) expr).getTable().getParent() == null);
+            }
+            else if(expr instanceof ASTLiteralArreglo)
+                ((ASTLiteralArreglo) expr).generatePushCastCode(fd,nextReg, edest, ((ASTLiteralArreglo) expr).getArreglos());
+            else if(expr instanceof ASTLiteralUR)
+                ((ASTLiteralUR) expr).generatePushCastCode(fd, nextReg, edest);
+            else if(!(expr instanceof ASTInvocarExpresion)){
+                expr.generateCode(fd, nextReg, "", "");
+                ASTCast cast = AssemblerInfo.checkCast(edest,expr.getState());
+                if(cast != null)
+                    cast.generateCode(fd, nextReg, "", "");
+                fd.write("push "+reg+"\n");
+            }
+
         }
 
     }

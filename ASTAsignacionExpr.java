@@ -6,15 +6,13 @@ public class ASTAsignacionExpr extends ASTExpresion {
     //@ invariant right != null;
   
     private ASTIdentificador id;
-    private ASTCast cast;
 
     //@ requires i != null;
     //@ requires r != null;
-    public ASTAsignacionExpr(ASTIdentificador i, ASTExpresion r, Tipo s, ASTCast c) {
+    public ASTAsignacionExpr(ASTIdentificador i, ASTExpresion r, Tipo s) {
 	super("=", null, r);
 	id = i;
 	state = s;
-	cast = c;
     }
 
     //@ requires i != null;
@@ -29,9 +27,7 @@ public class ASTAsignacionExpr extends ASTExpresion {
     public ASTAsignacion getASTAsignacion() {
 	LinkedList l = new LinkedList();
 	l.add(id);
-	LinkedList c = new LinkedList();
-	c.add(cast);
-	return new ASTAsignacion(l, right, c);
+	return new ASTAsignacion(l, right);
     }
 
     public void update() {}
@@ -72,9 +68,6 @@ public class ASTAsignacionExpr extends ASTExpresion {
 	    else{
 
 		right.generateCode(fd, nextReg, si, no);
-
-		if( cast != null)
-		    cast.generateCode(fd, nextReg, si, no);
 
 		if(id.getTable().getParent() == null)
 		    fd.write("mov [static + " + ((SymVar)id.getTable().getSym(id.getValue())).getOffset() + "], "+reg+"\n");

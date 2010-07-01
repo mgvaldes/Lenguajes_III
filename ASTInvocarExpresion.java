@@ -70,19 +70,24 @@ public class ASTInvocarExpresion extends ASTExpresion {
         for(int i = expresionEntrada.size() -1; i>=0; i--){
 
             boolean flag = ((Boolean) ref[i]).booleanValue();
-            int tam = ((ASTExpresion) expresiones[i]).getState().getTam();
+            ASTExpresion expr = (ASTExpresion) expresiones[i];
+            int tam = expr.getState().getTam();
 
             if(flag){
+
                 Tipo source = procInfo.getTable().exist((String) tsource[i]).getTipo();
                 fd.write("pop "+reg+"\n");
                 fd.write("add "+reg+", "+tam+"-8\n");
 
                 if(source instanceof Basico){
                     fd.write("pop "+nreg+"\n");
+                    ASTCast cast = AssemblerInfo.checkCast(expr.getState(), source);
+                    if(cast != null)
+                        cast.generateCode(fd, nextReg+1, "", "");
                     fd.write("mov ["+reg+"], "+nreg+"\n");
                 }
                 else
-                    AssemblerInfo.generateIdenPopCastCode(fd, nextReg, ((ASTExpresion) expresiones[i]).getState(), source);
+                    InvocarUtilities.generateIdenPopCastCode(fd, nextReg, expr.getState(), source, ((ASTIdentificador) expr).getTable().getParent() == null);
             }
             else
                 for(int k = 0; k < tam; k+=8)
@@ -139,13 +144,13 @@ public class ASTInvocarExpresion extends ASTExpresion {
                     if(cast != null){
                         fd.write("mov "+nreg+", ["+reg+"]\n");
                         cast.generateCode(fd, nextReg+1, "", "");
-                        fd.write("push qword ["+nreg+"]\n");
+                        fd.write("push qword "+nreg+"\n");
                     }
                     else
                         fd.write("push qword ["+reg+"]\n");
                }
                else
-                   AssemblerInfo.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState());
+                   InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), ((ASTIdentificador) argumento).getTable().getParent() == null);
 
                if(((Boolean) itr.next()).booleanValue()){
                    fd.write("sub "+reg+", "+argumento.getState().getTam()+"-8\n");
@@ -158,6 +163,7 @@ public class ASTInvocarExpresion extends ASTExpresion {
            else if(argumento instanceof ASTLiteralUR)
                ((ASTLiteralUR) argumento).generatePushCastCode(fd, nextReg, dest);
            else if(!(argumento instanceof ASTInvocarExpresion)){
+               argumento.generateCode(fd, nextReg, "", "");
                ASTCast cast = AssemblerInfo.checkCast(dest,argumento.getState());
                if(cast != null)
                    cast.generateCode(fd, nextReg, "", "");

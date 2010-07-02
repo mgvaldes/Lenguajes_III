@@ -86,8 +86,8 @@ public class ASTInvocarExpresion extends ASTExpresion {
                         cast.generateCode(fd, nextReg+1, "", "");
                     fd.write("mov ["+reg+"], "+nreg+"\n");
                 }
-                else
-                    InvocarUtilities.generateIdenPopCastCode(fd, nextReg, expr.getState(), source, ((ASTIdentificador) expr).getTable().getParent() == null);
+                //else
+		//InvocarUtilities.generateIdenPopCastCode(fd, nextReg, expr.getState(), source, ((ASTIdentificador) expr).getTable().getParent() == null);
             }
             else
                 for(int k = 0; k < tam; k+=8)
@@ -149,8 +149,8 @@ public class ASTInvocarExpresion extends ASTExpresion {
                     else
                         fd.write("push qword ["+reg+"]\n");
                }
-               else
-                   InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), ((ASTIdentificador) argumento).getTable().getParent() == null);
+               //else
+	       //InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), ((ASTIdentificador) argumento).getTable().getParent() == null);
 
                if(((Boolean) itr.next()).booleanValue()){
                    fd.write("sub "+reg+", "+argumento.getState().getTam()+"-8\n");

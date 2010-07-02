@@ -183,8 +183,8 @@ public class ASTInvocar extends ASTInstruccion {
                         cast.generateCode(fd, nextReg+1, "", "");
                     fd.write("mov ["+reg+"], "+nreg+"\n");
                 }
-                else
-                    InvocarUtilities.generateIdenPopCastCode(fd, nextReg, expr.getState(), source, ((ASTIdentificador) expr).getTable().getParent() == null);
+                //else
+		//InvocarUtilities.generateIdenPopCastCode(fd, nextReg, expr.getState(), source, ((ASTIdentificador) expr).getTable().getParent() == null);
             }
             else
                 for(int k = 0; k < tam; k+=8)
@@ -233,17 +233,17 @@ public class ASTInvocar extends ASTInstruccion {
                argumento.generateCode(fd, nextReg, "", "");
 
                if(argumento.getState() instanceof Basico){
-                    ASTCast cast = AssemblerInfo.checkCast(dest,argumento.getState());
-                    if(cast != null){
-                        fd.write("mov "+nreg+", ["+reg+"]\n");
-                        cast.generateCode(fd, nextReg+1, "", "");
-                        fd.write("push qword "+nreg+"\n");
-                    }
-                    else
-                        fd.write("push qword ["+reg+"]\n");
+		   ASTCast cast = AssemblerInfo.checkCast(dest,argumento.getState());
+		   if(cast != null){
+		       fd.write("mov "+nreg+", ["+reg+"]\n");
+		       cast.generateCode(fd, nextReg+1, "", "");
+		       fd.write("push qword "+nreg+"\n");
+		   }
+		   else
+		       fd.write("push qword ["+reg+"]\n");
                }
-               else
-                   InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), ((ASTIdentificador) argumento).getTable().getParent() == null);
+               //else
+	       //InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), ((ASTIdentificador) argumento).getTable().getParent() == null);
 
                if(((Boolean) itr.next()).booleanValue()){
                    fd.write("sub "+reg+", "+argumento.getState().getTam()+"-8\n");

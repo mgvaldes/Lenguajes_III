@@ -140,8 +140,8 @@ public class ASTLiteralUR extends ASTExpresion {
                         else
                             fd.write("push qword ["+reg+"]\n");
                     }
-                    else
-                        InvocarUtilities.generateIdenPushCastCode(fd, nextReg, edest, expr.getState(), ((ASTIdentificador) expr).getTable().getParent() == null);
+                    //else
+		    //InvocarUtilities.generateIdenPushCastCode(fd, nextReg, edest, expr.getState(), ((ASTIdentificador) expr).getTable().getParent() == null);
                 }
                 else if(expr instanceof ASTLiteralArreglo)
                     ((ASTLiteralArreglo) expr).generatePushCastCode(fd,nextReg, edest, ((ASTLiteralArreglo) expr).getArreglos());
@@ -198,8 +198,8 @@ public class ASTLiteralUR extends ASTExpresion {
                     else
                         fd.write("push qword ["+reg+"]\n");
                 }
-                else
-                    InvocarUtilities.generateIdenPushCastCode(fd, nextReg, edest, expr.getState(), ((ASTIdentificador) expr).getTable().getParent() == null);
+                //else
+		//InvocarUtilities.generateIdenPushCastCode(fd, nextReg, edest, expr.getState(), ((ASTIdentificador) expr).getTable().getParent() == null);
             }
             else if(expr instanceof ASTLiteralArreglo)
                 ((ASTLiteralArreglo) expr).generatePushCastCode(fd,nextReg, edest, ((ASTLiteralArreglo) expr).getArreglos());
@@ -241,6 +241,7 @@ public class ASTLiteralUR extends ASTExpresion {
 	    Tipo expr_type;
 	    Iterator campos_types;
 	    LinkedList aux_type;
+	    ASTCast cast;
 
 	    String si;
 	    String no;
@@ -283,6 +284,12 @@ public class ASTLiteralUR extends ASTExpresion {
 		if (id_type instanceof Basico) {
 		    if (aux_expr instanceof ASTIdentificador) {
 			fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
+
+			cast = AssemblerInfo.checkCast(id_type, aux_expr.getState());
+			if (cast != null) {
+			    cast.generateCode(fd, nextReg + 1, "", "");
+			}
+
 			fd.write("mov [" + reg + "], " + reg1 + "\n");
 		    }
 		    else if (aux_expr instanceof ASTConst) {
@@ -293,6 +300,12 @@ public class ASTLiteralUR extends ASTExpresion {
 			    fd.write(no + ":\n");
 			    fd.write("mov " + reg1 + ", 0\n");    
 			    fd.write(end + ":\n");
+			}
+			else {
+			    cast = AssemblerInfo.checkCast(id_type, aux_expr.getState());
+			    if (cast != null) {
+				cast.generateCode(fd, nextReg + 1, "", "");
+			    }
 			}
 			fd.write("mov [" + reg + "], " + reg1 + "\n");
 		    }
@@ -306,8 +319,32 @@ public class ASTLiteralUR extends ASTExpresion {
 			fd.write("mov [" + reg + "], " + reg1 + "\n");
 		    }
 		}
-		else if ((id_type instanceof Arreglo) || (id_type instanceof Registro) || (id_type instanceof Union)) {
+		else if ((id_type instanceof Arreglo)) {
 		    if (aux_expr instanceof ASTIdentificador) {			   
+			int offs = 0;
+			expr_type = ((SymVar)((ASTIdentificador)aux_expr).getTable().getSym(aux_expr.getValue())).getState();			
+			Tipo base_id_type = ((Arreglo)id_type).getTipoBase();
+			Tipo base_expr_type = ((Arreglo)expr_type).getTipoBase();
+
+			cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+			AssemblerInfo.saveReg(fd, nextReg + 2);
+			while (offs < expr_type.getTam()) {
+			    fd.write("mov " + reg2 + ", [" + reg1 + " - " + offs + "]\n");
+			    if (cast != null) {
+				cast.generateCode(fd, nextReg + 2, "", "");
+			    }
+			    fd.write("mov [" + reg + " - " + offs + "], " + reg2 + "\n");
+			    offs += 8;
+			}
+			AssemblerInfo.restoreReg(fd, nextReg + 2);
+		    }
+		    else if (aux_expr instanceof ASTLiteralArreglo) {
+			((ASTLiteralArreglo)aux_expr).generateCode(fd, nextReg, id_type);
+		    }
+		}
+		else if ((id_type instanceof Registro) || (id_type instanceof Union)) {
+		    if (aux_expr instanceof ASTIdentificador) {			   
+			System.out.println("-------------UR " + id_type);
 			int offs = 0;
 			expr_type = ((SymVar)((ASTIdentificador)aux_expr).getTable().getSym(aux_expr.getValue())).getState();			
 			    
@@ -319,13 +356,10 @@ public class ASTLiteralUR extends ASTExpresion {
 			}
 			AssemblerInfo.restoreReg(fd, nextReg + 2);
 		    }
-		    else if (aux_expr instanceof ASTLiteralArreglo) {
-			((ASTLiteralArreglo)aux_expr).generateCode(fd, nextReg, id_type);
-		    }
-		    else if (aux_expr instanceof ASTLiteralUR) {
+		    if (aux_expr instanceof ASTLiteralUR) {
 			((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, id_type);
-		    }
-		}
+		    }		
+		}	      
 		    
 		fd.write("mov " + reg2 + ", " + id_type.getTam() + "\n");
 		fd.write("sub " + reg + ", " + reg2 + "\n");

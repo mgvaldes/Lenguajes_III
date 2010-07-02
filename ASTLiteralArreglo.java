@@ -70,14 +70,17 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
     public Tipo inferType(LinkedList lista) {
        if(lista.getFirst() instanceof ASTConst)
-           return new Arreglo(lista.size(), ((ASTConst) lista.getFirst()).getState());
+           return new Arreglo(lista.size(), ((ASTConst)lista.getFirst()).getState());
 
        if(lista.getFirst() instanceof ASTLiteralUR)
-           return new Arreglo(lista.size(), ((ASTLiteralUR) lista.getFirst()).getState());
+           return new Arreglo(lista.size(), ((ASTLiteralUR)lista.getFirst()).getState());
 
+       if (lista.getFirst() instanceof ASTIdentificador)
+	   return new Arreglo(lista.size(), ((ASTIdentificador)lista.getFirst()).getState());
+       
        int size = lista.size();
 
-       return new Arreglo(size, inferType((LinkedList) lista.getFirst()));
+       return new Arreglo(size, inferType((LinkedList)lista.getFirst()));
     }
     
     //@ requires lista != null;
@@ -162,8 +165,8 @@ public class ASTLiteralArreglo extends ASTExpresion {
                        else
                            fd.write("push qword ["+reg+"]\n");
                    }
-                   else
-                       InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , expr.getState(),  ((ASTIdentificador) expr).getTable().getParent() == null);
+                   //else
+		   //InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , expr.getState(),  ((ASTIdentificador) expr).getTable().getParent() == null);
                }
                else if(expr instanceof ASTLiteralUR)
                     ((ASTLiteralUR) expr).generatePushCastCode(fd, nextReg, dest);
@@ -216,6 +219,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	String si;
 	String no;
 	String end;
+	ASTCast cast;
 	
 	AssemblerInfo.saveReg(fd, nextReg + 1);
 	while (it.hasNext()) {
@@ -240,6 +244,11 @@ public class ASTLiteralArreglo extends ASTExpresion {
 		    if (aux_expr instanceof ASTIdentificador) {
 			fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
 		    }
+
+		    cast = AssemblerInfo.checkCast(base_type, aux_expr.getState());
+		    if (cast != null) {
+			cast.generateCode(fd, nextReg + 1, "", "");
+		    }
 		}
 
 		fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");	    
@@ -247,7 +256,6 @@ public class ASTLiteralArreglo extends ASTExpresion {
 	    }
 	    else if ((aux_expr.getState() instanceof Registro) || 
 		     (aux_expr.getState() instanceof Union)) {
-		//System.out.println("tipo: " + aux_expr.getState().toString());
 		((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, aux_expr.getState());
 	    }
 	}

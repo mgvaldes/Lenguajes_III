@@ -68,7 +68,8 @@ public class ASTAsignacion extends ASTInstruccion {
 	    if (expr != null) {
 		if (!(expr instanceof ASTLiteralArreglo) && 
 		    !(expr instanceof ASTLiteralUR)) {
-		    //Esto tengo que hacerlo porque el state de los identificadores puede cambiar con los metodos de update().
+		    //Esto tengo que hacerlo porque el state de los identificadores 
+		    //puede cambiar con los metodos de update().
 		    if (expr instanceof ASTIdentificador) {
 			expr_state = ((SymVar)((ASTIdentificador)expr). getTable().getSym(expr.getValue())).getState();
 		    }
@@ -113,21 +114,6 @@ public class ASTAsignacion extends ASTInstruccion {
 			}
 
 			fd.write("mov [" + reg1 + "], " + reg + "\n");
-			
-			// aux_cast = AssemblerInfo.checkCast(aux_state, expr_state);
-			// if (aux_cast != null) {
-			//     System.out.println("cast");
-			//     if (expr instanceof ASTIdentificador) {
-			// 	System.out.println("idddd");
-			// 	fd.write("mov " + reg + ", [" + reg + "]\n");
-			//     }
-			//     aux_cast.generateCode(fd, nextReg, "", "");
-			// }
-			// else {
-			//     System.out.println("no cast");
-			// }
-
-			// fd.write("mov [" + reg1 + "], " + reg + "\n");
 		    }
 		    else if (aux_state instanceof Arreglo) { 
 			if (expr instanceof ASTLiteralArreglo) {
@@ -158,7 +144,8 @@ public class ASTAsignacion extends ASTInstruccion {
 			if (expr instanceof ASTLiteralUR) {
 			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Registro)id.getState());
 			}
-			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			else if ((expr instanceof ASTIdentificador) && 
+				 (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
 			    //Caso de asignacion de registros.
 			    int offs = 0;
 
@@ -182,7 +169,8 @@ public class ASTAsignacion extends ASTInstruccion {
 			if (expr instanceof ASTLiteralUR) {
 			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Union)id.getState());
 			}
-			else if ((expr instanceof ASTIdentificador) && (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+			else if ((expr instanceof ASTIdentificador) && 
+				 (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
 			    //Caso de asignacion de uniones.
 			    int offs = 0;
 
@@ -202,11 +190,7 @@ public class ASTAsignacion extends ASTInstruccion {
 			    fd.write("mov [" + reg1 + "], " + reg + "\n");
 			}
 		    }
-
-<<<<<<< HEAD
 		    AssemblerInfo.restoreReg(fd, nextReg + 1);
-=======
->>>>>>> 0c894c7cc8503d31229e44e009f72dae4aedff51
 		}
 	    }
     	}

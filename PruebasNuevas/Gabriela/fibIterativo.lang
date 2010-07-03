@@ -1,0 +1,53 @@
+int main{
+
+    print 'N';print 'u';print 'm';print 'e';print 'r';print 'o';
+    print ' ';
+    print 'a';print 'l';
+    print ' ';
+    print 'q';print 'u';print 'e';
+    print ' ';
+    print 's';print 'e';
+    print ' ';
+    print 'l';print 'e';
+    print ' ';
+    print 'c';print 'a';print 'l';print 'c';print 'u';print 'l';print 'a';print 'r';print 'a';
+    print ' ';
+    print 'e';print 'l';
+    print ' ';
+    print 'f';print 'i';print 'b';print 'o';print 'n';print 'a';print 'c';print 'c';print 'i';print ':';
+    print ' ';
+    print '\n';
+
+    const int N = read int;
+    int n, fib, fibSig;
+
+    n = 0;
+    fib = 0;
+    fibSig = 1;
+
+    while (n < N) {
+        int tmp = fib;
+        fib = fibSig;
+        fibSig = tmp + fibSig;
+        n = n + 1;
+    }
+
+    print 'E';print 'l';
+    print ' ';
+    print 'n';print 'u';print 'm';print 'e';print 'r';print 'o';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print 'f';print 'i';print 'b';print 'o';print 'n';print 'a';print 'c';print 'c';print 'i';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print N;
+    print ' ';
+    print 'e';print 's';
+    print ' ';
+    print fib;
+
+    print '\n';
+
+}

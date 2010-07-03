@@ -1,0 +1,15 @@
+void proc(int[2] a, struct{int [5] x; union{int p; bool q;} y; } &estructura){
+
+  estructura = {x = {1,2,3,4,5}; y = { q = true} };
+
+}
+
+int main{
+
+  struct{int [5] x; union{int p; bool q;} y; } estructuraParametro;
+  proc({1,2}, estructuraParametro);
+
+  print estructuraParametro.x[2];
+  print '\n';
+
+}

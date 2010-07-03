@@ -1,0 +1,18 @@
+void otracosa(int &a){
+  print a;
+  print '\n';
+  a = 2;
+  print a;
+  print '\n';
+
+}
+
+
+int main{
+  int a = 3;
+  print a;
+  print '\n';
+  otracosa(a);
+  print a;
+  print '\n';
+}

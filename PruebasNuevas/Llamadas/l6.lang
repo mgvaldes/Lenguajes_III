@@ -1,0 +1,14 @@
+void proc(int[2] a){
+
+  int b = a[0];
+  print b;
+  print '\n';
+
+}
+
+int main{
+
+  int a = 3;
+  proc({1,2});
+
+}

@@ -1,0 +1,56 @@
+int main{
+
+    print 'V';print 'a';print 'l';print 'o';print 'r';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print 'N';print ':';
+    print ' ';
+    print '\n';
+
+    const int N = read int;
+    int x;
+
+    if(true){
+
+        int a, b, n, y;
+        a = 0;
+        b = 1;
+        x = 0;
+        y = 1;
+        n = N;
+
+        while ( n != 0 ) {
+            if (n % 2 == 0) {
+                int aux = a;
+                a = a*a + b*b;
+                b = aux*b + b*aux + b*b;
+                n = n / 2;
+            } elif (n % 2 == 1) {
+                int aux = x;
+                x = a*x + b*y;
+                y = b*aux + a*y + b*y;
+                n = n - 1;
+            }
+            else{}
+        } 
+    }
+
+    print 'E';print 'l';
+    print ' ';
+    print 'v';print 'a';print 'l';print 'o';print 'r';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print 'f';print 'i';print 'b';print 'o';print 'n';print 'a';print 'c';print 'c';print 'i';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print N;
+    print ' ';
+    print 'e';print 's';
+    print ' ';
+    print x;
+    print '\n';
+
+}

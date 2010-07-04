@@ -287,6 +287,25 @@ public class ASTLiteralUR extends ASTExpresion {
 		    if (aux_expr instanceof ASTIdentificador) {
 			fd.write("mov " + reg1 + ", [" + reg1 + "]\n");
 		    }
+		    else if (aux_expr instanceof ASTConst) {
+			if (((Basico)id_type).getNBasico() == 3) {
+			    fd.write(si + ":\n");
+			    fd.write("mov " + reg1 + ", 1\n");    
+			    fd.write("jmp " + end + "\n");		    
+			    fd.write(no + ":\n");
+			    fd.write("mov " + reg1 + ", 0\n");    
+			    fd.write(end + ":\n");
+			}
+		    }
+		    else if (aux_expr instanceof ASTBool) {
+			fd.write(si + ":\n");
+			fd.write("mov " + reg1 + ", 1\n");    
+			fd.write("jmp " + end + "\n");		    
+			fd.write(no + ":\n");
+			fd.write("mov " + reg1 + ", 0\n");    
+			fd.write(end + ":\n");
+			fd.write("mov [" + reg + "], " + reg1 + "\n");
+		    }
 		    
 		    cast = AssemblerInfo.checkCast(id_type, aux_expr.getState());
 		    if (cast != null) {
@@ -294,35 +313,9 @@ public class ASTLiteralUR extends ASTExpresion {
 		    }
 		    
 		    fd.write("mov [" + reg + "], " + reg1 + "\n");
-		}
-		else if (aux_expr instanceof ASTConst) {
-		    if (((Basico)id_type).getNBasico() == 3) {
-			fd.write(si + ":\n");
-			fd.write("mov " + reg1 + ", 1\n");    
-			fd.write("jmp " + end + "\n");		    
-			fd.write(no + ":\n");
-			fd.write("mov " + reg1 + ", 0\n");    
-			fd.write(end + ":\n");
-		    }
-		    else {
-			cast = AssemblerInfo.checkCast(id_type, aux_expr.getState());
-			if (cast != null) {
-			    cast.generateCode(fd, nextReg + 1, "", "");
-			}
-		    }
-		    fd.write("mov [" + reg + "], " + reg1 + "\n");
-		}
-		else if (aux_expr instanceof ASTBool) {
-		    fd.write(si + ":\n");
-		    fd.write("mov " + reg1 + ", 1\n");    
-		    fd.write("jmp " + end + "\n");		    
-		    fd.write(no + ":\n");
-		    fd.write("mov " + reg1 + ", 0\n");    
-		    fd.write(end + ":\n");
-		    fd.write("mov [" + reg + "], " + reg1 + "\n");
-		}
+		}		
 		else if ((id_type instanceof Arreglo)) {
-		    if (aux_expr instanceof ASTIdentificador) {			   
+		    if (aux_expr instanceof ASTIdentificador) {	
 			int offs = 0;
 			expr_type = ((SymVar)((ASTIdentificador)aux_expr).getTable().getSym(aux_expr.getValue())).getState();			
 			base_id_type = ((Arreglo)id_type).getTipoBase();
@@ -344,23 +337,58 @@ public class ASTLiteralUR extends ASTExpresion {
 			((ASTLiteralArreglo)aux_expr).generateCode(fd, nextReg, id_type);
 		    }
 		}
-		else if ((id_type instanceof Registro) || (id_type instanceof Union)) {
+		else if (id_type instanceof Registro) {
 		    if (aux_expr instanceof ASTIdentificador) {
 			int offs = 0;
-			expr_type = ((SymVar)((ASTIdentificador)aux_expr).getTable().getSym(aux_expr.getValue())).getState(); 
-			    
+			int pos = 0;
+			
 			AssemblerInfo.saveReg(fd, nextReg + 2);
-			while (offs < expr_type.getTam()) {
+			while (offs < ((Registro)id_type).getTam()) {
+			    base_id_type = (Tipo)((LinkedList)((Registro)id_type).getTipos()).get(pos);
+			    base_expr_type = (Tipo)((LinkedList)((Registro)aux_expr.getState()).getTipos()).get(pos);
+			    cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+			    
 			    fd.write("mov " + reg2 + ", [" + reg1 + " - " + offs + "]\n");
+			    if (cast != null) {
+				cast.generateCode(fd, nextReg + 2, "", "");
+			    }
 			    fd.write("mov [" + reg + " - " + offs + "], " + reg2 + "\n");
 			    offs += 8;
+			    pos++;
 			}
 			AssemblerInfo.restoreReg(fd, nextReg + 2);
 		    }
+
 		    if (aux_expr instanceof ASTLiteralUR) {
 			((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, id_type);
 		    }		
-		}	      
+		}
+		else if (id_type instanceof Union) {
+		    if (aux_expr instanceof ASTIdentificador) {
+			int offs = 0;
+			int pos = 0;
+			
+			AssemblerInfo.saveReg(fd, nextReg + 2);
+			while (offs < ((Union)id_type).getTam()) {
+			    base_id_type = (Tipo)((LinkedList)((Union)id_type).getTipos()).get(pos);
+			    base_expr_type = (Tipo)((LinkedList)((Union)aux_expr.getState()).getTipos()).get(pos);
+			    cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+			    
+			    fd.write("mov " + reg2 + ", [" + reg1 + " - " + offs + "]\n");
+			    if (cast != null) {
+				cast.generateCode(fd, nextReg + 2, "", "");
+			    }
+			    fd.write("mov [" + reg + " - " + offs + "], " + reg2 + "\n");
+			    offs += 8;
+			    pos++;
+			}
+			AssemblerInfo.restoreReg(fd, nextReg + 2);
+		    }
+
+		    if (aux_expr instanceof ASTLiteralUR) {
+			((ASTLiteralUR)aux_expr).generateCode(fd, nextReg, id_type);
+		    }		
+		}
 		    
 		fd.write("mov " + reg2 + ", " + id_type.getTam() + "\n");
 		fd.write("sub " + reg + ", " + reg2 + "\n");

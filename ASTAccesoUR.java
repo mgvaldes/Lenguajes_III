@@ -15,6 +15,10 @@ public class ASTAccesoUR extends ASTAcceso {
 	campo = c;
     }
 
+    public String getCampo() {
+	return campo;
+    }
+
     public boolean isNull() {
 	return false;
     }

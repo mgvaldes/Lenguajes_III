@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.LinkedList;
 
 public class ASTIdentificador extends ASTExpresion {
     
@@ -33,6 +34,28 @@ public class ASTIdentificador extends ASTExpresion {
 	if(acceso != null && !acceso.isNull()) {
 	    state = acceso.check(state);
 	}
+    }
+
+    public Tipo getTipoAcceso(Tipo aux_type, ASTAcceso acc) {
+	Tipo t = aux_type;
+	ASTAcceso a = acc;
+
+	while (a != null) {
+	    if (a instanceof ASTAccesoArreglo) {
+		t = ((Arreglo)t).getTipoBase();
+	    }
+	    else {
+		if (t instanceof Registro) {		    
+		    t = (Tipo)((LinkedList)((Registro)t).getTipos()).get(((LinkedList)((Registro)t).getCampos()).indexOf(((ASTAccesoUR)a).getCampo()));
+		}
+		else if (t instanceof Union) {
+		    t = (Tipo)((LinkedList)((Union)t).getTipos()).get(((LinkedList)((Union)t).getCampos()).indexOf(((ASTAccesoUR)a).getCampo()));
+		}
+	    }
+	    a = a.getHijo();
+	}
+
+	return t;
     }
   
     public String printTree() {

@@ -1,0 +1,22 @@
+void proc(float &a){
+
+  print a;
+  print '\n';
+
+  a = 4.2;
+
+  print a;
+  print '\n';
+
+}
+
+int main{
+
+  int a = 3;
+
+  proc(a);
+
+  print a;
+  print '\n';
+
+}

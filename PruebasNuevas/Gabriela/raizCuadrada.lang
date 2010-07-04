@@ -1,0 +1,136 @@
+int main{
+
+    print 'V';print 'a';print 'l';print 'o';print 'r';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print 'x';print ':';
+    print ' ';
+    print '\n';
+
+    const float x = read float;
+
+    print 'V';print 'a';print 'l';print 'o';print 'r';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print 'l';print 'a';
+    print ' ';
+    print 'h';print 'o';print 'l';print 'g';print 'u';print 'r';print 'a';
+    print ' ';
+    print 'p';print 'e';print 'r';print 'm';print 'i';print 't';print 'i';print 'd';print 'a';print ':';
+    print ' ';
+    print '\n';
+
+    const float e = read float;
+
+    float y =  -1;
+    float z = 0;
+
+    if(true){
+
+        float inf = 0;
+        float sup = x + 1;
+
+        bool enc = false;
+
+        while (inf != sup && !enc) {
+
+            const float k = (inf + sup) / 2;
+
+            if (k*k > x) {
+                z = k*k - x;
+            } else {
+                z = x - k*k;
+            }
+
+            if (z <= e) {
+                inf = sup;
+                enc = true;
+                y = k;
+            } elif (k*k > x) {
+                sup = k;
+            } elif (x > k*k) {
+                inf = k;  
+            }
+            else{}
+        }
+    }
+
+    if (y*y > x) {
+        z = y*y - x;
+    } else {
+        z = x - y*y;
+    }
+
+    print 'E';print 'l';
+    print ' ';
+    print 'v';print 'a';print 'l';print 'o';print 'r';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print 'l';print 'a';
+    print ' ';
+    print 'r';print 'a';print 'i';print 'z';
+    print ' ';
+    print 'a';print 'p';print 'r';print 'o';print 'x';print 'i';print 'm';print 'a';print 'd';print 'a';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print x;
+    print ' ';
+    print 'e';print 's';print ':';
+    print ' ';
+    print y;
+    print '.';
+    print ' ';
+    print 'S';print 'e';
+    print ' ';
+    print 'h';print 'a';
+    print ' ';
+    print 'c';print 'o';print 'n';print 's';print 'i';print 'd';print 'e';print 'r';print 'a';print 'd';print 'o';
+    print ' ';
+    print 'u';print 'n';print 'a';
+    print ' ';
+    print 'h';print 'o';print 'l';print 'g';print 'u';print 'r';print 'a';
+    print ' ';
+    print 'm';print 'a';print 'x';print 'i';print 'm';print 'a';
+    print ' ';
+    print 'p';print 'e';print 'r';print 'm';print 'i';print 't';print 'i';print 'd';print 'a';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print e;
+    print '.';
+    print ' ';
+    print 'E';print 'l';
+    print ' ';
+    print 'c';print 'u';print 'a';print 'd';print 'r';print 'a';print 'd';print 'o';
+    print ' ';
+    print 'd';print 'e';
+    print ' ';
+    print 'e';print 's';print 't';print 'a';
+    print ' ';
+    print 'r';print 'a';print 'i';print 'z';
+    print ' ';
+    print 'e';print 's';
+    print ' ';
+    float cuadrado = y*y;
+    print cuadrado;
+    print ' ';
+    print 'y';
+    print ' ';
+    print 's';print 'u';
+    print ' ';
+    print 'd';print 'i';print 'f';print 'e';print 'r';print 'e';print 'n';print 'c';print 'i';print 'a';
+    print ' ';
+    print 'c';print 'o';print 'n';
+    print ' ';
+    print x;
+    print ' ';
+    print 'e';print 's';
+    print ' ';
+    print z;
+    print '\n';
+
+}

@@ -1,0 +1,21 @@
+void cualquiercosa(){
+  print 'a';
+  print '\n';
+}
+
+void otracosa(int a, int b){
+
+  int z = a;
+  print a;
+  print '\n';
+  cualquiercosa();
+
+}
+
+
+int main{
+  int a = 3;
+  otracosa(a,a);
+  print a;
+  print '\n';
+}

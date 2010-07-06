@@ -51,7 +51,7 @@ public class InvocarUtilities {
 		   if(cast != null){
 		       fd.write("mov "+nreg+", ["+reg+"]\n");
 		       cast.generateCode(fd, nextReg+1, "", "");
-		       fd.write("push qword "+nreg+"\n");
+		       fd.write("push "+nreg+"\n");
 		   }
 		   else
 		       fd.write("push qword ["+reg+"]\n");
@@ -102,7 +102,7 @@ public class InvocarUtilities {
                     if(cast != null){
                         fd.write("mov "+nreg+", ["+reg+"]\n");
                         cast.generateCode(fd, nextReg+1, "", "");
-                        fd.write("push qword "+nreg+"\n");
+                        fd.write("push "+nreg+"\n");
                     }
                     else
                         fd.write("push qword ["+reg+"]\n");
@@ -135,7 +135,7 @@ public class InvocarUtilities {
                     if(cast != null){
                         fd.write("mov "+nreg+", ["+reg+"]\n");
                         cast.generateCode(fd, nextReg+1, "", "");
-                        fd.write("push qword "+nreg+"\n");
+                        fd.write("push "+nreg+"\n");
                     }
                     else
                         fd.write("push qword ["+reg+"]\n");
@@ -181,7 +181,7 @@ public class InvocarUtilities {
                     if(cast != null){
                         fd.write("mov "+nnreg+", ["+reg+"]\n");
                         cast.generateCode(fd, nextReg+2, "", "");
-                        fd.write("push qword "+nnreg+"\n");
+                        fd.write("push "+nnreg+"\n");
                     }
                     else
                         fd.write("push qword ["+reg+"]\n");

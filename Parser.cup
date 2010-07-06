@@ -166,7 +166,7 @@ programa ::= listadeclaraciones voidfun:t
                }
 
                SymProc pro =new SymProc("main", t, null, null, m);
-               pro.setTamlocal(parser.maxdesplazamiento-8);
+               pro.setTamlocal(parser.maxdesplazamiento);
                parser.actual.insert(pro, parser.anidamiento);
 
                parser.procedimientos.add("main");
@@ -1768,7 +1768,7 @@ declaracionfuncion ::= tipos:t IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			
 			if( s != null && (s instanceof SymProc)) {
 			    SymProc p = (SymProc) s;
-			    p.setTamlocal(parser.maxdesplazamiento-8);
+			    p.setTamlocal(parser.maxdesplazamiento);
 			    p.getBloque().setInsts(b.getInsts());
                             p.calcOffsets(parser.intam-t.getTam());
                             parser.intam=0;
@@ -1875,7 +1875,7 @@ declaracionprocedimiento ::= VOID IDENTIFIER:i PARLEFT parametros:l PARRIGHT
 			      
 			      if( s != null && (s instanceof SymProc)) {
 				  SymProc p = (SymProc) s;
-				  p.setTamlocal(parser.maxdesplazamiento-8);
+				  p.setTamlocal(parser.maxdesplazamiento);
 				  p.getBloque().setInsts(b.getInsts());
                                   p.calcOffsets(parser.intam);
                                   parser.intam=0;

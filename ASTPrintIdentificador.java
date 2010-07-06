@@ -24,22 +24,13 @@ public class ASTPrintIdentificador extends ASTInstruccion {
     public void update() {}
 
     public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException{
+
+            String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
 	    AssemblerInfo.saveSpecificReg(fd, "rdi");
-	    Basico t = new Basico(0);
+	    Basico t = (Basico) iden.getState();
 	    
-	    if (iden.getState() instanceof Basico) {
-		if(iden.getTable().getParent() == null)
-		    fd.write("mov rdi, [static + " + ((SymVar)iden.getTable().getSym(iden.getValue())).getOffset() + "]\n");
-		else
-		    fd.write("mov rdi, [" + AssemblerInfo.getFp() + " - " + ((SymVar)iden.getTable().getSym(iden.getValue())).getOffset() + "]\n");
-		t = (Basico)iden.getState();
-	    }
-	    else if (iden.getState() instanceof Arreglo) {
-		String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
-		iden.generateCode(fd, nextReg, "", "");
-		fd.write("mov rdi, " + reg + "\n");
-		t = (Basico) ((Arreglo)iden.getState()).getTipoBase();
-	    }
+            iden.generateCode(fd, nextReg, "", "");
+            fd.write("mov rdi, [" + reg + "]\n");
 
 	    switch(t.getNBasico()) {	
 	    case 1:

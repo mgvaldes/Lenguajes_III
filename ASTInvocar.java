@@ -145,7 +145,7 @@ public class ASTInvocar extends ASTInstruccion {
 
         AssemblerInfo.saveRegLlamado(fd, nextReg);
 
-        empilarParametros(fd, 0);
+        InvocarUtilities.empilarParametros(fd, 0, expresionEntrada, procInfo);
 
         fd.write("call proc"+nombre+"\n");
 
@@ -172,9 +172,11 @@ public class ASTInvocar extends ASTInstruccion {
 
             if(flag){
 
+                boolean global = ((ASTIdentificador) expr).getTable().getParent() == null;
+
                 Tipo source = procInfo.getTable().exist((String) tsource[i]).getTipo();
+
                 fd.write("pop "+reg+"\n");
-                fd.write("add "+reg+", "+tam+"-8\n");
 
                 if(source instanceof Basico){
                     fd.write("pop "+nreg+"\n");
@@ -183,8 +185,8 @@ public class ASTInvocar extends ASTInstruccion {
                         cast.generateCode(fd, nextReg+1, "", "");
                     fd.write("mov ["+reg+"], "+nreg+"\n");
                 }
-                //else
-		//InvocarUtilities.generateIdenPopCastCode(fd, nextReg, expr.getState(), source, ((ASTIdentificador) expr).getTable().getParent() == null);
+                else
+		  InvocarUtilities.generateIdenPopCastCode(fd, nextReg, expr.getState(), source,  global);
             }
             else
                 for(int k = 0; k < tam; k+=8)
@@ -194,76 +196,6 @@ public class ASTInvocar extends ASTInstruccion {
 
         for(int k = 0; k < state.getTam(); k+=8)
             fd.write("pop "+reg+"\n");
-
-    }
-
-    public void empilarParametros(Writer fd, int nextReg) throws IOException{
-	
-        String reg = AssemblerInfo.getNombresRegAtPos(nextReg); 
-        String nreg = AssemblerInfo.getNombresRegAtPos(nextReg+1); 
-        Iterator ite = expresionEntrada.iterator();
-        Iterator itt = procInfo.getIn().iterator();
-        LinkedList ref = procInfo.getRef();        
-        Iterator itr = ref.iterator();
-        ASTExpresion argumento;
-
-        while(ite.hasNext()){
-
-           argumento = (ASTExpresion) ite.next();
-           Tipo dest = procInfo.getTable().exist((String) itt.next()).getTipo();
-
-           if(argumento.getState() instanceof Basico && ((Basico) argumento.getState()).getNBasico() == 3){
-
-
-               String si = AssemblerInfo.newLabel();
-               String no = AssemblerInfo.newLabel();
-               String end = AssemblerInfo.newLabel();
-
-               argumento.generateCode(fd, nextReg, si, no);
-
-               fd.write(si + ":\n");
-               fd.write("push 1\n");    
-               fd.write("jmp " + end + "\n");		    
-               fd.write(no + ":\n");
-               fd.write("push 0\n");    
-               fd.write(end + ":\n");
-           }
-           else if(argumento instanceof ASTIdentificador){
-
-               argumento.generateCode(fd, nextReg, "", "");
-
-               if(argumento.getState() instanceof Basico){
-		   ASTCast cast = AssemblerInfo.checkCast(dest,argumento.getState());
-		   if(cast != null){
-		       fd.write("mov "+nreg+", ["+reg+"]\n");
-		       cast.generateCode(fd, nextReg+1, "", "");
-		       fd.write("push qword "+nreg+"\n");
-		   }
-		   else
-		       fd.write("push qword ["+reg+"]\n");
-               }
-               //else
-	       //InvocarUtilities.generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), ((ASTIdentificador) argumento).getTable().getParent() == null);
-
-               if(((Boolean) itr.next()).booleanValue()){
-                   fd.write("sub "+reg+", "+argumento.getState().getTam()+"-8\n");
-                   fd.write("push "+reg+"\n");
-               }
-
-           }
-           else if(argumento instanceof ASTLiteralArreglo)
-               ((ASTLiteralArreglo) argumento).generatePushCastCode(fd,nextReg, dest, ((ASTLiteralArreglo) argumento).getArreglos());
-           else if(argumento instanceof ASTLiteralUR)
-               ((ASTLiteralUR) argumento).generatePushCastCode(fd, nextReg, dest);
-           else if(!(argumento instanceof ASTInvocarExpresion)){
-               argumento.generateCode(fd, nextReg, "", "");
-               ASTCast cast = AssemblerInfo.checkCast(dest,argumento.getState());
-               if(cast != null)
-                   cast.generateCode(fd, nextReg, "", "");
-               fd.write("push "+reg+"\n");
-           }
-
-        }
 
     }
 

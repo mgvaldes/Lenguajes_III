@@ -56,16 +56,18 @@ public class InvocarUtilities {
 		   else
 		       fd.write("push qword ["+reg+"]\n");
                }
-               else
-	         generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), global);
-
-               if(referencia){
-                    if(global)
-                        fd.write("sub "+reg+",8\n");
-                    else
-                        fd.write("add "+reg+",8\n");
-                   fd.write("push "+reg+"\n");
+               else{
+	           generateIdenPushCastCode(fd, nextReg, dest , argumento.getState(), global);
+                   if(referencia){
+                       if(global)
+                           fd.write("sub "+reg+",8\n");
+                       else
+                           fd.write("add "+reg+",8\n");
+                   }
                }
+
+               if(referencia)
+                   fd.write("push "+reg+"\n");
 
            }
            else if(argumento instanceof ASTLiteralArreglo)

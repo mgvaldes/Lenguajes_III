@@ -317,7 +317,7 @@ instruccion ::= declaracion:d SEQ {: RESULT = d; :}
                 :}
              |  RETURN expresion:e SEQ 
                 {:
-		 ASTReturn i = new ASTReturn(parser.intam);
+		 ASTReturn i = new ASTReturn(parser.intam, parser.tipoactualfun, e);
 		 
 		 Tipo t = parser.tipoactualfun;
 		 

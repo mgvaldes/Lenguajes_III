@@ -1,0 +1,13 @@
+int main{
+
+   union{
+     int a;
+     int b;
+   } unionX = {a = 3};
+
+   if(unionX hasactive a){
+     print true;
+     print '\n';
+   }
+
+}

@@ -74,6 +74,7 @@ Num = 0 | [1-9][0-9]*
   "print"         { return symbol(Symbols.PRINT); }
   "read"          { return symbol(Symbols.READ); }
   "main"          { return symbol(Symbols.MAIN); }
+  "hasactive"          { return symbol(Symbols.HASACTIVE); }
 
   {Identifier}    { return symbol(Symbols.IDENTIFIER, yytext()); }
   {Num}           { return symbol(Symbols.NUM, new Long(Long.parseLong(yytext()))); }

@@ -107,7 +107,7 @@ parser code {:
 terminal INT, FLOAT, BOOL, BREAK, IF, ELIF, ELSE, SWITCH, CASE, DEFAULT, FOR;
 terminal WHILE, CONST, ASIG, EQ, PLUS, MINUS, PLUSPLUS, MINUSMINUS, MULT, DIV, MOD;
 terminal NOTEQ, LESS, MORE, MOREEQ, LESSEQ, OR, AND, NOT, DOSPUNTOS, SEQ, COMA, PARLEFT;
-terminal PARRIGHT, BRACKETLEFT, BRACKETRIGHT, CORLEFT, CORRIGHT, DOT, COMILLAS;
+terminal PARRIGHT, BRACKETLEFT, BRACKETRIGHT, CORLEFT, CORRIGHT, DOT, COMILLAS, HASACTIVE;
 terminal UMINUS, UNOT, VOID, REF, RETURN, MAIN, UNION, STRUCT, TYPEDEF, PRINT, READ;
 
 terminal Long NUM;
@@ -1349,6 +1349,32 @@ expresionsinla ::= expresion:e1 EQ expresion:e2
                 res.updateState();
                 RESULT = res;
               :}
+           |  IDENTIFIER:i1 acceso:a HASACTIVE IDENTIFIER:i2
+              {:
+                Resultado r = parser.actual.exist(i1); 
+                Tipo state = r.getTipo();
+                ASTIdentificador iden = new ASTIdentificador(i1, r.getTable(), a, state);
+                ASTIdentificador iden2 = new ASTIdentificador(i2, null, null, null);
+
+                if (state != null) {
+		    iden.update();
+
+		    if(!iden.check())
+                        parser.custom_error("Mal acceso al idenficicador "+i1);
+
+                    if( !(iden.getState() instanceof Union))
+                        parser.custom_error(i1+ " con su acceso debe ser del tipo union");
+                    else{
+                        Union u = (Union) iden.getState();
+                        if(!u.getCampos().contains(i2))
+                            parser.custom_error(i2+" no es un campo de la union "+i1);
+                    }
+		} 
+                else 
+                    parser.declaration_error(i1);
+		   
+                RESULT = new ASTActive(iden, iden2);
+              :}
            ;
 
 
@@ -1447,6 +1473,32 @@ expresion ::= expresion:e1 EQ expresion:e2
            |  COMILLAS CHAR:c COMILLAS {: RESULT = new ASTConst(c); :}
            |  expresionarit:e1 {: RESULT = e1; :}
            |  literales:l {: parser.literal = true; RESULT = l; :}
+           |  IDENTIFIER:i1 acceso:a HASACTIVE IDENTIFIER:i2
+              {:
+                Resultado r = parser.actual.exist(i1); 
+                Tipo state = r.getTipo();
+                ASTIdentificador iden = new ASTIdentificador(i1, r.getTable(), a, state);
+                ASTIdentificador iden2 = new ASTIdentificador(i2, null, null, null);
+
+                if (state != null) {
+		    iden.update();
+
+		    if(!iden.check())
+                        parser.custom_error("Mal acceso al idenficicador "+i1);
+
+                    if( !(iden.getState() instanceof Union))
+                        parser.custom_error(i1+ " con su acceso debe ser del tipo union");
+                    else{
+                        Union u = (Union) iden.getState();
+                        if(!u.getCampos().contains(i2))
+                            parser.custom_error(i2+" no es un campo de la union "+i1);
+                    }
+		} 
+                else 
+                    parser.declaration_error(i1);
+		   
+                RESULT = new ASTActive(iden, iden2);
+              :}
            ;
 
 expresionarit ::= MINUS expresionarit:e1

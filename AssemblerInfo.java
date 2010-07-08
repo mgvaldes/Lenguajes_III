@@ -37,8 +37,7 @@ public class AssemblerInfo {
 	try {
 	    fd.write("%include \"asm_io.inc\"\n\n" +
 		     "section .bss\n" +
-		     "   static resb " + size + "\n" +
-		     "   memsfpu resb 108\n\n" +
+		     "   static resb " + size + "\n\n" +
 		     "section .text\n\n");
 
             Iterator it = procedimientos.iterator();

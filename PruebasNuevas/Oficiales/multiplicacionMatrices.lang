@@ -1,0 +1,247 @@
+void leerMatriz34 (int N, int M, struct { float d; int i;}[3][4] rs) {
+
+    for (int i = 0; i < N; i++) {
+
+        for (int j = 0; j < M; j++) {
+
+            print 'I'; print 'n'; print 'g'; print 'r'; print 'e'; print 's'; print 'e'; 
+            print ' '; 
+            print 'e'; print 'l'; 
+            print ' '; 
+            print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; 
+            print ' '; 
+            print '['; print i; print ']'; print '['; print j; print ']';
+            print ' '; 
+            print 'd'; print 'e'; 
+            print ' '; 
+            print 'l'; print 'a'; 
+            print ' '; 
+            print 'm'; print 'a'; print 't'; print 'r'; print 'i'; print 'z'; print ':'; 
+            print ' '; 
+
+            float e = read float;
+            int f = e;
+            rs[i][j] = { d = e; i = f};
+        }
+    }
+}
+
+void leerMatriz42 (int N, int M, struct { float d; int i;}[4][2] rs) {
+
+    for (int i = 0; i < N; i++) {
+
+        for (int j = 0; j < M; j++) {
+
+            print 'I'; print 'n'; print 'g'; print 'r'; print 'e'; print 's'; print 'e'; 
+            print ' '; 
+            print 'e'; print 'l'; 
+            print ' '; 
+            print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; 
+            print ' '; 
+            print '['; print i; print ']'; print '['; print j; print ']';
+            print ' '; 
+            print 'd'; print 'e'; 
+            print ' '; 
+            print 'l'; print 'a'; 
+            print ' '; 
+            print 'm'; print 'a'; print 't'; print 'r'; print 'i'; print 'z'; print ':'; 
+            print ' '; 
+
+            float e = read float;
+            int f = e;
+            rs[i][j] = { d = e; i = f};
+        }
+    }
+}
+
+void productoMatrices (int M, int P, int N, 
+                       struct { float d; int i;}[3][4] rs0, 
+                       struct { float d; int i;}[4][2] rs1, 
+                       struct{ float[3][2] ds; int[3][2] is;} r) {
+
+    for (int i = 0; i < M; i++) {
+
+        for (int j = 0; j < P; j++) {
+
+            r.ds[i][j] = 0;
+            r.is[i][j] = 0;
+
+            for (int k = 0; k < N; k++) {
+
+                r.ds[i][j] = r.ds[i][j] + rs0[i][k].d * rs1[k][j].d;
+                r.is[i][j] = r.is[i][j] + rs0[i][k].i * rs1[k][j].i;
+            }
+        }
+    }
+}
+
+void escribirMatrizRegistros34 (int N, int M,struct { float d; int i;}[3][4] m) {
+
+    for (int i = 0; i < N; i++) {
+
+        for (int j = 0; j < M; j++) {
+
+            print '('; print m[i][j].d; print ',';
+            print ' '; 
+            print m[i][j].i;
+            print ')'; print '\t';
+        }
+        print '\n';
+    }    
+}
+
+void escribirMatrizRegistros42 (int N, int M,struct { float d; int i;}[4][2] m) {
+
+    for (int i = 0; i < N; i++) {
+
+        for (int j = 0; j < M; j++) {
+
+            print '('; print m[i][j].d; print ',';
+            print ' '; 
+            print m[i][j].i;
+            print ')'; print '\t';
+        }
+        print '\n';
+    }    
+}
+
+void escribirMatrizEnteros (int N, int M, int[3][2] m) {
+
+    for (int i = 0; i < N; i++) {
+
+        for (int j = 0; j < M; j++) {
+
+            print m[i][j]; print '\t';
+        }
+        print '\n';
+    }    
+}
+
+void escribirMatrizReales (int N, int M, float[3][2] m) {
+
+    for (int i = 0; i < N; i++) {
+
+        for (int j = 0; j < M; j++) {
+
+            print m[i][j]; print '\t';
+        }
+        print '\n';
+    }    
+}
+
+void main{
+
+    const int M = 3;
+    const int N = 4;
+    const int P = 2;
+
+    struct {
+        float d;
+        int i;
+    }[3][4] matriz0;
+
+    struct {
+        float d;
+        int i;
+    }[4][2] matriz1;
+
+    float[3][2] resultado0;
+    int[3][2] resultado1;
+
+    struct{
+        float[3][2] ds;
+        int[3][2] is;
+    } resultado = { ds = { {resultado0[0][0], resultado0[0][1]};
+                           {resultado0[1][0], resultado0[2][1]};
+                           {resultado0[2][0], resultado0[2][1]} 
+                         };
+                    is = { {resultado1[0][0], resultado1[0][1]};
+                           {resultado1[1][0], resultado1[2][1]};
+                           {resultado1[2][0], resultado1[2][1]} 
+                         }
+                  };
+
+
+    print 'L'; print 'e'; print 'y'; print 'e'; print 'n'; print 'd'; print 'o'; 
+    print ' '; 
+    print 'l'; print 'a'; 
+    print ' '; 
+    print 'p'; print 'r'; print 'i'; print 'm'; print 'e'; print 'r'; print 'a'; 
+    print ' '; 
+    print 'm'; print 'a'; print 't'; print 'r'; print 'i'; print 'z'; 
+    print '\n'; 
+    leerMatriz34(3, 4, matriz0);
+
+    print 'L'; print 'e'; print 'y'; print 'e'; print 'n'; print 'd'; print 'o'; 
+    print ' '; 
+    print 'l'; print 'a'; 
+    print ' '; 
+    print 's'; print 'e'; print 'g'; print 'u'; print 'n'; print 'd'; print 'a'; 
+    print ' '; 
+    print 'm'; print 'a'; print 't'; print 'r'; print 'i'; print 'z';
+    print '\n'; 
+    leerMatriz42(4, 2, matriz1);
+
+    productoMatrices(3, 2, 4, matriz0, matriz1, resultado);
+
+    print 'L'; print 'a'; 
+    print ' '; 
+    print 'p'; print 'r'; print 'i'; print 'm'; print 'e'; print 'r'; print 'a'; 
+    print ' '; 
+    print 'm'; print 'a'; print 't'; print 'r'; print 'i'; print 'z'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'e'; print 'n'; print 't'; print 'r'; print 'a'; print 'd'; print 'a'; 
+    print ' '; 
+    print 'e'; print 's'; print ':'; 
+    print ' '; 
+    print '\n'; 
+    escribirMatrizRegistros34(3, 4, matriz0);
+
+    print 'L'; print 'a'; 
+    print ' '; 
+    print 's'; print 'e'; print 'g'; print 'u'; print 'n'; print 'd'; print 'a'; 
+    print ' '; 
+    print 'm'; print 'a'; print 't'; print 'r'; print 'i'; print 'z'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'e'; print 'n'; print 't'; print 'r'; print 'a'; print 'd'; print 'a'; 
+    print ' '; 
+    print 'e'; print 's'; print ':'; 
+    print ' '; 
+    print '\n'; 
+    escribirMatrizRegistros42(4, 2, matriz1);
+
+    print 'L'; print 'a'; print 's'; 
+    print ' '; 
+    print 'p'; print 'r'; print 'i'; print 'm'; print 'e'; print 'r'; print 'a'; 
+    print ' '; 
+    print 'm'; print 'a'; print 't'; print 'r'; print 'i'; print 'z'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 's'; print 'a'; print 'l'; print 'i'; print 'd'; print 'a'; 
+    print ' '; 
+    print 'e'; print 's'; print ':'; 
+    print ' ';
+    print '\n'; 
+    escribirMatrizReales(3, 2, resultado.ds);
+
+    print 'L'; print 'a'; print 's'; 
+    print ' '; 
+    print 's'; print 'e'; print 'g'; print 'u'; print 'n'; print 'd'; print 'a'; 
+    print ' '; 
+    print 'm'; print 'a'; print 't'; print 'r'; print 'i'; print 'z'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 's'; print 'a'; print 'l'; print 'i'; print 'd'; print 'a'; 
+    print ' '; 
+    print 'e'; print 's'; print ':'; 
+    print ' ';
+    print '\n'; 
+    escribirMatrizEnteros(3, 2, resultado.is);
+}
+

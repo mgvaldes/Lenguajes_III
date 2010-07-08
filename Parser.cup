@@ -38,7 +38,6 @@ parser code {:
     public boolean noGlobal = false;
     public boolean procDeclared = false;
     public boolean promiseDeclared = false;
-    public ASTAcceso last;
     public LinkedList in;
     public LinkedList referencias  = new LinkedList();
     public LinkedList procedimientos  = new LinkedList();
@@ -111,6 +110,7 @@ terminal PARRIGHT, BRACKETLEFT, BRACKETRIGHT, CORLEFT, CORRIGHT, DOT, COMILLAS, 
 terminal UMINUS, UNOT, VOID, REF, RETURN, MAIN, UNION, STRUCT, TYPEDEF, PRINT, READ;
 
 terminal Long NUM;
+terminal Double NFLOAT;
 terminal String  IDENTIFIER;
 terminal Boolean TRUE, FALSE;
 terminal String CHAR;
@@ -321,8 +321,8 @@ instruccion ::= declaracion:d SEQ {: RESULT = d; :}
 		 
 		 Tipo t = parser.tipoactualfun;
 		 
-		 if (!t.equals(e.getState()))
-		     parser.custom_error("Tiene que retornar un "+t);
+		 if (t.asign(e.getState()) == null)
+		     parser.custom_error("Tiene que retornar un tipo compatible con "+t);
 
 		 RESULT = i;
                 :}
@@ -654,13 +654,10 @@ acceso ::= acceso:a DOT IDENTIFIER:c
            {:
             ASTAcceso res;
 
-            if(a.isNull()) {
-		res = new ASTAccesoUR(a,c);
-		parser.last = res;
-            }
+            if(a == null) 
+		res = new ASTAccesoUR(null,c);
             else {
-		parser.last.setHijo(new ASTAccesoUR(parser.last.getHijo(),c));
-		parser.last = parser.last.getHijo();
+		a.setHijoFinal(new ASTAccesoUR(null,c));
 		res = a;
             }
 	    
@@ -675,23 +672,21 @@ acceso ::= acceso:a DOT IDENTIFIER:c
 	    
             ASTAcceso res;
 	    
-            if (a.isNull()) {
+            if (a == null) 
 		res = new ASTAccesoArreglo(a,e);
-		parser.last = res;
-            }
             else {
-		parser.last.setHijo(new ASTAccesoArreglo(parser.last.getHijo(),e));
-		parser.last = parser.last.getHijo();
+		a.setHijoFinal(new ASTAccesoArreglo(null,e));
 		res = a;
             }
 	    
             RESULT = res;
            :}
-        |  /* lamda */ {: RESULT = new ASTAcceso(); :}
+        |  /* lamda */ {: RESULT = null; :}
         ;
 
 asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo identificador */
                 {:
+
                  Resultado r = parser.actual.exist(i); 
                  Tipo state = r.getTipo();
 		 
@@ -700,6 +695,7 @@ asignacion1 ::= IDENTIFIER:i acceso:ac ASIG expresion:e /* Asignacion de un solo
 
 		 ASTIdentificador id = new ASTIdentificador(i, r.getTable(), ac, state);		 
 		 id.update();
+
 
 		 if (!id.check())
 		     parser.custom_error("Mal acceso al idenficicador "+id.getValue());
@@ -1054,16 +1050,26 @@ conswitch ::= SWITCH {: parser.inSwitch = true; :} PARLEFT expresion:e PARRIGHT 
               :}
               listacase:l DEFAULT DOSPUNTOS
               {:
-               parser.anterior = parser.actual;
+	       parser.anterior = parser.actual;
 	       parser.actual = new SymTable(parser.anterior);
+	       parser.alias_anterior = parser.alias_actual;
+	       parser.alias_actual = new SymTable(parser.alias_anterior);
+               parser.returning = false;
+               parser.breaking = false;
+	       parser.anidamiento++;
               :}
               listainstrucciones:b  BRACKETRIGHT
               {:
                l.setDef(new ASTBloque(b, parser.actual));
 	       l.setExp(e);
 	       parser.inSwitch = false; 
+	       parser.anidamiento--;
 	       parser.actual = parser.anterior; 
 	       parser.anterior = parser.anterior.getParent();
+	       parser.alias_actual = parser.alias_anterior; 
+	       parser.alias_anterior = parser.alias_anterior.getParent();
+               parser.returning = false;
+               parser.breaking = false;
 	       RESULT = l;
               :}
            ;
@@ -1074,6 +1080,8 @@ listacase ::= listacase:l CASE constantes:c DOSPUNTOS
 	       parser.actual = new SymTable(parser.anterior);
 	       parser.alias_anterior = parser.alias_actual;
 	       parser.alias_actual = new SymTable(parser.alias_anterior);
+               parser.returning = false;
+               parser.breaking = false;
 	       parser.anidamiento++;
               :} 
               listainstrucciones:b
@@ -1085,6 +1093,8 @@ listacase ::= listacase:l CASE constantes:c DOSPUNTOS
 	       parser.anterior = parser.anterior.getParent();
 	       parser.alias_actual = parser.alias_anterior; 
 	       parser.alias_anterior = parser.alias_anterior.getParent();
+               parser.returning = false;
+               parser.breaking = false;
 	       RESULT = l;
 	      :}
            |  /* lamda */ {: RESULT = new ASTSwitch(null,new LinkedList(), new LinkedList(), null); :}              
@@ -1107,7 +1117,7 @@ constantes ::= NUM:n
 
 		RESULT = new ASTConst(n.longValue());
                :}
-             | NUM:n1 DOT NUM:n2 
+             | NFLOAT:f
                {:
                 Basico flo = new Basico(2);
 		
@@ -1122,7 +1132,6 @@ constantes ::= NUM:n
 		    }
 		}
 				
-		Double f = new Double(n1+"."+n2);
 		RESULT = new ASTConst(f.doubleValue());
                :}
              | TRUE
@@ -1566,9 +1575,8 @@ expresionarit ::= MINUS expresionarit:e1
 		   ASTConst aux = new ASTConst(n.longValue());
 		   RESULT = aux;
 		  :}
-               |  NUM:n1 DOT NUM:n2 
+               |  NFLOAT:f
 		  {:
-		   Double f = new Double(n1+"."+n2);
                    RESULT = new ASTConst(f.doubleValue()); 
                   :}
                |  IDENTIFIER:i acceso:a

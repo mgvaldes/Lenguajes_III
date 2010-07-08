@@ -55,7 +55,6 @@ public class ASTAsignacion extends ASTInstruccion {
     }
     
     public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
-	try {
 	    String si = AssemblerInfo.newLabel();
 	    String no = AssemblerInfo.newLabel();
 	    String end = AssemblerInfo.newLabel();
@@ -119,8 +118,7 @@ public class ASTAsignacion extends ASTInstruccion {
 			    
 			    base_expr_type = ((ASTIdentificador)expr).getTipoAcceso(expr_state, ((ASTIdentificador)expr).getAcceso());				
 			}
-			else if (expr instanceof ASTInvocarExpresion) {
-			    System.out.println("aquiiiiiiiiiiiiiii");
+			else if (expr instanceof ASTInvocarExpresion) {			    
 			    base_expr_type = ((SymProc)((ASTInvocarExpresion)expr).getProcInfo()).getState();
 			    fd.write("pop " + reg + "\n");
 			}
@@ -157,6 +155,22 @@ public class ASTAsignacion extends ASTInstruccion {
 				offs += 8;
 			    }
 			    AssemblerInfo.restoreReg(fd, nextReg + 2);
+			}
+			else if (expr instanceof ASTInvocarExpresion) {
+			    int offs = ((Arreglo)aux_state).getTam() - 8;
+			    System.out.println("aqui: " + offs);
+			    base_id_type = ((Arreglo)aux_state).getTipoBase();
+			    base_expr_type = ((Arreglo)((SymProc)((ASTInvocarExpresion)expr).getProcInfo()).getState()).getTipoBase();
+			    
+			    cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+			    while (offs >= 0) {
+				fd.write("pop " + reg + "\n");
+				if (cast != null) {
+				    cast.generateCode(fd, nextReg, "", "");
+				}
+				fd.write("mov [" + reg1 + " - " + offs + "], " + reg + "\n");
+				offs -= 8;
+			    }
 			}
 			else {
 			    base_id_type = ((Arreglo)aux_state).getTipoBase();
@@ -276,11 +290,6 @@ public class ASTAsignacion extends ASTInstruccion {
 		    AssemblerInfo.restoreReg(fd, nextReg + 1);
 		}
 	    }
-    	}
-    	catch (Exception e) {
-            e.printStackTrace();
-    	    System.out.println("Error escribiendo en archivo de salida");
-    	}
     }
 }
 

@@ -250,7 +250,7 @@ public class ASTLiteralArreglo extends ASTExpresion {
 			cast.generateCode(fd, nextReg + 1, "", "");
 		    }
 		}
-
+		
 		fd.write("mov [" + reg + " - " + offset + "], " + reg1 + "\n");	    
 		offset += tamBase;
 	    }

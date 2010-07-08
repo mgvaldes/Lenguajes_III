@@ -42,9 +42,9 @@ public class ASTCast extends ASTExpresion {
                 fd.write("pop " + reg + "\n");
                 break;
             default:
-                String nreg = AssemblerInfo.getNombresRegAtPos(nextReg + 1);
+                String nreg = AssemblerInfo.getNombresRegAtPos(nextReg + 4);
 
-                AssemblerInfo.saveReg(fd, nextReg + 1);
+                AssemblerInfo.saveReg(fd, nextReg + 4);
                 fd.write("mov " + nreg + ", 256\n");
 
                 if( reg == "rax")
@@ -70,7 +70,7 @@ public class ASTCast extends ASTExpresion {
                     fd.write("pop rdx\n");
                 }
 
-                AssemblerInfo.restoreReg(fd, nextReg + 1);		
+                AssemblerInfo.restoreReg(fd, nextReg + 4);		
                 break;
             }                
     }

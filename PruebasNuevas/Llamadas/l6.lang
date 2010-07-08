@@ -1,3 +1,6 @@
+//Pasaje de parametros de un arreglo sirve. Al igual que el uso de literales.
+//Salida Esperada: Impresion de 1.
+
 void proc(int[2] a){
 
   int b = a[0];

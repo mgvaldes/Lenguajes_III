@@ -1,3 +1,6 @@
+//Se quiere las llamadas a funciones simples estan funcionando.
+//Salida Esperada: Impresion de a,3,a,7 y 9.
+
 void cualquiercosa(){
   print 'a';
   print '\n';

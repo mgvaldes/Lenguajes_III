@@ -1,0 +1,14 @@
+//Se quiere comprobar que se indican en los errores a la hora de usasr un campo
+//de la union que no esta activo.
+//Salida esparada: Error indicando que lo dicho anteriormente.
+
+void main{
+
+   union{
+     int a;
+     bool b;
+   } u = { a = 3 };
+
+   u.b = 3;
+
+}

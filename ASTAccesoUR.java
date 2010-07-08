@@ -19,18 +19,19 @@ public class ASTAccesoUR extends ASTAcceso {
 	return campo;
     }
 
-    public boolean isNull() {
-	return false;
-    }
-
     public Tipo check(Tipo t) {
 	int pos;
 
 	if(t instanceof Registro) {
 	    Registro r = (Registro) t;
 	    pos = r.getCampos().indexOf(campo);
-	    if(pos != -1)
-		return hijo.check((Tipo)r.getTipos().get(pos));
+	    if(pos != -1){
+                Tipo tr = (Tipo)r.getTipos().get(pos);
+                if( hijo != null)
+	            return hijo.check(tr);
+                else
+                    return tr;
+            }
 	    else 
 		return null;
 	}
@@ -38,7 +39,11 @@ public class ASTAccesoUR extends ASTAcceso {
 	    Union u = (Union) t;
 	    pos = u.getCampos().indexOf(campo);
 	    if(pos != -1) {
-		return hijo.check((Tipo)u.getTipos().get(pos));
+                Tipo tr = (Tipo)u.getTipos().get(pos);
+                if( hijo != null)
+	            return hijo.check(tr);
+                else
+                    return tr;
 	    }
 	    else 
 		return null;

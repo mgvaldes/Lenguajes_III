@@ -8,12 +8,11 @@ public class ASTInvocarExpresion extends ASTExpresion {
     private LinkedList expresionEntrada;
     private SymProc procInfo;
 
-    public ASTInvocarExpresion(String n, LinkedList e, Tipo s, SymProc pInfo) {
+    public ASTInvocarExpresion(String n, LinkedList e, Tipo s) {
 	super("invocar", null, null);
 	nombre = n;
 	expresionEntrada = e;
 	state = s;
-	procInfo = pInfo;
     }
 
     public void setNombre(String n) {

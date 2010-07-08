@@ -43,47 +43,48 @@ public class ASTReturn extends ASTInstruccion {
 	    String reg1 = AssemblerInfo.getNombresRegAtPos(nextReg + 1); 
 	    Tipo expr_state = new Basico(0); // Solo para inicializarlo
 
-	    if (expr instanceof ASTIdentificador) {
-		expr_state = ((SymVar)((ASTIdentificador)expr). getTable().getSym(expr.getValue())).getState();
-	    }
-	    else {
-		expr_state = expr.getState();
-	    }
-
-	    if ((expr instanceof ASTLiteralArreglo) || (expr instanceof ASTLiteralUR)) {
-		fd.write("mov " + reg + ", " + "rbp\n");
-		fd.write("add " + reg + ", " + offset + "\n");
-	    }
+	    if (!(expr instanceof ASTLiteralArreglo) && 
+		!(expr instanceof ASTLiteralUR)) {
+		if (expr instanceof ASTIdentificador) {
+		    expr_state = ((SymVar)((ASTIdentificador)expr). getTable().getSym(expr.getValue())).getState();
+		}
+		else {
+		    expr_state = expr.getState();
+		}
 	    
-	    if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
-		expr.generateCode(fd, nextReg, si, no);
-		if (!(expr instanceof ASTIdentificador)) {
-		    fd.write(si + ":\n");
-		    fd.write("mov " + reg + ", 1\n");    
-		    fd.write("jmp " + end + "\n");		    
-		    fd.write(no + ":\n");
-		    fd.write("mov " + reg + ", 0\n");    
-		    fd.write(end + ":\n");
-		}		       
-	    }
-	    else {
-		expr.generateCode(fd, nextReg, si, no);
+		if (expr_state instanceof Basico && ((Basico)expr_state).getNBasico() == 3) {
+		    expr.generateCode(fd, nextReg, si, no);
+		    if (!(expr instanceof ASTIdentificador)) {
+			fd.write(si + ":\n");
+			fd.write("mov " + reg + ", 1\n");    
+			fd.write("jmp " + end + "\n");		    
+			fd.write(no + ":\n");
+			fd.write("mov " + reg + ", 0\n");    
+			fd.write(end + ":\n");
+		    }		       
+		}
+		else {
+		    expr.generateCode(fd, nextReg, si, no);
+		}
 	    }
 
-	    Tipo base_id_type;
+	    Tipo base_id_type = dest;
 	    Tipo base_expr_type;
 	    ASTCast cast;
+	    fd.write("mov " + reg1 + ", " + "rbp\n");
+	    fd.write("add " + reg1 + ", " + offset + "\n");
 	    
 	    if (dest instanceof Basico) {
-		fd.write("mov " + reg1 + ", " + "rbp\n");
-		fd.write("add " + reg1 + ", " + offset + "\n");
-		base_id_type = dest;
 		base_expr_type = new Basico(0); // Solo para que no chille
 
 		if (expr instanceof ASTIdentificador) {
 		    fd.write("mov " + reg + ", [" + reg + "]\n");
 			    
 		    base_expr_type = ((ASTIdentificador)expr).getTipoAcceso(expr_state, ((ASTIdentificador)expr).getAcceso());				
+		}
+		else if (expr instanceof ASTInvocarExpresion) {			    
+		    base_expr_type = ((SymProc)((ASTInvocarExpresion)expr).getProcInfo()).getState();
+		    fd.write("pop " + reg + "\n");
 		}
 		else {
 		    base_expr_type = expr_state;
@@ -96,10 +97,75 @@ public class ASTReturn extends ASTInstruccion {
 		
 		fd.write("mov [" + reg1 + "], " + reg + "\n");
 	    }
+	    else if (dest instanceof Arreglo) {
+	    	base_expr_type = new Basico(0); // Solo para que no chille		
+
+	    	if (expr instanceof ASTLiteralArreglo) {
+	    	    ((ASTLiteralArreglo)expr).generateCode(fd, nextReg + 1, (Arreglo)dest);
+		}
+	    	else if ((expr instanceof ASTIdentificador) && 
+	    		 (((ASTIdentificador)expr).getAcceso().getHijo() == null)) {
+		    
+	    	    //Caso de asignacion de arreglos.
+	    	    int offs = 0;
+		    String reg2 = AssemblerInfo.getNombresRegAtPos(nextReg + 2);
+
+	    	    base_id_type = ((Arreglo)dest).getTipoBase();
+	    	    base_expr_type = ((Arreglo)expr_state).getTipoBase();
+		    
+	    	    cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+	    	    AssemblerInfo.saveReg(fd, nextReg + 2);
+	    	    while (offs < ((Arreglo)dest).getTam()) {
+	    		fd.write("mov " + reg2 + ", [" + reg + " - " + offs + "]\n");
+	    		if (cast != null) {
+	    		    cast.generateCode(fd, nextReg + 2, "", "");
+	    		}
+	    		fd.write("mov [" + reg1 + " - " + offs + "], " + reg2 + "\n");
+	    		offs += 8;
+	    	    }
+	    	    AssemblerInfo.restoreReg(fd, nextReg + 2);
+	    	}
+		else if (expr instanceof ASTInvocarExpresion) {
+		    int offs = ((Arreglo)aux_state).getTam() - 8;
+		    System.out.println("aqui: " + offs);
+		    base_id_type = ((Arreglo)aux_state).getTipoBase();
+		    base_expr_type = ((Arreglo)((SymProc)((ASTInvocarExpresion)expr).getProcInfo()).getState()).getTipoBase();
+			    
+		    cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+		    while (offs >= 0) {
+			fd.write("pop " + reg + "\n");
+			if (cast != null) {
+			    cast.generateCode(fd, nextReg, "", "");
+			}
+			fd.write("mov [" + reg1 + " - " + offs + "], " + reg + "\n");
+			offs -= 8;
+		    }
+		}
+		else {
+		    base_expr_type = new Basico(0); // Solo para que no chille
+		    
+		    if (expr instanceof ASTIdentificador) {
+			fd.write("mov " + reg + ", [" + reg + "]\n");
+			
+			base_expr_type = ((ASTIdentificador)expr).getTipoAcceso(expr_state, ((ASTIdentificador)expr).getAcceso());				
+		    }
+		    else {
+			base_expr_type = expr_state;
+		    }
+		    
+		    cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+		    if (cast != null) {
+			cast.generateCode(fd, nextReg, "", "");
+		    }			    
+		    
+		    fd.write("mov [" + reg1 + "], " + reg + "\n");
+		}
+	    }
 	}
 	catch (Exception e) {
             e.printStackTrace();
     	    System.out.println("Error escribiendo en archivo de salida");
+	    
     	}
     }
 

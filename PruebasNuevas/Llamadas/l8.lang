@@ -1,3 +1,6 @@
+//Comprobar el pasaje por valor/resultado de estructuras complejas.
+//Salida esperada: Impresión de 5.
+
 void proc(int[2] a, struct{int [5] x; union{int p; bool q;} y; } &estructura){
 
   estructura = {x = {5,4,3,2,1}; y = { q = false} };

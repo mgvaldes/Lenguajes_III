@@ -1,3 +1,6 @@
+//Se quiere comprobar que se hacen los cast en la llamada.
+//Salida Esperada: Impresion de 3.0.
+
 void proc(float a){
 
   print a;

@@ -40,7 +40,8 @@ public class ASTInvocar extends ASTInstruccion {
     }
 
     public ASTInvocarExpresion toExpresion() {
-	ASTInvocarExpresion r = new ASTInvocarExpresion(nombre, expresionEntrada, state, procInfo);
+	ASTInvocarExpresion r = new ASTInvocarExpresion(nombre, expresionEntrada, state);
+        r.setSymProc(procInfo);
 	return r;
     }
 

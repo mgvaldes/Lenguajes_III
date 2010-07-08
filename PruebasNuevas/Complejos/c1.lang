@@ -1,3 +1,6 @@
+//Se desea comprobar que la instruccion hasctive funcione correctamente.
+//Salida Esperada: Impresión de true.
+
 int main{
 
    union{

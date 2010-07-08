@@ -19,6 +19,10 @@ public class ASTAccesoUR extends ASTAcceso {
 	return campo;
     }
 
+    public boolean isNull(){
+        return false;
+    }
+
     public Tipo check(Tipo t) {
 	int pos;
 

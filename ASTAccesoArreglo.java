@@ -14,6 +14,10 @@ public class ASTAccesoArreglo extends ASTAcceso {
 	expr = e;
     }
 
+    public boolean isNull(){
+        return false;
+    }
+
     public Tipo check(Tipo t) {
 	if(t instanceof Arreglo) {
 	    Arreglo a = (Arreglo) t;

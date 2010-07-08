@@ -19,13 +19,21 @@ public class ASTAcceso {
     public void setHijoFinal(ASTAcceso h) {
 	if(hijo == null)
             hijo = h;
-        else
-            hijo.setHijoFinal(h);
+        else{
+            if( hijo instanceof ASTAcceso)
+                hijo = h;
+            else
+                hijo.setHijoFinal(h);
+        }
     }
 
 
     public ASTAcceso getHijo() {
 	return hijo;
+    }
+
+    public boolean isNull(){
+	return hijo == null;
     }
 
     public Tipo check(Tipo t) {

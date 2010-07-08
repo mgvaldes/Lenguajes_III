@@ -655,9 +655,9 @@ acceso ::= acceso:a DOT IDENTIFIER:c
             ASTAcceso res;
 
             if(a == null) 
-		res = new ASTAccesoUR(null,c);
+		res = new ASTAccesoUR(new ASTAcceso(),c);
             else {
-		a.setHijoFinal(new ASTAccesoUR(null,c));
+		a.setHijoFinal(new ASTAccesoUR(new ASTAcceso(),c));
 		res = a;
             }
 	    
@@ -673,9 +673,9 @@ acceso ::= acceso:a DOT IDENTIFIER:c
             ASTAcceso res;
 	    
             if (a == null) 
-		res = new ASTAccesoArreglo(a,e);
+		res = new ASTAccesoArreglo(new ASTAcceso(),e);
             else {
-		a.setHijoFinal(new ASTAccesoArreglo(null,e));
+		a.setHijoFinal(new ASTAccesoArreglo(new ASTAcceso(),e));
 		res = a;
             }
 	    

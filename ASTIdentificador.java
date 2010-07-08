@@ -31,7 +31,7 @@ public class ASTIdentificador extends ASTExpresion {
     }
 
     public void update() {
-	if(acceso != null && !acceso.isNull()) {
+	if(acceso != null) {
 	    state = acceso.check(state);
 	}
     }

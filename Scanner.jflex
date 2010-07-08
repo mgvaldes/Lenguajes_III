@@ -40,7 +40,7 @@ DocumentationComment = "/**" {CommentContent} "*"+ "/"
 CommentContent       = ( [^*] | \*+ [^/*] )*
 
 Identifier =  [a-zA-Z] [a-zA-Z0-9]*
-Num = 0 | [1-9][0-9]*
+Num = [0-9]*
 
 %state CHAR
 

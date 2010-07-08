@@ -14,14 +14,13 @@ public class ASTAccesoArreglo extends ASTAcceso {
 	expr = e;
     }
 
-    public boolean isNull() {
-  	return false;
-    }
-
     public Tipo check(Tipo t) {
 	if(t instanceof Arreglo) {
 	    Arreglo a = (Arreglo) t;
-	    return hijo.check(a.getSub());
+            if(hijo != null)
+  	        return hijo.check(a.getSub());
+            else
+               return a.getSub();
 	} 	
 	else
 	    return null;

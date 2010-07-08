@@ -16,12 +16,16 @@ public class ASTAcceso {
 	hijo = h;
     }
 
-    public ASTAcceso getHijo() {
-	return hijo;
+    public void setHijoFinal(ASTAcceso h) {
+	if(hijo == null)
+            hijo = h;
+        else
+            hijo.setHijoFinal(h);
     }
 
-    public boolean isNull() {
-  	return hijo == null;
+
+    public ASTAcceso getHijo() {
+	return hijo;
     }
 
     public Tipo check(Tipo t) {

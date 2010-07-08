@@ -38,10 +38,6 @@ int main{
 
             float k = (inf + sup) / 2;
 
-            print '\n';
-            print y;
-            print '\n';
-
             if (k*k > x) {
                 z = k*k - x;
             } else {

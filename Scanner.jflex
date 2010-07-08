@@ -40,7 +40,8 @@ DocumentationComment = "/**" {CommentContent} "*"+ "/"
 CommentContent       = ( [^*] | \*+ [^/*] )*
 
 Identifier =  [a-zA-Z] [a-zA-Z0-9]*
-Num = [0-9]*
+Num = [0-9]+
+NFloat = [0-9]+ "." [0-9]+
 
 %state CHAR
 
@@ -78,6 +79,7 @@ Num = [0-9]*
 
   {Identifier}    { return symbol(Symbols.IDENTIFIER, yytext()); }
   {Num}           { return symbol(Symbols.NUM, new Long(Long.parseLong(yytext()))); }
+  {NFloat}         { return symbol(Symbols.NFLOAT, new Double(Double.parseDouble(yytext()))); }
   \'              { yybegin(CHAR); return symbol(Symbols.COMILLAS);}
 
   /* Operadores */

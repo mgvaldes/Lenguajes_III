@@ -1,0 +1,27 @@
+//Se quiere comprobar que las asignaciones en estrucutras, arreglos y uniones
+//funciona adecuadamente. Además se hace uso de literales.
+//Salida Esperada: Impresion de 16,true y 0.02.
+
+void main{
+
+   struct{
+      int [2][3] a;
+      union{
+         int a;
+         bool b;
+      }b;
+      float c;
+   } estructura = {
+                    a = { {1,2,3}; {4,5,6+10} };
+                    b = { b = true && (false || true) };
+                    c = 0.02;
+                  };
+
+   print estructura.a[1][2];
+   print '\n';
+   print estructura.b.b;
+   print '\n';
+   print estructura.c;
+   print '\n';
+
+}

@@ -1,3 +1,6 @@
+//Comprobar el pasaje por valor/resultado.
+//Salida Esperada: Impresion de 3,3,2 y 2.
+
 void otracosa(int &a){
   print a;
   print '\n';

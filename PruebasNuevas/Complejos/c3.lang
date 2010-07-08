@@ -1,0 +1,11 @@
+//Se quiere comprobar que se indican los errores de indexacion.
+//Salida Esperada: Impresion de un error.
+
+void main{
+
+   int [4] arreglo;
+
+   a[5] = 2;
+
+
+}

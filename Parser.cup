@@ -110,6 +110,7 @@ terminal PARRIGHT, BRACKETLEFT, BRACKETRIGHT, CORLEFT, CORRIGHT, DOT, COMILLAS, 
 terminal UMINUS, UNOT, VOID, REF, RETURN, MAIN, UNION, STRUCT, TYPEDEF, PRINT, READ;
 
 terminal Long NUM;
+terminal Double NFLOAT;
 terminal String  IDENTIFIER;
 terminal Boolean TRUE, FALSE;
 terminal String CHAR;
@@ -1116,7 +1117,7 @@ constantes ::= NUM:n
 
 		RESULT = new ASTConst(n.longValue());
                :}
-             | NUM:n1 DOT NUM:n2 
+             | NFLOAT:f
                {:
                 Basico flo = new Basico(2);
 		
@@ -1131,7 +1132,6 @@ constantes ::= NUM:n
 		    }
 		}
 				
-		Double f = new Double(n1+"."+n2);
 		RESULT = new ASTConst(f.doubleValue());
                :}
              | TRUE
@@ -1575,9 +1575,8 @@ expresionarit ::= MINUS expresionarit:e1
 		   ASTConst aux = new ASTConst(n.longValue());
 		   RESULT = aux;
 		  :}
-               |  NUM:n1 DOT NUM:n2 
+               |  NFLOAT:f
 		  {:
-		   Double f = new Double(n1+"."+n2);
                    RESULT = new ASTConst(f.doubleValue()); 
                   :}
                |  IDENTIFIER:i acceso:a

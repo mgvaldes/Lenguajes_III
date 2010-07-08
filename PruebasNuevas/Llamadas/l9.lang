@@ -1,0 +1,47 @@
+//Comprobar que la recursión y el return con tipos básicos sirve.
+//Salida esperada: Factorial del número dado.
+
+int factorial(int n){
+
+    if(n<0){
+        print 'E'; print 'r'; print 'r'; print 'o'; print 'r';
+        print '\n';
+        return -1;
+    }
+    elif( n == 0 || n == 1){
+       return 1;
+    }
+    else{
+        return n*factorial(n-1);
+    }
+}
+
+
+void main{
+
+    print 'I'; print 'n'; print 'g'; print 'r'; print 'e'; print 's'; print 'e'; 
+    print ' '; 
+    print 'e'; print 'l'; 
+    print ' '; 
+    print 'n'; print 'u'; print 'm'; print 'e'; print 'r'; print 'o'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'f'; print 'a'; print 'c'; print 't'; print 'o'; print 'r'; print 'i'; print 'a'; print 'l'; 
+    print ' '; 
+    print 'a'; 
+    print ' '; 
+    print 'c'; print 'a'; print 'l'; print 'c'; print 'u'; print 'l'; print 'a'; print 'r'; print ':'; 
+    print ' '; 
+
+    int n = read int;
+
+    int resultado  = factorial(n);
+
+    print 'R'; print 'e';print 's';print 'u';print 'l';print 't';print 'a';print 'd';print 'o';print ':';
+    print ' ';
+    print resultado;
+    print '\n';
+
+}
+   

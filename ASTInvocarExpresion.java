@@ -8,11 +8,12 @@ public class ASTInvocarExpresion extends ASTExpresion {
     private LinkedList expresionEntrada;
     private SymProc procInfo;
 
-    public ASTInvocarExpresion(String n, LinkedList e, Tipo s) {
+    public ASTInvocarExpresion(String n, LinkedList e, Tipo s, SymProc pInfo) {
 	super("invocar", null, null);
 	nombre = n;
 	expresionEntrada = e;
 	state = s;
+	procInfo = pInfo;
     }
 
     public void setNombre(String n) {
@@ -45,7 +46,6 @@ public class ASTInvocarExpresion extends ASTExpresion {
     }
 
     public void generateCode(Writer fd, int nextReg, String si, String no) throws IOException {
-
         AssemblerInfo.saveRegLlamado(fd, nextReg);
 
         InvocarUtilities.empilarParametros(fd, 0, expresionEntrada, procInfo);
@@ -54,12 +54,10 @@ public class ASTInvocarExpresion extends ASTExpresion {
 
         desempilarParametros(fd, 0, si, no);
 
-        AssemblerInfo.restoreRegLlamado(fd, nextReg);
-         
+        AssemblerInfo.restoreRegLlamado(fd, nextReg);         
     }
 
-    public void desempilarParametros(Writer fd, int nextReg, String si, String no) throws IOException{
-
+    public void desempilarParametros(Writer fd, int nextReg, String si, String no) throws IOException {
         Object [] expresiones = expresionEntrada.toArray();
         Object [] ref =  procInfo.getRef().toArray();
         Object [] tsource =  procInfo.getIn().toArray();
@@ -93,7 +91,6 @@ public class ASTInvocarExpresion extends ASTExpresion {
             else
                 for(int k = 0; k < tam; k+=8)
                     fd.write("pop "+reg+"\n");
-
         }
 
         if(state instanceof Basico && ((Basico) state).getNBasico() == 3){
@@ -102,7 +99,5 @@ public class ASTInvocarExpresion extends ASTExpresion {
             fd.write("je "+si+"\n");
             fd.write("jmp "+no+"\n");
         }
-
     }
-
 }

@@ -101,7 +101,7 @@ public class ASTAsignacion extends ASTInstruccion {
 		int offset;
 		Tipo aux_state;
 		Tipo base_id_type;
-		Tipo base_expr_type; // Solo para que no chille
+		Tipo base_expr_type;
 		
 		while(it.hasNext()) {
 		    id = (ASTIdentificador)it.next();
@@ -118,6 +118,11 @@ public class ASTAsignacion extends ASTInstruccion {
 			    fd.write("mov " + reg + ", [" + reg + "]\n");
 			    
 			    base_expr_type = ((ASTIdentificador)expr).getTipoAcceso(expr_state, ((ASTIdentificador)expr).getAcceso());				
+			}
+			else if (expr instanceof ASTInvocarExpresion) {
+			    System.out.println("aquiiiiiiiiiiiiiii");
+			    base_expr_type = ((SymProc)((ASTInvocarExpresion)expr).getProcInfo()).getState();
+			    fd.write("pop " + reg + "\n");
 			}
 			else {
 			    base_expr_type = expr_state;

@@ -1661,7 +1661,7 @@ llamadafuncion ::= IDENTIFIER:i PARLEFT PARRIGHT
 			else
 			    parser.custom_error("El procedimiento/funcion "+i+" no ha sido declarado");
                     }
-		    		    
+
 		    ASTInvocar re  = new ASTInvocar(i, l, state);		    
 
 		    if(s != null) {

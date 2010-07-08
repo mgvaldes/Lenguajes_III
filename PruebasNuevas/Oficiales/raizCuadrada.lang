@@ -36,7 +36,7 @@ int main{
 
         while (inf != sup && !enc) {
 
-            const float k = (inf + sup) / 2;
+            const float k = (inf + sup) / 2.0;
 
             if (k*k > x) {
                 z = k*k - x;

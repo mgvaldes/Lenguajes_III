@@ -321,8 +321,8 @@ instruccion ::= declaracion:d SEQ {: RESULT = d; :}
 		 
 		 Tipo t = parser.tipoactualfun;
 		 
-		 if (!t.equals(e.getState()))
-		     parser.custom_error("Tiene que retornar un "+t);
+		 if (t.asign(e.getState()) == null)
+		     parser.custom_error("Tiene que retornar un tipo compatible con "+t);
 
 		 RESULT = i;
                 :}

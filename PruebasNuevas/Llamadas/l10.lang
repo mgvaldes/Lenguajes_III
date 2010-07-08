@@ -15,7 +15,10 @@ int fibonnaci(int n){
        return 1;
     }
     else{
-        return fibonnaci(n-1)+fibonnaci(n-2);
+	int n1 = fibonnaci(n-1);
+	int n2 = fibonnaci(n-2);
+	return (n1 + n2);
+        //return (fibonnaci(n-1) + fibonnaci(n-2));
     }
 }
 

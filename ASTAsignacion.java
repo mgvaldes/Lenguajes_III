@@ -158,10 +158,9 @@ public class ASTAsignacion extends ASTInstruccion {
 			}
 			else if (expr instanceof ASTInvocarExpresion) {
 			    int offs = ((Arreglo)aux_state).getTam() - 8;
-			    System.out.println("aqui: " + offs);
 			    base_id_type = ((Arreglo)aux_state).getTipoBase();
 			    base_expr_type = ((Arreglo)((SymProc)((ASTInvocarExpresion)expr).getProcInfo()).getState()).getTipoBase();
-			    
+
 			    cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
 			    while (offs >= 0) {
 				fd.write("pop " + reg + "\n");
@@ -219,6 +218,24 @@ public class ASTAsignacion extends ASTInstruccion {
 			    }
 			    AssemblerInfo.restoreReg(fd, nextReg + 2);
 			}
+			else if (expr instanceof ASTInvocarExpresion) {
+			    int offs = ((Registro)aux_state).getTam() - 8;
+			    int pos = ((Registro)aux_state).getTam()/8 - 1;
+
+			    while (offs >= 0) {
+				base_id_type = (Tipo)((LinkedList)((Registro)aux_state).getTipos()).get(pos);
+				base_expr_type = (Tipo)((LinkedList)((Registro)expr.getState()).getTipos()).get(pos);
+				cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+
+				fd.write("pop " + reg + "\n");
+				if (cast != null) {
+				    cast.generateCode(fd, nextReg, "", "");
+				}
+				fd.write("mov [" + reg1 + " - " + offs + "], " + reg + "\n");
+				offs -= 8;
+				pos--;
+			    }
+			}
 			else {
 			    base_id_type = ((ASTIdentificador)id).getTipoAcceso(aux_state, ((ASTIdentificador)id).getAcceso());
 			    base_expr_type = new Basico(0); // Solo para que no chille
@@ -265,6 +282,24 @@ public class ASTAsignacion extends ASTInstruccion {
 				pos++;
 			    }
 			    AssemblerInfo.restoreReg(fd, nextReg + 2);
+			}
+			else if (expr instanceof ASTInvocarExpresion) {
+			    int offs = ((Union)aux_state).getTam() - 8;
+			    int pos = ((Union)aux_state).getTam()/8 - 1;
+
+			    while (offs >= 0) {
+				base_id_type = (Tipo)((LinkedList)((Union)aux_state).getTipos()).get(pos);
+				base_expr_type = (Tipo)((LinkedList)((Union)expr.getState()).getTipos()).get(pos);
+				cast = AssemblerInfo.checkCast(base_id_type, base_expr_type);
+
+				fd.write("pop " + reg + "\n");
+				if (cast != null) {
+				    cast.generateCode(fd, nextReg, "", "");
+				}
+				fd.write("mov [" + reg1 + " - " + offs + "], " + reg + "\n");
+				offs -= 8;
+				pos--;
+			    }
 			}
 			else {
 			    base_id_type = ((ASTIdentificador)id).getTipoAcceso(aux_state, ((ASTIdentificador)id).getAcceso());

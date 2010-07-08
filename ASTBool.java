@@ -226,7 +226,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
-		    fd.write("jl " + si + "\n");
+		    fd.write("jg " + si + "\n");
 		    fd.write("jmp " + no + "\n");
 	        }
 	        else if (value.compareTo("<=") == 0) {
@@ -254,7 +254,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
-		    fd.write("jle " + si + "\n");
+		    fd.write("jge " + si + "\n");
 		    fd.write("jmp " + no + "\n");
 	        }
 	        else if (value.compareTo(">") == 0) {
@@ -283,7 +283,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
-		    fd.write("jg " + si + "\n");
+		    fd.write("jl " + si + "\n");
 		    fd.write("jmp " + no + "\n");
 	        }
 	        else{
@@ -312,7 +312,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("pop " + reg + "\n");
 
                     AssemblerInfo.restoreReg(fd, nextReg + 1);
-		    fd.write("jge " + si + "\n");
+		    fd.write("jle " + si + "\n");
 		    fd.write("jmp " + no + "\n");
 	        }
                 break;

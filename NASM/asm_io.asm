@@ -37,6 +37,7 @@
 
 section .bss
    static resb 5
+   memfpu resb 108
 
 section .rodata
     int_format  db  "%li", 0
@@ -96,6 +97,7 @@ section .text
 
     print_float:
         prologue
+        fsave [memfpu]
 
         ;Signo
         mov  rax, rdi
@@ -131,6 +133,7 @@ section .text
         sub  rdi, 52
         call print_int
 
+        frstor [memfpu]
         epilogue
         
     print_reg:

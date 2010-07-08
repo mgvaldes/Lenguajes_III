@@ -1,7 +1,7 @@
 //Comprobar que efictavamente los parametros son pasados por valor y que pueden
 //ser modificados dentro del procedimiento. Tambien que se puedan hacer llamadas
 //dentro de un procedimiento.
-//Salida Esperada: Impresion de 3,a y 3.
+//Salida Esperada: Impresion de 3,5,a y 3.
 
 void cualquiercosa(){
   print 'a';
@@ -13,6 +13,8 @@ void otracosa(int a, int b){
   int z = a;
   print z;
   print '\n';
+  print b;
+  print '\n';
   cualquiercosa();
 
 }
@@ -20,7 +22,7 @@ void otracosa(int a, int b){
 
 int main{
   int a = 3;
-  otracosa(a,a);
+  otracosa(a,5);
   print a;
   print '\n';
 }

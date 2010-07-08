@@ -158,7 +158,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
-                    fd.write("fincstp\n");
+                    fd.write("finit\n");
 
                     fd.write("pop " + nreg + "\n");
                     fd.write("pop " + reg + "\n");
@@ -189,7 +189,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
-                    fd.write("fincstp\n");
+                    fd.write("finit\n");
 
                     fd.write("pop " + nreg + "\n");
                     fd.write("pop " + reg + "\n");
@@ -220,7 +220,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
-                    fd.write("fincstp\n");
+                    fd.write("finit\n");
 
                     fd.write("pop " + nreg + "\n");
                     fd.write("pop " + reg + "\n");
@@ -248,7 +248,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
-                    fd.write("fincstp\n");
+                    fd.write("finit\n");
 
                     fd.write("pop " + nreg + "\n");
                     fd.write("pop " + reg + "\n");
@@ -277,7 +277,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
-                    fd.write("fincstp\n");
+                    fd.write("finit\n");
 
                     fd.write("pop " + nreg + "\n");
                     fd.write("pop " + reg + "\n");
@@ -306,7 +306,7 @@ public class ASTBool extends ASTExpresion {
                     fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 
                     fd.write("fcomip st1\n");
-                    fd.write("fincstp\n");
+                    fd.write("finit\n");
 
                     fd.write("pop " + nreg + "\n");
                     fd.write("pop " + reg + "\n");

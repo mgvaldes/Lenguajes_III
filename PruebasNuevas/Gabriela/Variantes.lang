@@ -1,0 +1,444 @@
+typedef struct{
+    char[100] xs;
+    char[100] ys;
+    char[100] zs;
+    int nxs;
+    int nys;
+    int nzs;
+    int[100] as;
+    int nas;
+    bool[100] bs;
+    int nbs;
+    float[100] rs;
+    int nrs;
+} Registro;
+
+void leerLetras (char[100] cs, int ncs) {
+
+    for (int i = 0; i < ncs; i++) {
+        print 'I'; print 'n'; print 't'; print 'r'; print 'o'; print 'd'; print 'u'; print 'z'; print 'c'; print 'a'; 
+        print ' '; 
+        print 'l'; print 'a'; 
+        print ' '; 
+        print 'l'; print 'e'; print 't'; print 'r'; print 'a'; 
+        print ' ';
+        print i; print ':';
+        print ' ';
+        cs[i] = read char;
+    }
+
+}
+
+void pasarArregloCaracteresAArregloVariantes(char[100] cs, int ncs,
+                                             union{
+                                                struct{
+                                                    char x;
+                                                    char y;
+                                                    char z;
+                                                } Variante0;
+
+                                                struct{
+                                                    int a;
+                                                    bool b;
+                                                } Variante1;
+
+                                                float Variante2;
+                                             }[100] vs) {
+    for (int i = 0; i < ncs; i++) {
+
+        char c = cs[i];
+        switch (c) {
+            case 'a':
+            case 'e':
+            case 'o':
+                 char c0, c1;
+                 if (i < ncs - 2) {
+                     c0 = cs[i+1];
+                     c1 = cs[i+2];
+                 } elif (i < ncs - 1) {
+                     c0 = cs[i+1];
+                     c1 = c0;
+                 } else {
+                     c0 = c;
+                     c1 = c;
+                 }                     
+                 vs[i] = {Variante0 = {x = c; y = c0; z = c1}};
+                 break;
+            case 'i':
+            case 'u':
+                 vs[i] = {Variante1 = {a = i; b = c == 'i'}};
+                 break;
+            default:
+                 vs[i] = {Variante2 = (i/3.0)};
+        }
+    }
+}
+
+void vaciarArregloVariantesEnRegistro ( union{
+                                            struct{
+                                                char x;
+                                                char y;
+                                                char z;
+                                            } Variante0;
+
+                                            struct{
+                                                int a;
+                                                bool b;
+                                            } Variante1;
+
+                                            float Variante2;
+                                        }[100] vs, int nvs, Registro r) {
+
+    for (int i = 0; i < nvs; i++) {
+
+        union{
+           struct{
+               char x;
+               char y;
+               char z;
+           } Variante0;
+
+           struct{
+               int a;
+               bool b;
+           } Variante1;
+
+           float Variante2;
+        }v = vs[i];
+
+        if (v hasactive Variante0) {
+            r.xs[r.nxs] = v.Variante0.x;
+            r.nxs++;
+            r.ys[r.nys] = v.Variante0.y;
+            r.nys++;
+            r.zs[r.nzs] = v.Variante0.z;
+            r.nzs++;
+        } elif (v hasactive Variante1) {
+            r.as[r.nas] = v.Variante1.a;
+            r.nas++;
+            r.bs[r.nbs] = v.Variante1.b;
+            r.nbs++;
+        } elif (v hasactive Variante2) {
+            r.rs[r.nrs] = v.Variante2;
+            r.nrs++;
+        }
+        else{}
+    }
+}
+
+void escribirVariante ( union{
+                            struct{
+                                char x;
+                                char y;
+                                char z;
+                            } Variante0;
+
+                            struct{
+                                int a;
+                                bool b;
+                            } Variante1;
+
+                            float Variante2;
+                         } v) {
+
+    if (v hasactive Variante0) {
+        print 'V'; print 'a'; print 'r'; print 'i'; print 'a'; print 'n'; print 't'; print 'e'; 
+        print ' '; 
+        print '0'; print ':'; 
+        print ' '; 
+        print '('; print v.Variante0.x; print ','; 
+        print ' '; 
+        print v.Variante0.y; print ','; 
+        print ' '; 
+        print v.Variante0.z; print ')'; 
+        print '\n'; 
+    } elif (v hasactive Variante1) {
+        print 'V'; print 'a'; print 'r'; print 'i'; print 'a'; print 'n'; print 't'; print 'e'; 
+        print ' '; 
+        print '0'; print ':'; 
+        print ' '; 
+        print '('; print v.Variante1.a; print ','; 
+        print ' '; 
+        print v.Variante1.b; print ')'; 
+        print '\n'; 
+    } elif (v hasactive Variante2) {
+        print 'V'; print 'a'; print 'r'; print 'i'; print 'a'; print 'n'; print 't'; print 'e'; 
+        print ' '; 
+        print '0'; print ':'; 
+        print ' '; 
+        print '('; print v.Variante2; print ')'; 
+        print '\n'; 
+    }
+    else{}
+
+}
+
+void escribirArregloCaracteres(char[100] cs, int ncs) {
+    
+    for (int i = 0; i < ncs; i++) {
+        print 'E'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; 
+        print ' '; 
+        print i;
+        print ':'; 
+        print ' ';
+        print cs[i]; 
+        print '\n';
+    }
+}
+
+void escribirArregloEnteros(int[100] es, int nes) {
+    
+    for (int i = 0; i < nes; i++) {
+        print 'E'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; 
+        print ' '; 
+        print i;
+        print ':'; 
+        print ' ';
+        print es[i]; 
+        print '\n';
+    } 
+}
+
+void escribirArregloBooleanos(bool[100] bs, int nbs) {
+    
+    for (int i = 0; i < nbs; i++) {
+        print 'E'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; 
+        print ' '; 
+        print i;
+        print ':'; 
+        print ' ';
+        print bs[i]; 
+        print '\n';
+    }        
+}
+
+void escribirArregloReales(float[100] rs, int nrs) {
+    
+    for (int i = 0; i < nrs; i++) {
+        print 'E'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; 
+        print ' '; 
+        print i;
+        print ':'; 
+        print ' ';
+        print rs[i]; 
+        print '\n';
+    }        
+}
+
+
+void escribirContenidoRegistro (Registro r) {
+
+    print 'E'; print 'l'; 
+    print ' '; 
+    print 'a'; print 'r'; print 'r'; print 'e'; print 'g'; print 'l'; print 'o'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'x'; print '\''; print 's'; 
+    print ' '; 
+    print 'e'; print 'n'; 
+    print ' '; 
+    print 'e'; print 'l'; 
+    print ' '; 
+    print 'r'; print 'e'; print 'g'; print 'i'; print 's'; print 't'; print 'r'; print 'o'; 
+    print ' '; 
+    print 'c'; print 'o'; print 'n'; print 't'; print 'i'; print 'e'; print 'n'; print 'e'; 
+    print ' ';
+    print r.nxs;
+    print ' ';
+    print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; print 's';
+    print '\n';
+    escribirArregloCaracteres(r.xs, r.nxs);
+
+    print 'E'; print 'l'; 
+    print ' '; 
+    print 'a'; print 'r'; print 'r'; print 'e'; print 'g'; print 'l'; print 'o'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'y'; print '\''; print 's'; 
+    print ' '; 
+    print 'e'; print 'n'; 
+    print ' '; 
+    print 'e'; print 'l'; 
+    print ' '; 
+    print 'r'; print 'e'; print 'g'; print 'i'; print 's'; print 't'; print 'r'; print 'o'; 
+    print ' '; 
+    print 'c'; print 'o'; print 'n'; print 't'; print 'i'; print 'e'; print 'n'; print 'e'; 
+    print ' ';
+    print r.nys;
+    print ' ';
+    print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; print 's';
+    print '\n';
+    escribirArregloCaracteres(r.ys, r.nys);
+    
+    print 'E'; print 'l'; 
+    print ' '; 
+    print 'a'; print 'r'; print 'r'; print 'e'; print 'g'; print 'l'; print 'o'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'z'; print '\''; print 's'; 
+    print ' '; 
+    print 'e'; print 'n'; 
+    print ' '; 
+    print 'e'; print 'l'; 
+    print ' '; 
+    print 'r'; print 'e'; print 'g'; print 'i'; print 's'; print 't'; print 'r'; print 'o'; 
+    print ' '; 
+    print 'c'; print 'o'; print 'n'; print 't'; print 'i'; print 'e'; print 'n'; print 'e'; 
+    print ' ';
+    print r.nzs;
+    print ' ';
+    print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; print 's';
+    print '\n';
+    escribirArregloCaracteres(r.zs, r.nzs);
+
+    print 'E'; print 'l'; 
+    print ' '; 
+    print 'a'; print 'r'; print 'r'; print 'e'; print 'g'; print 'l'; print 'o'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'a'; print '\''; print 's'; 
+    print ' '; 
+    print 'e'; print 'n'; 
+    print ' '; 
+    print 'e'; print 'l'; 
+    print ' '; 
+    print 'r'; print 'e'; print 'g'; print 'i'; print 's'; print 't'; print 'r'; print 'o'; 
+    print ' '; 
+    print 'c'; print 'o'; print 'n'; print 't'; print 'i'; print 'e'; print 'n'; print 'e'; 
+    print ' ';
+    print r.nas;
+    print ' ';
+    print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; print 's';
+    print '\n';
+    escribirArregloEnteros(r.as, r.nas);
+
+    print 'E'; print 'l'; 
+    print ' '; 
+    print 'a'; print 'r'; print 'r'; print 'e'; print 'g'; print 'l'; print 'o'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'b'; print '\''; print 's'; 
+    print ' '; 
+    print 'e'; print 'n'; 
+    print ' '; 
+    print 'e'; print 'l'; 
+    print ' '; 
+    print 'r'; print 'e'; print 'g'; print 'i'; print 's'; print 't'; print 'r'; print 'o'; 
+    print ' '; 
+    print 'c'; print 'o'; print 'n'; print 't'; print 'i'; print 'e'; print 'n'; print 'e'; 
+    print ' ';
+    print r.nbs;
+    print ' ';
+    print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; print 's';
+    print '\n';
+    escribirArregloBooleanos(r.bs, r.nbs);
+
+    print 'E'; print 'l'; 
+    print ' '; 
+    print 'a'; print 'r'; print 'r'; print 'e'; print 'g'; print 'l'; print 'o'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'r'; print '\''; print 's'; 
+    print ' '; 
+    print 'e'; print 'n'; 
+    print ' '; 
+    print 'e'; print 'l'; 
+    print ' '; 
+    print 'r'; print 'e'; print 'g'; print 'i'; print 's'; print 't'; print 'r'; print 'o'; 
+    print ' '; 
+    print 'c'; print 'o'; print 'n'; print 't'; print 'i'; print 'e'; print 'n'; print 'e'; 
+    print ' ';
+    print r.nbs;
+    print ' ';
+    print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; print 's';
+    print '\n';
+    escribirArregloReales(r.rs, r.nrs);
+}
+
+void main{
+
+    print 'C'; print 'a'; print 'n'; print 't'; print 'i'; print 'd'; print 'a'; print 'd'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'l'; print 'e'; print 't'; print 'r'; print 'a'; print 's'; 
+    print ' '; 
+    print 'a'; 
+    print ' '; 
+    print 'l'; print 'e'; print 'e'; print 'r'; 
+    print ' '; 
+    print '('; print 'm'; print 'a'; print 'x'; print 'i'; print 'm'; print 'o'; 
+    print ' '; 
+    print '1'; print '0'; print '0'; print ')'; print ':'; 
+    print ' ';
+    int n = read int;
+
+    char[100] entrada;
+
+    union{
+       struct{
+           char x;
+           char y;
+           char z;
+       } Variante0;
+
+       struct{
+           int a;
+           bool b;
+       } Variante1;
+
+       float Variante2;
+    }[100] variantes;
+
+    char[100] cs0;
+    char[100] cs1;
+    char[100] cs2;
+    int[100] is;
+    bool[100] bs;
+    float[100] ds;
+
+    Registro r = {xs = cs0; ys = cs1; zs = cs2; nxs = 0; nys = 0; nzs = 0; 
+                  as = is; nas = 0; bs = bs; nbs = 0; rs = ds; nrs = 0};
+
+    leerLetras(entrada, n);
+
+    // Construcci'on del arreglo de variantes
+    pasarArregloCaracteresAArregloVariantes(entrada, n, variantes);
+
+    // Vaciado del contenido de los variantes en el registro de arreglos
+    vaciarArregloVariantesEnRegistro(variantes, n, r);
+
+    // Impresi'on del arreglo de variantes
+    print 'E'; print 'l'; 
+    print ' '; 
+    print 'a'; print 'r'; print 'r'; print 'e'; print 'g'; print 'l'; print 'o'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print 'v'; print 'a'; print 'r'; print 'i'; print 'a'; print 'n'; print 't'; print 'e'; print 's'; 
+    print ' '; 
+    print 'c'; print 'o'; print 'n'; print 't'; print 'i'; print 'e'; print 'n'; print 'e'; 
+    print ' ';
+    print n;
+    print ' '; 
+    print 'e'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; print 's';
+    print '\n';
+
+    for (int i = 0; i < n; i++) {
+        print 'E'; print 'l'; print 'e'; print 'm'; print 'e'; print 'n'; print 't'; print 'o'; 
+        print ' ';
+        print i;
+        print '\n';
+        escribirVariante(variantes[i]);
+    }
+
+    escribirContenidoRegistro(r);
+
+}
+

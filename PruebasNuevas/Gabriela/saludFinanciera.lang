@@ -1,0 +1,149 @@
+
+void main {
+
+    const int p = 12;
+
+    float[12] v;
+
+    print 'C'; print 'a'; print 'p'; print 'i'; print 't'; print 'a'; print 'l'; 
+    print ' '; 
+    print 'i'; print 'n'; print 'i'; print 'c'; print 'i'; print 'a'; print 'l'; print ':';
+    print ' '; 
+    float y = read float;
+    bool b;
+
+    for (int i = 0; i < p; i++) {
+        print 'V'; print 'a'; print 'l'; print 'o'; print 'r'; 
+        print ' '; 
+        print 'd'; print 'e'; 
+        print ' '; 
+        print 'v'; print '['; print i; print ']';
+        print ' ';
+        print ':';
+        print ' ';
+        v[i] = read float;
+    }
+
+
+    print 'L'; print 'a'; 
+    print ' '; 
+    print 'e'; print 'm'; print 'p'; print 'r'; print 'e'; print 's'; print 'a'; 
+    print ' '; 
+    print 't'; print 'e'; print 'n'; print 'i'; print 'a'; 
+    print ' '; 
+    print 'u'; print 'n'; 
+    print ' '; 
+    print 'c'; print 'a'; print 'p'; print 'i'; print 't'; print 'a'; print 'l'; 
+    print ' '; 
+    print 'i'; print 'n'; print 'i'; print 'c'; print 'i'; print 'a'; print 'l'; 
+    print ' '; 
+    print 'd'; print 'e';
+    print ' ';
+    print y;  
+    print '\n'; 
+
+    if(true){
+        float t;
+        int k;
+        char[3] x;
+
+        b = true;
+        t = 0;
+        k = 0;
+
+        while ( k < p ) {
+
+            b = b && (v[k] >= -0.1*y);
+            t = t + v[k];
+            k = k + 1;
+        }
+
+        b = (t > 0.05*y) && b;
+        y = y + t;
+
+        print 'S'; print 'u'; 
+        print ' '; 
+        print 'b'; print 'a'; print 'l'; print 'a'; print 'n'; print 'c'; print 'e'; 
+        print ' '; 
+        print 'a'; print 'c'; print 'u'; print 'm'; print 'u'; print 'l'; print 'a'; print 'd'; print 'o'; 
+        print ' '; 
+        print 'f'; print 'u'; print 'e'; 
+        print ' '; 
+        print 'd'; print 'e'; 
+        print ' ';
+        print t;
+        print '.';
+        print '\n'; 
+
+
+
+        if (t > 0.05*y) {
+            x = {' ',' ',' '};
+        } else {
+            x = {'n','o',' '};
+        }
+
+        print 'E'; print 'l'; 
+        print ' '; 
+        print 'b'; print 'a'; print 'l'; print 'a'; print 'n'; print 'c'; print 'e'; 
+        print ' '; 
+        print 'a'; print 'c'; print 'u'; print 'm'; print 'u'; print 'l'; print 'a'; print 'd'; print 'o'; 
+        print ' ';
+        print x[0];
+        print x[1];
+        print x[2];
+        print 'e'; print 's'; 
+        print ' '; 
+        print 'm'; print 'a'; print 'y'; print 'o'; print 'r'; 
+        print ' '; 
+        print 'a'; print 'l'; 
+        print ' '; 
+        print '5'; print '%'; 
+        print ' '; 
+        print 'd'; print 'e'; print 'l'; 
+        print ' '; 
+        print 'c'; print 'a'; print 'p'; print 'i'; print 't'; print 'a'; print 'l'; 
+        print ' '; 
+        print 'i'; print 'n'; print 'i'; print 'c'; print 'i'; print 'a'; print 'l';
+        print '\n'; 
+    }
+
+    print 'L'; print 'a'; 
+    print ' '; 
+    print 'e'; print 'm'; print 'p'; print 'r'; print 'e'; print 's'; print 'a'; 
+    print ' '; 
+    print 't'; print 'i'; print 'e'; print 'n'; print 'e'; 
+    print ' '; 
+    print 'u'; print 'n'; 
+    print ' '; 
+    print 'c'; print 'a'; print 'p'; print 'i'; print 't'; print 'a'; print 'l'; 
+    print ' '; 
+    print 'a'; print 'c'; print 't'; print 'u'; print 'a'; print 'l'; 
+    print ' '; 
+    print 'd'; print 'e'; 
+    print ' '; 
+    print y; 
+    print '\n'; 
+
+    if (b) {
+        print 'L'; print 'a'; 
+        print ' '; 
+        print 'e'; print 'm'; print 'p'; print 'r'; print 'e'; print 's'; print 'a'; 
+        print ' '; 
+        print 'e'; print 's'; 
+        print ' '; 
+        print 's'; print 'a'; print 'l'; print 'u'; print 'd'; print 'a'; print 'b'; print 'l'; print 'e';
+        print '\n'; 
+    } else {
+        print 'L'; print 'a'; 
+        print ' '; 
+        print 'e'; print 'm'; print 'p'; print 'r'; print 'e'; print 's'; print 'a'; 
+        print ' '; 
+        print 'n'; print 'o'; 
+        print ' '; 
+        print 'e'; print 's'; 
+        print ' '; 
+        print 's'; print 'a'; print 'l'; print 'u'; print 'd'; print 'a'; print 'b'; print 'l'; print 'e';
+        print '\n'; 
+    }
+}

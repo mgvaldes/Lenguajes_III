@@ -46,275 +46,74 @@ public class ASTBool extends ASTExpresion {
             switch(basicType){
                 case 1:
                 case 4:
-                if (value.compareTo("==") == 0) {
-		    left.generateCode(fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-                    fd.write("cmp " + reg + ", " + nreg + "\n");
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
+                left.generateCode(fd, nextReg, si, no);
+
+                if (left instanceof ASTIdentificador) 
+                    fd.write("mov " + reg + ", [" + reg + "]\n");
+
+                AssemblerInfo.saveReg(fd, nextReg + 1);
+                right.generateCode(fd, nextReg + 1, si, no);
+
+		if (right instanceof ASTIdentificador) 
+ 		    fd.write("mov " + nreg + ", [" + nreg + "]\n");
+
+                fd.write("cmp " + reg + ", " + nreg + "\n");
+                AssemblerInfo.restoreReg(fd, nextReg + 1);
+
+                if (value.compareTo("==") == 0) 
                     fd.write("je " + si + "\n");
-                    fd.write("jmp " + no + "\n");
-	        }
-	        else if (value.compareTo("!=") == 0) {
-		    left.generateCode(fd, nextReg, si, no);
-                    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-                    fd.write("cmp " + reg + ", " + nreg + "\n");
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else if (value.compareTo("!=") == 0) 
                     fd.write("jne " + si + "\n");
-                    fd.write("jmp " + no + "\n");
-	        }
-	        else if (value.compareTo("<") == 0) {
-		    left.generateCode(fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-		    fd.write("cmp " + reg + ", " + nreg + "\n");
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else if (value.compareTo("<") == 0) 
 		    fd.write("jl " + si + "\n");
-		    fd.write("jmp " + no + "\n");
-	        }
-	        else if (value.compareTo("<=") == 0) {
-		    left.generateCode(fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-		    fd.write("cmp " + reg + ", " + nreg + "\n");
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else if (value.compareTo("<=") == 0) 
 		    fd.write("jle " + si + "\n");
-		    fd.write("jmp " + no + "\n");
-	        }
-	        else if (value.compareTo(">") == 0) {
-		    left.generateCode( fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-		    fd.write("cmp " + reg + ", " + nreg + "\n");
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else if (value.compareTo(">") == 0) 
 		    fd.write("jg " + si + "\n");
-		    fd.write("jmp " + no + "\n");
-	        }
-	        else {
-		    left.generateCode(fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-		    fd.write("cmp " + reg + ", " + nreg + "\n");
-		    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else 
 		    fd.write("jge " + si + "\n");
-		    fd.write("jmp " + no + "\n");
-	        }
+
+                fd.write("jmp " + no + "\n");
                 break;
             case 2:
-	        if (value.compareTo("==") == 0) {
+                left.generateCode(fd, nextReg, si, no);
 
-		    left.generateCode(fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
+                if (left instanceof ASTIdentificador) 
+                    fd.write("mov " + reg + ", [" + reg + "]\n");
 
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
+                AssemblerInfo.saveReg(fd, nextReg + 1);
+                right.generateCode(fd, nextReg + 1, si, no);
+                if (right instanceof ASTIdentificador) {
+                    fd.write("mov " + nreg + ", [" + nreg + "]\n");
+                }
 
-                    fd.write("push " + reg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
+                fd.write("push " + reg + "\n");
+                fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
 			
-                    fd.write("push " + nreg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
+                fd.write("push " + nreg + "\n");
+                fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
+                fd.write("fcomip st1\n");
+                fd.write("finit\n");
 
-                    fd.write("fcomip st1\n");
-                    fd.write("finit\n");
+                fd.write("pop " + nreg + "\n");
+                fd.write("pop " + reg + "\n");
 
-                    fd.write("pop " + nreg + "\n");
-                    fd.write("pop " + reg + "\n");
+                AssemblerInfo.restoreReg(fd, nextReg + 1);
 
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        if (value.compareTo("==") == 0) 
                     fd.write("je " + si + "\n");
-                    fd.write("jmp " + no + "\n");
-                        
-	        }
-	        else if (value.compareTo("!=") == 0) {
-
-		    left.generateCode(fd, nextReg, si, no);
-
-                    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-
-                    fd.write("push " + reg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-			
-                    fd.write("push " + nreg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-
-                    fd.write("fcomip st1\n");
-                    fd.write("finit\n");
-
-                    fd.write("pop " + nreg + "\n");
-                    fd.write("pop " + reg + "\n");
-
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else if (value.compareTo("!=") == 0) 
                     fd.write("jne " + si + "\n");
-                    fd.write("jmp " + no + "\n");
-
-	        }
-	        else if (value.compareTo("<") == 0) {
-
-		    left.generateCode(fd, nextReg, si, no);
-
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-
-                    fd.write("push " + reg + "\n");
-                    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
-			
-                    fd.write("push " + nreg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-
-                    fd.write("fcomip st1\n");
-                    fd.write("finit\n");
-
-                    fd.write("pop " + nreg + "\n");
-                    fd.write("pop " + reg + "\n");
-
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else if (value.compareTo("<") == 0) 
 		    fd.write("jg " + si + "\n");
-		    fd.write("jmp " + no + "\n");
-	        }
-	        else if (value.compareTo("<=") == 0) {
-
-		    left.generateCode(fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-                    fd.write("push " + reg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-			
-                    fd.write("push " + nreg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-
-                    fd.write("fcomip st1\n");
-                    fd.write("finit\n");
-
-                    fd.write("pop " + nreg + "\n");
-                    fd.write("pop " + reg + "\n");
-
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else if (value.compareTo("<=") == 0) 
 		    fd.write("jge " + si + "\n");
-		    fd.write("jmp " + no + "\n");
-	        }
-	        else if (value.compareTo(">") == 0) {
-
-		    left.generateCode(fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-
-                    fd.write("push " + reg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-			
-                    fd.write("push " + nreg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-
-                    fd.write("fcomip st1\n");
-                    fd.write("finit\n");
-
-                    fd.write("pop " + nreg + "\n");
-                    fd.write("pop " + reg + "\n");
-
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else if (value.compareTo(">") == 0)
 		    fd.write("jl " + si + "\n");
-		    fd.write("jmp " + no + "\n");
-	        }
-	        else{
-
-		    left.generateCode(fd, nextReg, si, no);
-		    if (left instanceof ASTIdentificador) {
-			fd.write("mov " + reg + ", [" + reg + "]\n");
-		    }
-
-                    AssemblerInfo.saveReg(fd, nextReg + 1);
-                    right.generateCode(fd, nextReg + 1, si, no);
-		    if (right instanceof ASTIdentificador) {
-			fd.write("mov " + nreg + ", [" + nreg + "]\n");
-		    }
-
-                    fd.write("push " + reg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-			
-                    fd.write("push " + nreg + "\n");
-                    fd.write("fld qword [" + AssemblerInfo.getSp() + "]\n");
-
-                    fd.write("fcomip st1\n");
-                    fd.write("finit\n");
-
-                    fd.write("pop " + nreg + "\n");
-                    fd.write("pop " + reg + "\n");
-
-                    AssemblerInfo.restoreReg(fd, nextReg + 1);
+	        else
 		    fd.write("jle " + si + "\n");
-		    fd.write("jmp " + no + "\n");
-	        }
+
+                fd.write("jmp " + no + "\n");
                 break;
             default:
 	        if (value.compareTo("!") == 0) {

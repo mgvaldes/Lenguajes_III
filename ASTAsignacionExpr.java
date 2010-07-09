@@ -43,9 +43,20 @@ public class ASTAsignacionExpr extends ASTExpresion {
 	    String newno = AssemblerInfo.newLabel();
 	    String end = AssemblerInfo.newLabel();
 	    String reg = AssemblerInfo.getNombresRegAtPos(nextReg);
-	
-	    if (right.getState() instanceof Basico && ((Basico) right.getState()).getNBasico() == 3) {
-		right.generateCode(fd, nextReg, newsi, newno);
+
+            right.generateCode(fd, nextReg, newsi, newno);
+
+            if(right instanceof ASTIdentificador){
+
+                fd.write("mov "+reg+",["+reg+"]\n");
+
+		if(id.getTable().getParent() == null)
+		    fd.write("mov [static + " + ((SymVar)id.getTable().getSym(id.getValue())).getOffset() + "], "+reg+"\n");
+		else
+		    fd.write("mov ["+AssemblerInfo.getFp()+" - " + ((SymVar)id.getTable().getSym(id.getValue())).getOffset() + "], "+reg+"\n");
+            
+            }	
+	    else if (right.getState() instanceof Basico && ((Basico) right.getState()).getNBasico() == 3) {
 
 		fd.write(newsi + ":\n");
 		if(id.getTable().getParent() == null)
@@ -66,8 +77,6 @@ public class ASTAsignacionExpr extends ASTExpresion {
 
 	    }
 	    else{
-
-		right.generateCode(fd, nextReg, si, no);
 
 		if(id.getTable().getParent() == null)
 		    fd.write("mov [static + " + ((SymVar)id.getTable().getSym(id.getValue())).getOffset() + "], "+reg+"\n");

@@ -1,0 +1,23 @@
+//Se revisa que lo que se retorne este bien
+//Salida: Error.
+
+int fun1(int a, int b)
+{
+  if(a == 2)
+  {
+    return true;
+  }
+  elif( a == 3)
+  {
+    a = 3;
+  }
+  else
+  {
+    return a;
+  }
+}
+
+
+int main
+{
+}

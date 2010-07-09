@@ -1,0 +1,27 @@
+//Asignacion multiples con diferentes tipos
+//Salida: 45,45,45,45.0,-.
+
+int c = 45;
+
+int main
+{
+
+  int a = 3 + 2 -1 + c;
+  float d;
+  char f;
+
+  int b;
+
+  b = a = d = f = c;
+
+  print a;
+  print '\n';
+  print b;
+  print '\n';
+  print c;
+  print '\n';
+  print d;
+  print '\n';
+  print f;
+  print '\n';
+}

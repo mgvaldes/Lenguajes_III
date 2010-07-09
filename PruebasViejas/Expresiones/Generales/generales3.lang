@@ -1,0 +1,14 @@
+//Expresion booleana con char, enteros y flotantes
+//Salida: true
+
+int main{
+
+  float a = 3.2;
+  int b = 3;
+  char c = 'a';
+  bool d = ((a > b) || (b <= c)) && ((c != b) == (a == b));
+
+  print d;
+  print '\n';
+
+}

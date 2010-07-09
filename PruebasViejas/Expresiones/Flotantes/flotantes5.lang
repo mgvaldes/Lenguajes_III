@@ -1,0 +1,14 @@
+// Expresion con todas las operaciones
+// SALIDA: 89.15
+
+int main{
+
+  float a = 1.4;
+  float b = 2.8;
+  float c = 23.2;
+  a = (a+b)*c - c/b;
+
+  print a;
+  print '\n';
+
+}

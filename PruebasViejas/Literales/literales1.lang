@@ -1,0 +1,8 @@
+//Declaracion de un literal de un arreglo simple.
+//Salida: Sin errores.
+
+int main{
+
+  int [5] a = {1,2,3,4,5};
+
+}

@@ -1,0 +1,14 @@
+//Asignaciones a variables locales
+//Salida: 4,16.
+
+int main
+{
+
+  int a = 3 + 2 -1;
+  int b = a +3*4;
+
+  print a;
+  print '\n';
+  print b;
+  print '\n';
+}

@@ -1,0 +1,14 @@
+//No se pueden imprimir o leer expresiones o tipos complejos.
+//Salida: Errores.
+
+int main
+{
+  int[5] a;
+
+  print true || false;
+
+  print a;
+
+  read int[5];
+
+}

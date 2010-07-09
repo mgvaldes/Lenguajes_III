@@ -1,0 +1,28 @@
+//if con elif
+//Salida: 0.
+
+int main{
+
+  int a = 3;
+  int d = 2;
+
+  if ((a == d) || false)
+  {
+   a++;
+  }
+  elif(false)
+  {
+    a = 33;
+  }
+  elif( (a=d) != 2)
+  {
+    a--;
+  }
+  else{
+    a = 0;
+  }
+
+  print a;
+  print '\n';
+
+}

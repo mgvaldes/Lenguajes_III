@@ -468,7 +468,7 @@ listaatributos ::= listaatributos:l tipos:t IDENTIFIER:i SEQ
 		   :}
                 ;
 
-literales ::= literalarreglo:la {: 				 
+literales ::= literalarreglo:la {: 	
                                   ASTLiteralArreglo res = new ASTLiteralArreglo(la);
                                   parser.tipoactualur = null;
                                   res.updateState();

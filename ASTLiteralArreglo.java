@@ -29,7 +29,6 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
     public void finalCheck(Tipo real){
 
-
         if(real.asign(state) == null )
             state = null;
         else
@@ -61,8 +60,10 @@ public class ASTLiteralArreglo extends ASTExpresion {
 
 		refreshState(((Arreglo) real).getSub(),l);
 		
-		while(it.hasNext()) 
+		while(it.hasNext()) {
+                    l = (LinkedList) it.next();
 		    refreshState(((Arreglo) real).getSub(),l);
+                }
 		    
 	    }		
 	}

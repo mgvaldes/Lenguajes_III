@@ -14,7 +14,7 @@ void main{
    } estructura = {
                     a = { {1,2,3}; {4,5,6+10} };
                     b = { b = true && (false || true) };
-                    c = 0.02;
+                    c = 0.02
                   };
 
    print estructura.a[1][2];

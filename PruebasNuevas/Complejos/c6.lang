@@ -1,4 +1,4 @@
-//Se quiere comprobar que se indican en los errores a la hora de usasr un campo
+//Se quiere comprobar que se indican en los errores a la hora de usar un campo
 //de la union que no esta activo.
 //Salida esparada: Error indicando que lo dicho anteriormente.
 
@@ -9,6 +9,6 @@ void main{
      bool b;
    } u = { a = 3 };
 
-   u.b = 3;
+   u.b = true;
 
 }

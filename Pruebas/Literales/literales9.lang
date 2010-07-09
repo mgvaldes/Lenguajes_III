@@ -1,8 +1,0 @@
-//Error de tipos.
-//Salida: Error.
-
-int main{
-
-  union{ int a; int b; } estructuta = {a = true};
-
-}

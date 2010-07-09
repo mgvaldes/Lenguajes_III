@@ -1,8 +1,0 @@
-//Error ya que el campo c no existe.
-//Salida: Error.
-
-int main{
-
-  union{ int a; int b; } estructuta = {c = 2};
-
-}

@@ -1,14 +1,19 @@
 //Se quiere comprobar que las asignaciones en los arreglos funciona y además
 //que se indica si se sale del índice.
-//Salida Esperada: Impresion de 3 seguido de un error.
+//Salida Esperada: Impresion de 3 y 8 seguido de un error.
 
 void main{
 
-   int [4][2][5] arregloMejorado;
+   int [4][2][5] a;
 
-   a[1][2][1] = 3;
+   a[1][0][3] = 3;
 
-   print a1][2][1];
+   print a[1][0][3];
+   print '\n';
+
+   a[0][1][4] = a[1][0][3] +5;
+
+   print a[0][1][4];
    print '\n';
 
    a[1][10][1] = 3;

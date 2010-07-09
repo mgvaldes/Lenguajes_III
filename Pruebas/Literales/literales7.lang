@@ -1,8 +1,0 @@
-//Declaracion de un literal de una matriz.
-//Salida: Sin errores.
-
-int main{
-
-  int [5][2] a = {{1,2};{1,2};{1,2};{1,2}};
-
-}

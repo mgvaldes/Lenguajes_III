@@ -20,7 +20,7 @@ public class ASTAcceso {
 	if(hijo == null)
             hijo = h;
         else{
-            if( hijo instanceof ASTAcceso)
+            if( !(hijo instanceof ASTAccesoUR || hijo instanceof ASTAccesoArreglo))
                 hijo = h;
             else
                 hijo.setHijoFinal(h);

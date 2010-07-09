@@ -1,8 +1,0 @@
-//Error ya que solo se puede asignar un elemento a la vez en la union.
-//Salida: Error.
-
-int main{
-
-  union{ int a; int b; } estructuta = {a = 3; b = 2};
-
-}

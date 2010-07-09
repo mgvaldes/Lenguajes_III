@@ -666,7 +666,7 @@ acceso ::= acceso:a DOT IDENTIFIER:c
         |  acceso:a CORLEFT expresion:e CORRIGHT
            {:
 	    Tipo t = e.getState();
-		
+
 	    if (!(t instanceof Basico) && ((Basico) t).getNBasico() != 1)
 		parser.custom_error("Tiene que usar int para acceder a un arreglo");
 	    

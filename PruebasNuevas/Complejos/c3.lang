@@ -3,7 +3,7 @@
 
 void main{
 
-   int [4] arreglo;
+   int [4] a;
 
    a[5] = 2;
 

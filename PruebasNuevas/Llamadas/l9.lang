@@ -12,7 +12,8 @@ int factorial(int n){
        return 1;
     }
     else{
-        return n*factorial(n-1);
+        int otro = factorial(n-1);
+        return n*otro;
     }
 }
 

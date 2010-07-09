@@ -1,8 +1,0 @@
-//Declaracion de un literal de una estructura.
-//Salida: Sin errores.
-
-int main{
-
-  struct{ int a; int b; } estructuta = { a = 3; b = 2 };
-
-}

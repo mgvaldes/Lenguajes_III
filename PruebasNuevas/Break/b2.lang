@@ -1,0 +1,32 @@
+//Comprobar el uso de break en varios while anidados.
+//Impresion de 0, 0, 1, 2, 3, 4, 5, true y true
+
+void main{
+
+    int j = 0;
+
+    for(int i = 0; i< 5; i++){
+        print i;
+        print '\n';
+        while(j<10){
+            print j;
+            print '\n'; 
+            if(j == 5){
+                break;
+            }
+            j++;
+        }
+        if(j == 5){
+            print true;
+            print '\n';
+            break;
+        }
+
+    }
+
+    if(j == 5){
+        print true;
+        print '\n';
+    }
+
+}

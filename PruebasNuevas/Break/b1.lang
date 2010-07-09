@@ -1,0 +1,19 @@
+//Comprobar el uso de break en un ciclo simple.
+//Salida esperada: Impresion de 3
+
+void main{
+
+    int i;
+
+    for(i = 0; i< 5; i++){
+        
+        if(i > 2){
+            break;
+        }
+
+    }
+
+    print i;
+    print '\n';
+
+}

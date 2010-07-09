@@ -236,7 +236,7 @@ public class ASTAsignacion extends ASTInstruccion {
 		    }
 		    else if (aux_state instanceof Union) {
 			if (expr instanceof ASTLiteralUR) {
-			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Registro)id.getState());
+			    ((ASTLiteralUR)expr).generateCode(fd, nextReg + 1, (Union)id.getState());
 			}
 			else if (expr instanceof ASTIdentificador) {
 			    int offs = 0;

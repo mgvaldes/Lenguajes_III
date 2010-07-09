@@ -849,6 +849,7 @@ agreg\'o alguna instrucci\'on fuera de lo com\'un.\\
     En el caso de las funciones, adem\'as, devolver un valor del mismo tipo especificado en la declaraci\'on.\\
  
     Para las funciones es obligatorio devolver un valor. El siguiente ejemplo debe dar error:\\
+    \newpage
 
     \begin{verbatim}
       int a(bool b) {
@@ -1662,8 +1663,7 @@ A continuaci\'on se muestran todos los casos de pruebas con sus respectivas inte
 \begin{itemize}
 \item \textbf{Llamadas:}\\ \\
   \emph{Intenci\'on:}\\ \\
-  Ver que la generaci\'on de funciones y procedimientos funcione adecuadamente.\\
-
+  Ver que la generaci\'on de funciones y procedimientos funcione adecuadamente.\\ \\
   \emph{Casos:}\\ 
   \begin{table}[!hbp]
     \begin{tabular}{c c c c}
@@ -1686,6 +1686,18 @@ A continuaci\'on se muestran todos los casos de pruebas con sus respectivas inte
       l5.lang        & Ver que los casts esten        & I mpresi\'on de 3.0, & Correcto  \\ [1ex] 
                      & con los parametros valor/re-   & 4.2 y 4              &           \\ [1ex] 
                      & sultado                        &                      &           \\ [1ex] 
+      \hline
+    \end{tabular}    
+  \end{table}
+
+  \newpage
+
+  \begin{table}[!hbp]
+    \begin{tabular}{c c c c}
+      \hline            
+      \hline            
+      Caso de Prueba & Objetivo                       & Salida Esperada      & Resultado \\ [0.5ex]
+      \hline                          
       l6.lang        & Pasaje de parametros de un     & I mpresi\'on de 1    & Correcto  \\ [1ex] 
                      & arreglo sirve. Al igual que    &                      &           \\ [1ex] 
                      & el uso de literales.           &                      &           \\ [1ex] 
@@ -1702,7 +1714,6 @@ A continuaci\'on se muestran todos los casos de pruebas con sus respectivas inte
                      & sirve                          & dado                 &           \\ [1ex] 
       l11.lang       & el return de tipos comlejos    & I mpresi\'on  4, 11, & Incorrecto: Falla en la  \\ [1ex] 
                      & sirve                          & 2.03 y h.            & generaci\'on de c\'odigo  \\ [1ex] 
-
       \hline
     \end{tabular}    
   \end{table}
@@ -1712,6 +1723,8 @@ A continuaci\'on se muestran todos los casos de pruebas con sus respectivas inte
   Ver que los accesos y asignaciones a los complejos funcionan de forma correcta\\
 
   \emph{Casos:}\\ 
+
+  \newpage
   \begin{table}[!hbp]
     \begin{tabular}{c c c c}
       \hline            
@@ -1741,30 +1754,54 @@ A continuaci\'on se muestran todos los casos de pruebas con sus respectivas inte
 
 \item \textbf{Oficiales:}\\ \\
   \emph{Intenci\'on:}\\ \\
-  Estos son los casos de prueba obligarios para tods los grupos traducidos a este lenguaje espec\ifico.\\
+  Estos son los casos de prueba obligarios para tods los grupos traducidos a este lenguaje espec\'ifico.\\
 
-  \emph{Casos:}\\ 
+  \emph{Casos:}\\
+  \newpage
+
   \begin{table}[!hbp]
     \begin{tabular}{c c c c}
       \hline            
       \hline            
-      Caso de Prueba              & Objetivo    & Salida Esperada    & Resultado \\ [0.5ex]
+      Caso de Prueba              & Resultado \\ [0.5ex]
       \hline                          
-      fibIterativo.lang           &             &                    & Correcto  \\ [1ex] 
-      fibLogaritmico.lang         &             &                    & Correcto  \\ [1ex] 
-      generarPermutaciones.lang   &             &                    & Incorrecto: No compil\'o \\ [1ex] 
-      multiplicacionMatrices.lang &             &                    & Incorrecto: No compil\'o \\ [1ex]
-      raizCuadrada.lang           &             &                    & El programa se ejecuta sin problemas,  \\ [1ex] 
-                                  &             &                    & pero los valores aproximados de la ra\'iz  \\ [1ex] 
-                                  &             &                    & cuadrada no son buenos  \\ [1ex] 
-      saludFinanciera.lang        &             &                    & El programa se ejecut\'o sin problemas  \\ [1ex] 
-                                  &             &                    & es posible que tenga errores la eje-  \\ [1ex] 
-                                  &             &                    & cuci\'on en vista que siempre dio  \\ [1ex] 
-                                  &             &                    & que la empresa es saludable  \\ [1ex] 
-      variantes.lang              &             &                    & Incorrecto: no compil\'o  \\ [1ex] 
+      fibIterativo.lang           & Correcto  \\ [1ex] 
+      fibLogaritmico.lang         & Correcto  \\ [1ex] 
+      generarPermutaciones.lang   & Correcto \\ [1ex] 
+      multiplicacionMatrices.lang & Correcto \\ [1ex]
+      raizCuadrada.lang           & El programa se ejecuta sin problemas,  \\ [1ex] 
+                                  & pero los valores aproximados de la ra\'iz  \\ [1ex] 
+                                  & cuadrada no son buenos  \\ [1ex] 
+      saludFinanciera.lang        & El programa se ejecut\'o sin problemas  \\ [1ex] 
+                                  & es posible que tenga errores la eje-  \\ [1ex] 
+                                  & cuci\'on en vista que siempre dio  \\ [1ex] 
+                                  & que la empresa es saludable  \\ [1ex] 
+      variantes.lang              & Incorrecto: no compil\'o  \\ [1ex] 
       \hline
     \end{tabular}    
   \end{table}
+
+  %% \begin{table}[!hbp]
+  %%   \begin{tabular}{c c c c}
+  %%     \hline            
+  %%     \hline            
+  %%     Caso de Prueba              & Objetivo    & Salida Esperada    & Resultado \\ [0.5ex]
+  %%     \hline                          
+  %%     fibIterativo.lang           &             &                    & Correcto  \\ [1ex] 
+  %%     fibLogaritmico.lang         &             &                    & Correcto  \\ [1ex] 
+  %%     generarPermutaciones.lang   &             &                    & Incorrecto: No compil\'o \\ [1ex] 
+  %%     multiplicacionMatrices.lang &             &                    & Incorrecto: No compil\'o \\ [1ex]
+  %%     raizCuadrada.lang           &             &                    & El programa se ejecuta sin problemas,  \\ [1ex] 
+  %%                                 &             &                    & pero los valores aproximados de la ra\'iz  \\ [1ex] 
+  %%                                 &             &                    & cuadrada no son buenos  \\ [1ex] 
+  %%     saludFinanciera.lang        &             &                    & El programa se ejecut\'o sin problemas  \\ [1ex] 
+  %%                                 &             &                    & es posible que tenga errores la eje-  \\ [1ex] 
+  %%                                 &             &                    & cuci\'on en vista que siempre dio  \\ [1ex] 
+  %%                                 &             &                    & que la empresa es saludable  \\ [1ex] 
+  %%     variantes.lang              &             &                    & Incorrecto: no compil\'o  \\ [1ex] 
+  %%     \hline
+  %%   \end{tabular}    
+  %% \end{table}
 
 \end{itemize}
 

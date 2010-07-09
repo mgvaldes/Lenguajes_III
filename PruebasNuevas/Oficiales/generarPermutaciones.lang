@@ -1,5 +1,4 @@
 void mostrarArreglo (int ncs, char[9] cs) {
-
     int i;
 
     for (i = 0; i < ncs - 1; i++) {
@@ -12,19 +11,17 @@ void mostrarArreglo (int ncs, char[9] cs) {
     }
 }
 
-void swap (char[9] a, int p1, int p2) {
-
+void swap (char[9] &a, int p1, int p2) {
     char tmp = a[p1];
     a[p1] = a[p2];
     a[p2] = tmp;
 }
 
 void generarPermutacionesAux (int ncs, char[9] cs, int m) {
-
     if (m == 0) {
         mostrarArreglo(ncs, cs);
-    } elif (m > 0) {
-
+    } 
+    elif (m > 0) {
         int l;
 
         for (l = m - 1; l >= 0; l--) {
@@ -37,11 +34,10 @@ void generarPermutacionesAux (int ncs, char[9] cs, int m) {
 }
 
 void generarPermutaciones (int ncs, char[9] cs) {
-
     generarPermutacionesAux(ncs, cs, ncs);
 }
 
-void main{
+void main {
 
     /* inicializar en 9 en caso de s'olo manejar arreglos de tamaño 
        constante con valor conocido a momento de compilaci'on */
@@ -49,8 +45,7 @@ void main{
     int n = 9;
     char[9] cs;
 
-    for (int i = 0; i < n; i++) {
-
+    /*for (int i = 0; i < n; i++) {
         print 'C'; print 'a'; print 'r'; print 'a'; print 'c'; print 't'; print 'e'; print 'r'; 
         print ' '; 
         print i;
@@ -59,8 +54,9 @@ void main{
         print ' '; 
         print 'a'; print 'r'; print 'r'; print 'e'; print 'g'; print 'l'; print 'o'; print ':'; 
         print ' '; 
-        cs[i] = read char;
-    }
-  
+	cs[i] = read char;
+    }*/
+
+    cs = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'};
     generarPermutaciones(n, cs);
 }

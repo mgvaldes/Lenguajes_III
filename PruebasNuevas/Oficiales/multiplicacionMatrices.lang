@@ -1,4 +1,4 @@
-void leerMatriz34 (int N, int M, struct { float d; int i;}[3][4] rs) {
+void leerMatriz34 (int N, int M, struct { float d; int i;}[3][4] &rs) {
 
     for (int i = 0; i < N; i++) {
 
@@ -26,7 +26,7 @@ void leerMatriz34 (int N, int M, struct { float d; int i;}[3][4] rs) {
     }
 }
 
-void leerMatriz42 (int N, int M, struct { float d; int i;}[4][2] rs) {
+void leerMatriz42 (int N, int M, struct { float d; int i;}[4][2] &rs) {
 
     for (int i = 0; i < N; i++) {
 
@@ -57,7 +57,7 @@ void leerMatriz42 (int N, int M, struct { float d; int i;}[4][2] rs) {
 void productoMatrices (int M, int P, int N, 
                        struct { float d; int i;}[3][4] rs0, 
                        struct { float d; int i;}[4][2] rs1, 
-                       struct{ float[3][2] ds; int[3][2] is;} r) {
+                       struct{ float[3][2] ds; int[3][2] is;} &r) {
 
     for (int i = 0; i < M; i++) {
 
@@ -151,16 +151,7 @@ void main{
     struct{
         float[3][2] ds;
         int[3][2] is;
-    } resultado = { ds = { {resultado0[0][0], resultado0[0][1]};
-                           {resultado0[1][0], resultado0[2][1]};
-                           {resultado0[2][0], resultado0[2][1]} 
-                         };
-                    is = { {resultado1[0][0], resultado1[0][1]};
-                           {resultado1[1][0], resultado1[2][1]};
-                           {resultado1[2][0], resultado1[2][1]} 
-                         }
-                  };
-
+    } resultado;
 
     print 'L'; print 'e'; print 'y'; print 'e'; print 'n'; print 'd'; print 'o'; 
     print ' '; 

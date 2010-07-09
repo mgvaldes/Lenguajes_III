@@ -148,7 +148,7 @@ precedence left MULT, DIV, MOD;
 precedence nonassoc UMINUS, UNOT, MINUSMINUS, PLUSPLUS;
 
 programa ::= listadeclaraciones voidfun:t 
-             {: 
+             {:	      
                parser.promiseDeclared = true;
                parser.procDeclared = true;
                parser.noGlobal = true;
@@ -468,7 +468,7 @@ listaatributos ::= listaatributos:l tipos:t IDENTIFIER:i SEQ
 		   :}
                 ;
 
-literales ::= literalarreglo:la {: 
+literales ::= literalarreglo:la {: 				 
                                   ASTLiteralArreglo res = new ASTLiteralArreglo(la);
                                   parser.tipoactualur = null;
                                   res.updateState();

@@ -39,22 +39,27 @@ public class ASTIdentificador extends ASTExpresion {
     public Tipo getTipoAcceso(Tipo aux_type, ASTAcceso acc) {
 	Tipo t = aux_type;
 	ASTAcceso a = acc;
-
+	
 	while (a != null) {
-	    if (a instanceof ASTAccesoArreglo) {
-		t = ((Arreglo)t).getTipoBase();
-	    }
-	    else {
-		if (t instanceof Registro) {		    
-		    t = (Tipo)((LinkedList)((Registro)t).getTipos()).get(((LinkedList)((Registro)t).getCampos()).indexOf(((ASTAccesoUR)a).getCampo()));
+	    if (a.getHijo() != null) {
+		if (a instanceof ASTAccesoArreglo) {
+		    t = ((Arreglo)t).getSub();
+		    //t = ((Arreglo)t).getTipoBase();
+		    //return t;
 		}
-		else if (t instanceof Union) {
-		    t = (Tipo)((LinkedList)((Union)t).getTipos()).get(((LinkedList)((Union)t).getCampos()).indexOf(((ASTAccesoUR)a).getCampo()));
+		else {
+		    if (t instanceof Registro) {		    
+			t = (Tipo)((LinkedList)((Registro)t).getTipos()).get(((LinkedList)((Registro)t).getCampos()).indexOf(((ASTAccesoUR)a).getCampo()));
+		    }
+		    else if (t instanceof Union) {
+			t = (Tipo)((LinkedList)((Union)t).getTipos()).get(((LinkedList)((Union)t).getCampos()).indexOf(((ASTAccesoUR)a).getCampo()));
+		    }
+		
 		}
 	    }
 	    a = a.getHijo();
 	}
-
+	
 	return t;
     }
   

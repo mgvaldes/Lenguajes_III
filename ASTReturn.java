@@ -239,13 +239,14 @@ public class ASTReturn extends ASTInstruccion {
 		    }
 		}
 	    }
-	}
+	    fd.write("jmp "+returnLabel+"\n");
+	}	
     	catch (Exception e) {
             e.printStackTrace();
     	    System.out.println("Error escribiendo en archivo de salida");	    
     	}
     }
-
+x
     // public void generateCode(Writer fd, int nextReg, String breakLabel, String returnLabel) throws IOException {
     // 	try {
     // 	    String si = AssemblerInfo.newLabel();

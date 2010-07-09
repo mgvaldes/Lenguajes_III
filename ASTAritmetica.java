@@ -187,77 +187,34 @@ public class ASTAritmetica extends ASTExpresion {
 
 	    case 2:
 
-		if (value.compareTo("+") == 0) {
-		
-		    fd.write("push "+reg+"\n");
-		    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
-			
-		    fd.write("push "+nreg+"\n");
+                fd.write("push "+reg+"\n");
+                fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
+    
+                if(right != null)
+                    fd.write("push "+nreg+"\n");
+
+		if (value.compareTo("+") == 0) 
 		    fd.write("fadd qword ["+AssemblerInfo.getSp()+"]\n");
-			
-		    fd.write("fstp qword ["+AssemblerInfo.getSp()+" + 8]\n");
-		    
-		    fd.write("pop " + nreg + "\n");
-		    fd.write("pop " + reg + "\n");
-		    
-		}	 
 		else if (value.compareTo("-") == 0) {
-		
-		    if(right == null){
-
-			fd.write("push "+reg+"\n");
-			fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
-			
+		    if(right == null)
 			fd.write("fchs\n");
-		    
-			fd.write("fstp qword ["+AssemblerInfo.getSp()+"]\n");
-		    
-			fd.write("pop " + reg + "\n");
-
-		    }
-		    else{
-
-			fd.write("push "+reg+"\n");
-			fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
-			
-			fd.write("push "+nreg+"\n");
+		    else
 			fd.write("fsub qword ["+AssemblerInfo.getSp()+"]\n");
-		    
-			fd.write("fstp qword ["+AssemblerInfo.getSp()+" + 8]\n");
-		    
-			fd.write("pop " + nreg + "\n");
-			fd.write("pop " + reg + "\n");
-			
-		    }		    		    
 		}
-	        else if (value.compareTo("*") == 0) {
-		
-		    fd.write("push "+reg+"\n");
-		    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
-			
-		    fd.write("push "+nreg+"\n");
+	        else if (value.compareTo("*") == 0) 
 		    fd.write("fmul qword ["+AssemblerInfo.getSp()+"]\n");
-			
-		    fd.write("fstp qword ["+AssemblerInfo.getSp()+" + 8]\n");
-		    
-		    fd.write("pop " + nreg + "\n");
-		    fd.write("pop " + reg + "\n");
-
-		}
-		else if ((value.compareTo("/") == 0)) {
-		
-		    fd.write("push "+reg+"\n");
-		    fd.write("fld qword ["+AssemblerInfo.getSp()+"]\n");
-			
-		    fd.write("push "+nreg+"\n");
+		else
 		    fd.write("fdiv qword ["+AssemblerInfo.getSp()+"]\n");
-			
-		    fd.write("fstp qword ["+AssemblerInfo.getSp()+" + 8]\n");
-		    
-		    fd.write("pop " + nreg + "\n");
+                
+                if(right == null){
+                    fd.write("fstp qword ["+AssemblerInfo.getSp()+"]\n");
 		    fd.write("pop " + reg + "\n");
-
-		}
+                }
+                else{
+   		    fd.write("fstp qword ["+AssemblerInfo.getSp()+" + 8]\n");
+ 		    fd.write("pop " + nreg + "\n");
+                    fd.write("pop " + reg + "\n");
+                }
 		break;
 	    default:
 		break;
